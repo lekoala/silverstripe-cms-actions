@@ -1,10 +1,10 @@
 <?php
 
-namespace LeKoala\Base\Security;
+namespace LeKoala\CmsActions\Test;
 
-use SilverStripe\Forms\GridField\GridField;
-use LeKoala\Base\Forms\GridField\GridFieldRowButton;
 use SilverStripe\Dev\TestOnly;
+use LeKoala\CmsActions\GridFieldRowButton;
+use SilverStripe\Forms\GridField\GridField;
 
 /**
  * A test action
