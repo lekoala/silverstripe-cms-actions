@@ -1,0 +1,5 @@
+nl:
+  ActionsGridFieldItemRequest:
+    DONE: 'Actie {action} werd gedaan op {name}'
+    CREATEANDCLOSE: 'Creëren en sluiten'
+    SAVEANDCLOSE: 'Opslaan en sluiten'

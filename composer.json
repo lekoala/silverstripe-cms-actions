@@ -1,0 +1,52 @@
+{
+    "name": "lekoala/silverstripe-cms-actions",
+    "description": "Add actions to your models in SilverStripe",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "betterbuttons",
+        "buttons",
+        "actions",
+        "form",
+        "module",
+        "cms"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "LeKoala",
+            "email": "thomas@lekoala.be"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "silverstripe/recipe-plugin": "^1",
+        "silverstripe/recipe-cms": "^4.4"
+    },
+    "require-dev": {
+        "sminnee/phpunit": "^5.7",
+        "squizlabs/php_codesniffer": "^3.0"
+    },
+    "extra": {
+        "installer-name": "cms-actions",
+        "expose": [
+            "css"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "LeKoala\\CmsActions\\": "src/",
+            "LeKoala\\CmsActions\\Test\\": "tests/"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/lekoala/silverstripe-cms-actions/issues"
+    },
+    "scripts": {
+        "lint": "phpcs src/ tests/",
+        "lint-clean": "phpcbf src/ tests/",
+        "test": "phpunit -v"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

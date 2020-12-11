@@ -1,0 +1,31 @@
+#Form_ItemEditForm_action_doDelete.align-right {
+    position: absolute;
+    right: 1.5385rem;
+}
+
+.cms-content-header-utils {
+    padding-right: 1.5385rem;
+}
+
+#action_doSaveAndNext:before,
+.btn-icon-end:before {
+    float: right;
+    margin-right: 0;
+    margin-left: 6px;
+}
+
+.btn-toolbar .bb-align {
+    display: inline-block;
+    line-height: 32px;
+    padding-left: 1.5385rem;
+    padding-right: 1.5385rem;
+}
+
+label.btn {
+    margin-bottom: 0;
+}
+
+table .btn-link {
+    padding: 0;
+    margin: 0;
+}

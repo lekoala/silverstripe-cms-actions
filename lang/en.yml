@@ -1,0 +1,5 @@
+en:
+  ActionsGridFieldItemRequest:
+    DONE: 'Action {action} was done on {name}'
+    CREATEANDCLOSE: 'Create and Close'
+    SAVEANDCLOSE: 'Save and Close'

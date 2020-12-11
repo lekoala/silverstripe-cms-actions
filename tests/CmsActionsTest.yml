@@ -1,0 +1,6 @@
+'SilverStripe\Security\Member':
+  admin:
+    Email: admin@test.com
+'LeKoala\CmsActions\Test\Test_CmsActionsModel':
+  demo:
+    Name: demo
