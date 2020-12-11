@@ -133,7 +133,7 @@ This feature can be disabled with the `enable_save_prev_next` config flag
 
 You can also use the HasPrevNextUtils trait to add navigation in your utils as well.
 
-## Adding actions to GridField
+## Adding actions to a GridField row
 
 You can create new row actions by extending the `GridFieldRowButton`
 
@@ -206,6 +206,22 @@ set a d-none on it:
 
     $actions->push($downloadExcelReport = new CustomLink('downloadExcelReport', 'Download report'));
     $downloadExcelReport->addExtraClass('d-none');
+
+## Adding buttons to a whole GridField
+
+This is done using GridFieldTableButton
+
+    class MyGridButton extends GridFieldTableButton
+    {
+        protected $buttonLabel = 'Do stuff';
+        protected $fontIcon = 'do_stuff';
+
+        public function handle(GridField $gridField, Controller $controller)
+        {
+        }
+    }
+
+This class can then be added as a regular GridField component
 
 ## Adding actions in getCmsFields
 

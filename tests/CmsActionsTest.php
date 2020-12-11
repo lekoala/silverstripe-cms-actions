@@ -55,7 +55,8 @@ class CmsActionsTest extends SapphireTest
 
         $record = $this->getAdminMember();
 
-        $gridField = new GridField('testGridfield');
+        $list = Member::get();
+        $gridField = new GridField('testGridfield', null, $list);
         $detailForm = new GridFieldDetailForm('testDetailForm');
         $GridFieldDetailForm = new GridFieldDetailForm_ItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
         $form = $GridFieldDetailForm->ItemEditForm();
@@ -71,7 +72,8 @@ class CmsActionsTest extends SapphireTest
 
         $record = $this->getTestModel();
 
-        $gridField = new GridField('testGridfield');
+        $list = Test_CmsActionsModel::get();
+        $gridField = new GridField('testGridfield', null, $list);
         $detailForm = new GridFieldDetailForm('testDetailForm');
         $GridFieldDetailForm = new GridFieldDetailForm_ItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
         $form = $GridFieldDetailForm->ItemEditForm();
