@@ -8,6 +8,7 @@ use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use LeKoala\CmsActions\ActionsGridFieldItemRequest;
+use LeKoala\CmsActions\CustomLink;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
@@ -30,6 +31,8 @@ class CmsActionsTest extends SapphireTest
     public function setUp()
     {
         parent::setUp();
+        $controller = Controller::curr();
+        $controller->config()->set('url_segment', 'test_controller');
     }
 
     public function tearDown()
@@ -50,7 +53,6 @@ class CmsActionsTest extends SapphireTest
     public function getMemberForm()
     {
         $controller = Controller::curr();
-        $controller->config()->set('url_segment', 'test_controller');
         $form = new Form($controller);
 
         $record = $this->getAdminMember();
@@ -68,7 +70,6 @@ class CmsActionsTest extends SapphireTest
     public function getTestForm()
     {
         $controller = Controller::curr();
-        $controller->config()->set('url_segment', 'test_controller');
 
         $record = $this->getTestModel();
 
@@ -101,5 +102,37 @@ class CmsActionsTest extends SapphireTest
             $doSaveAndClose = $form->Actions()->fieldByName("MajorActions.action_doSaveAndClose");
         }
         $this->assertNotEmpty($doSaveAndClose);
+    }
+
+    public function testHasDefaultTitle()
+    {
+        $customLink = new CustomLink('doTest');
+        $this->assertEquals('Do test', $customLink->getTitle());
+    }
+
+    public function testConfirmationMessage()
+    {
+        $customLink = new CustomLink('doTest');
+        $customLink->setConfirmation(true);
+        $this->assertContains('sure', $customLink->getConfirmation());
+    }
+
+    public function testGridFieldAction()
+    {
+        $form = $this->getTestForm();
+        $action = new Test_GridFieldAction;
+
+        $record = $this->getTestModel();
+        $list = Test_CmsActionsModel::get();
+        $gridField = new GridField('testGridfield', null, $list);
+        $actionName = 'test';
+        $arguments = ['ID' => $record->ID];
+        $data = [];
+
+        $result = $action->doHandle($gridField, $actionName, $arguments, $data);
+
+        $this->assertEquals($actionName, $action->performedActionName);
+        $this->assertEquals($arguments, $action->performedArguments);
+        $this->assertEquals($data, $action->performedData);
     }
 }

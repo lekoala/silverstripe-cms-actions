@@ -1,5 +1,12 @@
 en:
   ActionsGridFieldItemRequest:
-    DONE: 'Action {action} was done on {name}'
     CREATEANDCLOSE: 'Create and Close'
+    DONE: 'Action {action} was done on {name}'
     SAVEANDCLOSE: 'Save and Close'
+    SAVEANDNEXT: 'Save and Next'
+    SAVEANDPREVIOUS: 'Save and Previous'
+  CustomButton:
+    CONFIRM_MESSAGE: 'Are you sure?'
+  HasPrevNextUtils:
+    Next: Next
+    Previous: Previous

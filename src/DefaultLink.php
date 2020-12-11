@@ -40,8 +40,9 @@ trait DefaultLink
         $ctrl = Controller::curr();
         $fieldName = $ctrl->getRequest()->param('ModelClass');
         $allParams = $ctrl->getRequest()->allParams();
+        $ID = $allParams['ID'] ?? 0;
         $params = array_merge(['CustomLink' => $action], $params);
-        $action = '/EditForm/field/' . $fieldName . '/item/' . $allParams['ID'] . '/doCustomLink';
+        $action = '/EditForm/field/' . $fieldName . '/item/' . $ID . '/doCustomLink';
 
         return $this->getControllerLink($action, $params);
     }

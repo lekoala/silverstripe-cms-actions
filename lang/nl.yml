@@ -1,5 +1,12 @@
 nl:
   ActionsGridFieldItemRequest:
-    DONE: 'Actie {action} werd gedaan op {name}'
     CREATEANDCLOSE: 'Creëren en sluiten'
+    DONE: 'Actie {action} werd gedaan op {name}'
     SAVEANDCLOSE: 'Opslaan en sluiten'
+    SAVEANDNEXT: 'Opslaan en volgende'
+    SAVEANDPREVIOUS: 'Opslaan en vorige'
+  CustomButton:
+    CONFIRM_MESSAGE: 'Weet je zeker dat?'
+  HasPrevNextUtils:
+    Next: 'De volgende'
+    Previous: Vorige
