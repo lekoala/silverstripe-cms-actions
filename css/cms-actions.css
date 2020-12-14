@@ -1,12 +1,16 @@
+/* Only necessary pre 4.4 */
 #Form_ItemEditForm_action_doDelete.align-right {
     position: absolute;
     right: 1.5385rem;
 }
 
+/* Add some spacing on the right */
 .cms-content-header-utils {
     padding-right: 1.5385rem;
 }
 
+/* It makes more sense to have the icon on the right
+You can also use it on your own classes with .btn-icon-end */
 #action_doSaveAndNext:before,
 .btn-icon-end:before {
     float: right;
@@ -14,6 +18,7 @@
     margin-left: 6px;
 }
 
+/* Align stuff in the toolbar */
 .btn-toolbar .bb-align {
     display: inline-block;
     line-height: 32px;
@@ -21,10 +26,10 @@
     padding-right: 1.5385rem;
 }
 
+/* Misc stuff - check if still necessary */
 label.btn {
     margin-bottom: 0;
 }
-
 table .btn-link {
     padding: 0;
     margin: 0;

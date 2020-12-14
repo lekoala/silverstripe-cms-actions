@@ -165,6 +165,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($RightGroup) {
                 // Stack position is enough to have it on the left
             } else {
+                // Only necessary pre 4.4
                 $deleteAction->addExtraClass('align-right');
             }
             // Set custom titlte
@@ -181,6 +182,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($RightGroup) {
                 // Stack position is enough to have it on the left
             } else {
+                // Only necessary pre 4.4
                 $cancelButton->addExtraClass('align-right');
             }
             // Set custom titlte
