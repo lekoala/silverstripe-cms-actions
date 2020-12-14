@@ -317,6 +317,11 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
         $message = null;
         $error = false;
+
+        // Check record BEFORE the action
+        // It can be deleted by the action and it will return to the list
+        $isNewRecord = $record->ID == 0;
+
         try {
             $result = $record->$action($data, $form, $controller);
 
@@ -344,7 +349,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $error = true;
             $message = $ex->getMessage();
         }
-        $isNewRecord = $record->ID == 0;
+
         // Build default message
         if (!$message) {
             $message = _t(
