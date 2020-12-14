@@ -284,49 +284,6 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * TODO: move to softdelete module
-     *
-     * @param [type] $actions
-     * @return void
-     */
-    public function softDeleteOnAfterUpdateCMSActions($actions)
-    {
-        $RightGroup = $actions->fieldByName('RightGroup');
-        $deleteAction = $actions->fieldByName('action_doDelete');
-        $undoDelete = $actions->fieldByName('action_doCustomAction[undoDelete]');
-        $forceDelete = $actions->fieldByName('action_doCustomAction[forceDelete]');
-        $softDelete = $actions->fieldByName('action_doCustomAction[softDelete]');
-        if ($softDelete) {
-            if ($deleteAction) {
-                $actions->remove($deleteAction);
-            }
-            if ($RightGroup) {
-                // Move at the end of the stack
-                $actions->remove($softDelete);
-                $actions->push($softDelete);
-                // Without this positionning fails and button is stuck near +
-                if ($RightGroup) {
-                    $softDelete->addExtraClass('default-position');
-                }
-            }
-        }
-        if ($forceDelete) {
-            if ($deleteAction) {
-                $actions->remove($deleteAction);
-            }
-            if ($RightGroup) {
-                // Move at the end of the stack
-                $actions->remove($forceDelete);
-                $actions->push($forceDelete);
-                // Without this positionning fails and button is stuck near +
-                if ($RightGroup) {
-                    $forceDelete->addExtraClass('default-position');
-                }
-            }
-        }
-    }
-
-    /**
      * Forward a given action to a DataObject
      *
      * Action must be declared in getCMSActions to be called
