@@ -77,7 +77,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
 
     public function getActionName()
     {
-        $class = (new ReflectionClass($this->record))->getShortName();
+        $class = (new ReflectionClass(get_called_class()))->getShortName();
         // ! without lowercase, in does not work
         return strtolower(str_replace('Button', '', $class));
     }
