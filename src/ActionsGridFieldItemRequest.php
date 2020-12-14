@@ -181,7 +181,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($RightGroup) {
                 // Stack position is enough to have it on the left
             } else {
-                $deleteAction->addExtraClass('align-right');
+                $cancelButton->addExtraClass('align-right');
             }
             // Set custom titlte
             if ($record->hasMethod('getCancelButtonTitle')) {
