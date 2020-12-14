@@ -265,8 +265,10 @@ class ActionsGridFieldItemRequest extends DataExtension
         $saveAndClose = new FormAction('doSaveAndClose', $label);
         $saveAndClose->addExtraClass($this->getBtnClassForRecord($record));
         $saveAndClose->setAttribute('data-text-alternate', $label);
-        $saveAndClose->setAttribute('data-btn-alternate-add', 'btn-primary');
-        $saveAndClose->setAttribute('data-btn-alternate-remove', 'btn-outline-primary');
+        if ($record->ID) {
+            $saveAndClose->setAttribute('data-btn-alternate-add', 'btn-primary');
+            $saveAndClose->setAttribute('data-btn-alternate-remove', 'btn-outline-primary');
+        }
         $saveAndClose->addExtraClass('font-icon-level-up');
         $saveAndClose->setUseButtonTag(true);
         $MajorActions->push($saveAndClose);
