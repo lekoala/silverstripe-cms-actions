@@ -29,6 +29,11 @@ trait CustomButton
     protected $confirmation;
 
     /**
+     * @var bool
+     */
+    protected $noChangeTrack = true;
+
+    /**
      * Get the title of the link
      * Called by ActionsGridFieldItemRequest to build default message
      *
@@ -127,6 +132,27 @@ trait CustomButton
             $confirmation = _t('CustomButton.CONFIRM_MESSAGE', 'Are you sure?');
         }
         $this->confirmation = $confirmation;
+        return $this;
+    }
+
+    /**
+     * Get the value of noChangeTrack
+     * @return bool
+     */
+    public function getNoChangeTrack()
+    {
+        return $this->noChangeTrack;
+    }
+
+    /**
+     * Set the value of noChangeTrack
+     *
+     * @param bool $noChangeTrack
+     * @return $this
+     */
+    public function setNoChangeTrack($noChangeTrack)
+    {
+        $this->noChangeTrack = $noChangeTrack;
         return $this;
     }
 }

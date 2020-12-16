@@ -50,7 +50,12 @@ class CustomLink extends LiteralField
 
         $title = $this->getButtonTitle();
         $classes = $this->extraClass();
-        $classes .= ' action no-ajax';
+        if ($this->getNoChangeTrack()) {
+            $classes .= ' no-change-track';
+        }
+        // don't add .action because it will submit with ajax
+        // check if "no-ajax" is actually necessary
+        $classes .= ' no-ajax';
 
         $attrs = '';
         if ($this->newWindow) {
