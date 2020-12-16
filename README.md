@@ -259,6 +259,7 @@ See for instance how it's done in my [softdelete module](https://github.com/leko
 
 ## Todo
 
+- Support 4.7 properly (no-ajax buttons are still submitted through ajax)
 - Explore pages or siteconfig support
 - Support on cms profile for members
 - Mobile ui for utils / Group many buttons into drop
@@ -271,6 +272,7 @@ This module is kindly sponsored by [RESTRUCT](restruct.nl)
 ## Compatibility
 
 Tested with 4.6 but should work on any ^4.4 projects
+Not working perfectly on 4.7 at the moment due to some admin js changes
 
 ## Maintainer
 

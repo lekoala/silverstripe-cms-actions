@@ -50,6 +50,8 @@ class CustomLink extends LiteralField
 
         $title = $this->getButtonTitle();
         $classes = $this->extraClass();
+        $classes .= ' action no-ajax';
+
         $attrs = '';
         if ($this->newWindow) {
             $attrs .= ' target="_blank"';
