@@ -257,6 +257,14 @@ This is called after all buttons have been defined.
 
 See for instance how it's done in my [softdelete module](https://github.com/lekoala/silverstripe-softdelete).
 
+## Tab tracking
+
+This extension will also track the active tab when you call save and next / prev and next. This allows editing stuff in a row and keep the same tab.
+
+When clicking on the main tabs, it will also update the url. This way, when you reload the page, the good tab will reopen.
+
+This also allows targeting specific pages with a given tab with links.
+
 ## Todo
 
 - Support 4.7 properly (no-ajax buttons are still submitted through ajax)

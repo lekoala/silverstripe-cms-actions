@@ -30,7 +30,8 @@
     "extra": {
         "installer-name": "cms-actions",
         "expose": [
-            "css"
+            "css",
+            "javascript"
         ]
     },
     "autoload": {

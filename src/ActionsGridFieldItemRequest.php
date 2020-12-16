@@ -460,7 +460,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         $link = $this->owner->getEditLink($getNextRecordID);
 
-        // Link to a specific tab if set
+        // Link to a specific tab if set, see cms-actions.js
         if ($next && !empty($data['_activetab'])) {
             $link .= '#' . $data['_activetab'];
         }
@@ -487,7 +487,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         $link = $this->owner->getEditLink($getPreviousRecordID);
 
-        // Link to a specific tab if set
+        // Link to a specific tab if set, see cms-actions.js
         if ($prev && !empty($data['_activetab'])) {
             $link .= '#' . $data['_activetab'];
         }

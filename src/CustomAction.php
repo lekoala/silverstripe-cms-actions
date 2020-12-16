@@ -48,9 +48,6 @@ class CustomAction extends FormAction
         }
         // Note: type should stay "action" to properly submit
         $this->addExtraClass('custom-action');
-        if ($this->getNoChangeTrack()) {
-            $this->addExtraClass('no-change-track');
-        }
         if ($this->confirmation) {
             $this->setAttribute('data-message', Convert::raw2htmlatt($this->confirmation));
             $this->setAttribute('onclick', 'return confirm(this.dataset.message);return false;');

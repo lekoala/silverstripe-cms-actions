@@ -108,6 +108,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
         if ($this->fontIcon) {
             $button->addExtraClass('font-icon-' . $this->fontIcon);
         }
+        //TODO: replace prompt and confirm with inline js
         if ($this->prompt) {
             $button->setAttribute('data-prompt', $this->prompt);
             $promptDefault = $this->getPromptDefault();

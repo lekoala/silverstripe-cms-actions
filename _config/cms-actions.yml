@@ -5,6 +5,8 @@ SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
   extensions:
     - LeKoala\CmsActions\ActionsGridFieldItemRequest
 SilverStripe\Admin\LeftAndMain:
+  extra_requirements_javascript:
+    - "lekoala/silverstripe-cms-actions:javascript/cms-actions.js"
   extra_requirements_css:
     - "lekoala/silverstripe-cms-actions:css/cms-actions.css"
 LeKoala\CmsActions\ActionsGridFieldItemRequest:
