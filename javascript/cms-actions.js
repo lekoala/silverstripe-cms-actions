@@ -1,4 +1,4 @@
-/* global $, window, jQuery */
+/* global $, window, document, jQuery */
 
 /**
  * Custom admin tweaks
@@ -20,7 +20,7 @@
                     hash = url.split("#")[1];
 
                 if (window.location.hash) {
-                    var currHash = location.hash.substring(1);
+                    var currHash = window.location.hash.substring(1);
                     if (currHash == hash) {
                         this.trigger("click");
                         tabLoaded = true;
@@ -48,11 +48,20 @@
         });
 
         // Prevent navigation for no ajax, otherwise it triggers the action AND navigate to edit form
-        $(".grid-field__icon-action.no-ajax").entwine({
+        $(".grid-field__icon-action.no-ajax,.custom-link.no-ajax").entwine({
             onmatch: function () {},
             onunmatch: function () {},
             onclick: function (e) {
-                e.stopPropagation();
+                if (this.attr("target") == "_blank") {
+                    // Maybe not necessary?
+                    e.stopPropagation();
+                } else {
+                    // Prevent ajax submission
+                    e.preventDefault();
+
+                    // This will update history
+                    document.location.href = this.attr("href");
+                }
             },
         });
     });
