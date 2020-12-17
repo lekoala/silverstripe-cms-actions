@@ -250,6 +250,15 @@ In your admin class
         return $this->redirectBack();
     }
 
+## Show messages instead of actions
+
+If an action is not available/visible, the user may wonder why. Obviously you can display a disabled button, but you can also
+display a message instead of the button. This can be done like so:
+
+    $actions->push(LiteralField::create('MyCustomAction', "<span class=\"bb-align\">Action not available</span>"));
+
+The `bb-align` class ensure the text is properly aligned with the buttons.
+
 ## Extensions support
 
 If your extensions depend on this module, you can play with `DataObject::onBeforeUpdateCMSActions` and `DataObject::onAfterUpdateCMSActions` extension hook to add your own buttons.
