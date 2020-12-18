@@ -85,7 +85,8 @@ download an excel report or a pdf file.
 Please note that are we use a die pattern that is not very clean, but you can very well return
 a HTTPResponse object instead.
 
-CustomLink opens by default a new window. You can use `setNewWindow(false)` to prevent this.
+CustomLink use by default ajax navigation. You can use `setNoAjax(true)` to prevent this.
+CustomLink can open links in a new window. You can use `setNewWindow(true)` to enable this.
 CustomLink calls by default an action on the model matching its name. But really you can point it to anything, even an external link using `setLink('https//www.silverstripe.org')`.
 
 #### Confirm actions
