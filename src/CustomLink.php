@@ -17,6 +17,11 @@ class CustomLink extends LiteralField
     use DefaultLink;
 
     /**
+     * @var boolean
+     */
+    protected $noAjax = false;
+
+    /**
      * @param string $name
      * @param string $title
      * @param string|array $link Will default to name of link on current record if not set
@@ -50,11 +55,13 @@ class CustomLink extends LiteralField
 
         $title = $this->getButtonTitle();
         $classes = $this->extraClass();
-        // don't add .action because it will submit with ajax
-        // check if "no-ajax" is actually necessary
-        $classes .= ' no-ajax';
+        if ($this->noAjax) {
+            $classes .= ' no-ajax';
+        }
 
         $attrs = '';
+
+        // note: links with target are never submitted through ajax
         if ($this->newWindow) {
             $attrs .= ' target="_blank"';
         }
@@ -66,5 +73,26 @@ class CustomLink extends LiteralField
         $content = '<a href="' . $link . '" class="' . $classes . '"' . $attrs . '>' . $title . '</a>';
         $this->content = $content;
         return parent::FieldHolder();
+    }
+
+    /**
+     * Get the value of noAjax
+     * @return boolean
+     */
+    public function getNoAjax()
+    {
+        return $this->noAjax;
+    }
+
+    /**
+     * Set the value of noAjax
+     *
+     * @param boolean $noAjax
+     * @return $this
+     */
+    public function setNoAjax($noAjax)
+    {
+        $this->noAjax = $noAjax;
+        return $this;
     }
 }
