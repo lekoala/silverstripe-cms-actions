@@ -134,6 +134,15 @@ This feature can be disabled with the `enable_save_prev_next` config flag
 
 You can also use the HasPrevNextUtils trait to add navigation in your utils as well.
 
+### Custom prev/next record
+
+By implementing PrevRecord and NextRecord and your DataObject, you can override the
+default logic provided by SilverStripe.
+
+Prev/next records can be tricky to manage, if you have grid state issues, using nested
+gridfields and stuff like that. Using PrevRecord and NextRecord provide a simple mean
+without dealing with state problems.
+
 ## Adding actions to a GridField row
 
 You can create new row actions by extending the `GridFieldRowButton`

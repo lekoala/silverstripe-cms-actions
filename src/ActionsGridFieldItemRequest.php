@@ -192,6 +192,22 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
     }
 
+    public function getCustomPreviousRecordID(DataObject $record)
+    {
+        if ($record->hasMethod('PrevRecord')) {
+            return $record->PrevRecord()->ID ?? 0;
+        }
+        $this->owner->getPreviousRecordID();
+    }
+
+    public function getCustomNextRecordID(DataObject $record)
+    {
+        if ($record->hasMethod('NextRecord')) {
+            return $record->NextRecord()->ID ?? 0;
+        }
+        $this->owner->getNextRecordID();
+    }
+
     /**
      * @param FieldList $actions
      * @param DataObject $record
@@ -213,8 +229,9 @@ class ActionsGridFieldItemRequest extends DataExtension
             $MajorActions = $actions;
         }
 
-        $getPreviousRecordID = $this->owner->getPreviousRecordID();
-        $getNextRecordID = $this->owner->getNextRecordID();
+        // TODO: check why with paginator, after the first page, getPreviousRecordID/getNextRecordID tend to not work properly
+        $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
+        $getNextRecordID = $this->getCustomNextRecordID($record);
 
         // Coupling for HasPrevNextUtils
         if (Controller::has_curr()) {
@@ -454,7 +471,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
-        $getNextRecordID = $this->owner->getNextRecordID();
+        $getNextRecordID = $this->getCustomNextRecordID($record);
         $class = get_class($record);
         $next = $class::get()->byID($getNextRecordID);
 
@@ -481,7 +498,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
-        $getPreviousRecordID = $this->owner->getPreviousRecordID();
+        $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
         $class = get_class($record);
         $prev = $class::get()->byID($getPreviousRecordID);
 
