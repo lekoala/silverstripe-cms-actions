@@ -4,3 +4,6 @@
 'LeKoala\CmsActions\Test\Test_CmsActionsModel':
   demo:
     Name: demo
+'LeKoala\CmsActions\Test\Test_ActionsPage':
+  demo:
+    Title: demo

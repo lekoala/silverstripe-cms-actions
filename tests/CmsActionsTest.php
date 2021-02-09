@@ -9,6 +9,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use LeKoala\CmsActions\ActionsGridFieldItemRequest;
 use LeKoala\CmsActions\CustomLink;
+use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
@@ -26,6 +27,7 @@ class CmsActionsTest extends SapphireTest
 
     protected static $extra_dataobjects = array(
         Test_CmsActionsModel::class,
+        Test_ActionsPage::class,
     );
 
     public function setUp()
@@ -40,16 +42,34 @@ class CmsActionsTest extends SapphireTest
         parent::tearDown();
     }
 
+    /**
+     * @return Test_ActionsPage
+     */
+    public function getTestPage()
+    {
+        return $this->objFromFixture(Test_ActionsPage::class, 'demo');
+    }
+
+    /**
+     * @return Test_CmsActionsModel
+     */
     public function getTestModel()
     {
         return $this->objFromFixture(Test_CmsActionsModel::class, 'demo');
     }
 
+    /**
+     * @return Member
+     */
     public function getAdminMember()
     {
         return $this->objFromFixture(Member::class, 'admin');
     }
 
+
+    /**
+     * @return Form
+     */
     public function getMemberForm()
     {
         $controller = Controller::curr();
@@ -134,5 +154,20 @@ class CmsActionsTest extends SapphireTest
         $this->assertEquals($actionName, $action->performedActionName);
         $this->assertEquals($arguments, $action->performedArguments);
         $this->assertEquals($data, $action->performedData);
+    }
+
+    public function testLeftAndMain()
+    {
+        $leftAndMain = LeftAndMain::create();
+        $form = $this->getTestForm();
+
+        $page = $this->getTestPage();
+        // otherwise getRecord complains
+        $leftAndMain->record = $page;
+        $result = $leftAndMain->doCustomAction(['action_doCustomAction' => [
+            'testAction' => 1
+        ], 'ID' => $page->ID, 'ClassName' => $page->ClassName], $form);
+
+        $this->assertEquals($page->testAction(), $form->getMessage());
     }
 }

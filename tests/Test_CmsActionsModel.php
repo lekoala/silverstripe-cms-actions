@@ -38,6 +38,11 @@ class Test_CmsActionsModel extends DataObject implements TestOnly
         return true;
     }
 
+    public function testAction()
+    {
+        return 'called testAction';
+    }
+
     public function getDeleteButtonTitle()
     {
         return 'Delete this!';

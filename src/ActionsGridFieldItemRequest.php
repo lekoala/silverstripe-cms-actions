@@ -19,13 +19,14 @@ use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
+ * This is also applied to LeftAndMain to allow actions on pages
  *
  * This is a lightweight version of BetterButtons that use default getCMSActions functionnality
  * on DataObjects
  *
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons/blob/master/src/Extensions/GridFieldBetterButtonsItemRequest.php
- * @property \SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest $owner
+ * @property \SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest|\SilverStripe\Admin\LeftAndMain $owner
  */
 class ActionsGridFieldItemRequest extends DataExtension
 {
@@ -320,7 +321,17 @@ class ActionsGridFieldItemRequest extends DataExtension
     protected function forwardActionToRecord($action, $data = [], $form = null)
     {
         $controller = $this->getToplevelController();
-        $record = $this->owner->record;
+        if ($controller instanceof LeftAndMain) {
+            if (empty($data['ClassName']) || empty($data['ID'])) {
+                throw new Exception("Submitted data does not contain and ID and a ClassName");
+            }
+            $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
+        } else {
+            $record = $this->owner->record;
+        }
+        if (!$record) {
+            throw new Exception("No record to handle the action $action");
+        }
         $definedActions = $record->getCMSActions();
         // Check if the action is indeed available
         $clickedAction = null;
@@ -406,7 +417,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
         }
         // Redirect after action
-        return $this->redirectAfterAction($isNewRecord);
+        return $this->redirectAfterAction($isNewRecord, $record);
     }
 
     /**
@@ -431,6 +442,12 @@ class ActionsGridFieldItemRequest extends DataExtension
      * Handles custom actions
      *
      * Use CustomAction class to trigger this
+     *
+     * Nested actions are submitted like this
+     * [action_doCustomAction] => Array
+     * (
+     *   [doTestAction] => 1
+     * )
      *
      * @param array The form data
      * @param Form The form object
@@ -520,6 +537,9 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     protected function getToplevelController()
     {
+        if (!$this->owner->hasMethod("getController")) {
+            return Controller::curr();
+        }
         $c = $this->owner->getController();
         while ($c && $c instanceof GridFieldDetailForm_ItemRequest) {
             $c = $c->getController();
@@ -557,16 +577,27 @@ class ActionsGridFieldItemRequest extends DataExtension
      * Response object for this request after a successful save
      *
      * @param bool $isNewRecord True if this record was just created
+     * @param DataObject $record
      * @return HTTPResponse|DBHTMLText
      * @todo  This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
      * because it is a protected method and not visible to a decorator!
      */
-    protected function redirectAfterAction($isNewRecord)
+    protected function redirectAfterAction($isNewRecord, $record = null)
     {
         $controller = $this->getToplevelController();
+
+        if ($controller instanceof LeftAndMain) {
+            // CMSMain => redirect to show
+            if ($this->owner->hasMethod("LinkPageEdit")) {
+                return $controller->redirect($this->owner->LinkPageEdit($record->ID));
+            }
+            // Fallback
+            return $controller->redirect($this->owner->Link());
+        }
+
         if ($isNewRecord) {
             return $controller->redirect($this->owner->Link());
-        } elseif ($this->owner->gridField->getList()->byID($this->owner->record->ID)) {
+        } elseif ($this->owner->gridField && $this->owner->gridField->getList()->byID($this->owner->record->ID)) {
             // Return new view, as we can't do a "virtual redirect" via the CMS Ajax
             // to the same URL (it assumes that its content is already current, and doesn't reload)
             return $this->owner->edit($controller->getRequest());
@@ -574,7 +605,11 @@ class ActionsGridFieldItemRequest extends DataExtension
             // Changes to the record properties might've excluded the record from
             // a filtered list, so return back to the main view if it can't be found
             $url = $controller->getRequest()->getURL();
-            $noActionURL = $controller->removeAction($url);
+            $action = $controller->getAction();
+            $noActionURL = $url;
+            if ($action) {
+                $noActionURL = $controller->removeAction($url, $action);
+            }
             $controller->getRequest()->addHeader('X-Pjax', 'Content');
             return $controller->redirect($noActionURL, 302);
         }

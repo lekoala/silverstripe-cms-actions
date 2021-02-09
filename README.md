@@ -24,6 +24,13 @@ We can declare things in two functions:
 
 ![cms utils](docs/cms-utils.png "cms utils")
 
+## LeftAndMain support
+
+This module is mainly targeted at dealing with actions on regular DataObjects. However, in order to support actions on pages, the `ActionsGridFieldItemRequest`
+is also applied on `LeftAndMain`. Therefore, actions defined on pages should work properly as well.
+
+WARNING : this is still a bit experimental even if early tests show that this work well.
+
 ## Add your buttons
 
 ### Actions
