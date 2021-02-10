@@ -321,14 +321,18 @@ class ActionsGridFieldItemRequest extends DataExtension
     protected function forwardActionToRecord($action, $data = [], $form = null)
     {
         $controller = $this->getToplevelController();
-        if ($controller instanceof LeftAndMain) {
+
+        // We have an item request
+        $record = null;
+        if ($this->owner instanceof GridFieldDetailForm_ItemRequest) {
+            $record = $this->owner->record;
+        } elseif ($controller instanceof LeftAndMain) {
             if (empty($data['ClassName']) || empty($data['ID'])) {
                 throw new Exception("Submitted data does not contain and ID and a ClassName");
             }
             $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
-        } else {
-            $record = $this->owner->record;
         }
+
         if (!$record) {
             throw new Exception("No record to handle the action $action");
         }
