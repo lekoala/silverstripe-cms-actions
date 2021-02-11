@@ -193,20 +193,28 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
     }
 
+    /**
+     * @param DataObject $record
+     * @return int
+     */
     public function getCustomPreviousRecordID(DataObject $record)
     {
         if ($record->hasMethod('PrevRecord')) {
             return $record->PrevRecord()->ID ?? 0;
         }
-        $this->owner->getPreviousRecordID();
+        return $this->owner->getPreviousRecordID();
     }
 
+    /**
+     * @param DataObject $record
+     * @return int
+     */
     public function getCustomNextRecordID(DataObject $record)
     {
         if ($record->hasMethod('NextRecord')) {
             return $record->NextRecord()->ID ?? 0;
         }
-        $this->owner->getNextRecordID();
+        return $this->owner->getNextRecordID();
     }
 
     /**
