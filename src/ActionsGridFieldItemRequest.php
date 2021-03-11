@@ -428,6 +428,10 @@ class ActionsGridFieldItemRequest extends DataExtension
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
                 $controller->getResponse()->addHeader('X-Reload', true);
             }
+            // 4xx status makes a red box
+            if ($error) {
+                $controller->getResponse()->setStatusCode(400);
+            }
         } else {
             $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
         }
