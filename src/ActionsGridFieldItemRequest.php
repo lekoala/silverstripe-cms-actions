@@ -277,6 +277,9 @@ class ActionsGridFieldItemRequest extends DataExtension
         if (!$record->canEdit()) {
             return;
         }
+        if (!$record->ID && !$record->canCreate()) {
+            return;
+        }
 
         $MajorActions = $actions->fieldByName('MajorActions');
 
