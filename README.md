@@ -42,52 +42,62 @@ action defined on your DataObject.
 In the following example, we call doCustomAction. The return string is displayed as a notification.
 If not return string is specified, we display a generic message "Action {action} done on {record}".
 
-    public function getCMSActions()
-    {
-        $actions = parent::getCMSActions();
+```php
+public function getCMSActions()
+{
+    $actions = parent::getCMSActions();
 
-        $actions->push(new CustomAction("doCustomAction", "My custom action"));
+    $actions->push(new CustomAction("doCustomAction", "My custom action"));
 
-        return $actions;
-    }
+    return $actions;
+}
 
-    public function doCustomAction() {
-        return 'Done!';
-    }
+public function doCustomAction() {
+    return 'Done!';
+}
+```
 
 If it throws an exception or return a false bool, it will show an error message
 
-    public function doCustomAction() {
-        throw new Exception("Show this error");
-        return false;
-    }
+```php
+public function doCustomAction() {
+    throw new Exception("Show this error");
+    return false;
+}
+```
 
 You can set icon. See SilverStripeIcons class for available icons. We use base silverstripe icons.
 
-    $downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
+```php
+$downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
+```
 
 CustomActions are buttons and submitted through ajax. If it changes the state of your record you
 may need to refresh the UI, but be careful of not losing any unsaved data.
 
-    $myAction->setShouldRefresh(true);
+```php
+$myAction->setShouldRefresh(true);
+```
 
 Sometimes, you don't want buttons, but links. Use CustomLink instead. This is useful to, say,
 download an excel report or a pdf file.
 
-    public function getCMSActions()
-    {
-        $actions = parent::getCMSActions();
+```php
+public function getCMSActions()
+{
+    $actions = parent::getCMSActions();
 
-        $actions->push($downloadExcelReport = new CustomLink('downloadExcelReport','Download report'));
-        $downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
+    $actions->push($downloadExcelReport = new CustomLink('downloadExcelReport','Download report'));
+    $downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
 
-        return $actions;
-    }
+    return $actions;
+}
 
-    public function downloadExcelReport() {
-        echo "This is the report";
-        die();
-    }
+public function downloadExcelReport() {
+    echo "This is the report";
+    die();
+}
+```
 
 Please note that are we use a die pattern that is not very clean, but you can very well return
 a HTTPResponse object instead.
@@ -106,12 +116,14 @@ Declare getCMSUtils or use updateCMSUtils in your extensions. These utilities wi
 appear next to the tabs. They are ideal to provide some extra information or navigation.
 I've used these to add shortcuts, timers, dropdowns navs...
 
-    public function getCMSUtils()
-    {
-        $fields = new FieldList();
-        $fields->push(new LiteralField("LastLoginInfo", "Last login at " . $this->LastLogin));
-        return $fields;
-    }
+```php
+public function getCMSUtils()
+{
+    $fields = new FieldList();
+    $fields->push(new LiteralField("LastLoginInfo", "Last login at " . $this->LastLogin));
+    return $fields;
+}
+```
 
 ### Save and close
 
@@ -159,51 +171,55 @@ This can be used, for example, to download files, like invoices, etc directly fr
 
 For example, you can do this:
 
-    class MyRowAction extends GridFieldRowButton
+```php
+class MyRowAction extends GridFieldRowButton
+{
+    protected $fontIcon = 'torso';
+
+    public function getActionName()
     {
-        protected $fontIcon = 'torso';
-
-        public function getActionName()
-        {
-            return 'my_action';
-        }
-
-        public function getButtonLabel()
-        {
-            return 'My Action';
-        }
-
-        public function doHandle(GridField $gridField, $actionName, $arguments, $data)
-        {
-            $item = $gridField->getList()->byID($arguments['RecordID']);
-            if (!$item) {
-                return;
-            }
-            // Do something with item
-            // Or maybe download a file...
-            return Controller::curr()->redirectBack();
-        }
+        return 'my_action';
     }
+
+    public function getButtonLabel()
+    {
+        return 'My Action';
+    }
+
+    public function doHandle(GridField $gridField, $actionName, $arguments, $data)
+    {
+        $item = $gridField->getList()->byID($arguments['RecordID']);
+        if (!$item) {
+            return;
+        }
+        // Do something with item
+        // Or maybe download a file...
+        return Controller::curr()->redirectBack();
+    }
+}
+```
 
 And use it in your ModelAdmin like so:
 
-    public function getGridFieldFrom(Form $form)
-    {
-        return $form->Fields()->dataFieldByName($this->getSanitisedModelClass());
+```php
+public function getGridFieldFrom(Form $form)
+{
+    return $form->Fields()->dataFieldByName($this->getSanitisedModelClass());
+}
+
+public function getEditForm($id = null, $fields = null)
+{
+    $form = parent::getEditForm($id, $fields);
+
+    $gridfield = $this->getGridFieldFrom($form);
+
+    if ($this->modelClass == MyModel::class) {
+        $gridfield->getConfig()->addComponent(new MyRowAction());
     }
 
-    public function getEditForm($id = null, $fields = null)
-    {
-        $form = parent::getEditForm($id, $fields);
-
-        $gridfield = $this->getGridFieldFrom($form);
-
-        if ($this->modelClass == MyModel::class) {
-            $gridfield->getConfig()->addComponent(new MyRowAction());
-        }
-
-        return $form;
-    }
+    return $form;
+}
+```
 
 ## Adding links to GridField
 
@@ -213,7 +229,9 @@ Again, it will be added to the Actions column.
 
 This acts like a CustomLink describe above, so if we go back to our report example, we get this:
 
-    $gridfield->getConfig()->addComponent(new GridFieldCustomLink('downloadExcelReport', 'Download Report'));
+```php
+$gridfield->getConfig()->addComponent(new GridFieldCustomLink('downloadExcelReport', 'Download Report'));
+```
 
 ![gridfield row actions](docs/gridfield-row-actions.png "gridfield row actions")
 
@@ -221,22 +239,26 @@ For security reasons, the action MUST be declared in getCMSActions. Failing to d
 helpful error message. If you do not want to display the button in the detail form, simply
 set a d-none on it:
 
-    $actions->push($downloadExcelReport = new CustomLink('downloadExcelReport', 'Download report'));
-    $downloadExcelReport->addExtraClass('d-none');
+```php
+$actions->push($downloadExcelReport = new CustomLink('downloadExcelReport', 'Download report'));
+$downloadExcelReport->addExtraClass('d-none');
+```
 
 ## Adding buttons to a whole GridField
 
 This is done using GridFieldTableButton
 
-    class MyGridButton extends GridFieldTableButton
-    {
-        protected $buttonLabel = 'Do stuff';
-        protected $fontIcon = 'do_stuff';
+```php
+class MyGridButton extends GridFieldTableButton
+{
+    protected $buttonLabel = 'Do stuff';
+    protected $fontIcon = 'do_stuff';
 
-        public function handle(GridField $gridField, Controller $controller)
-        {
-        }
+    public function handle(GridField $gridField, Controller $controller)
+    {
     }
+}
+```
 
 This class can then be added as a regular GridField component
 
@@ -249,30 +271,36 @@ This is done using the `CmsInlineFormAction` class. Please note that the `doCust
 
 This is due to the fact that we are not submitting the form, therefore we are not processing the record with our `ActionsGridFieldItemRequest`.
 
-    public function getCMSFields()
-    {
-        $fields = parent::getCMSFields();
+```php
+public function getCMSFields()
+{
+    $fields = parent::getCMSFields();
 
-        $fields->addFieldToTab('Root.Actions', new CmsInlineFormAction('doCustomAction', 'Do this'));
+    $fields->addFieldToTab('Root.Actions', new CmsInlineFormAction('doCustomAction', 'Do this'));
 
-        return $fields;
-    }
+    return $fields;
+}
+```
 
 In your admin class
 
-    // don't forget to add me to allowed_actions as well
-    function doCustomAction()
-    {
-        // do something here
-        return $this->redirectBack();
-    }
+```php
+// don't forget to add me to allowed_actions as well
+function doCustomAction()
+{
+    // do something here
+    return $this->redirectBack();
+}
+```
 
 ## Show messages instead of actions
 
 If an action is not available/visible, the user may wonder why. Obviously you can display a disabled button, but you can also
 display a message instead of the button. This can be done like so:
 
-    $actions->push(LiteralField::create('MyCustomAction', "<span class=\"bb-align\">Action not available</span>"));
+```php
+$actions->push(LiteralField::create('MyCustomAction', "<span class=\"bb-align\">Action not available</span>"));
+```
 
 The `bb-align` class ensure the text is properly aligned with the buttons.
 
