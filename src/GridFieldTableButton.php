@@ -4,6 +4,8 @@ namespace LeKoala\CmsActions;
 
 use ReflectionClass;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
@@ -27,6 +29,11 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
      * @var boolean
      */
     protected $noAjax = true;
+
+    /**
+     * @var boolean
+     */
+    protected $allowEmptyResponse = false;
 
     /**
      * @var string
@@ -165,14 +172,19 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                 return $result;
             }
 
+            if ($this->allowEmptyResponse) {
+                return;
+            }
+
             // Do something!
-            if ($this->noAjax) {
+            if ($this->noAjax || !Director::is_ajax()) {
                 return $controller->redirectBack();
             } else {
-                $controller->getResponse()->setStatusCode(
-                    200,
-                    'Action completed'
-                );
+                $response = $controller->getResponse();
+                $response->setBody($gridField->forTemplate());
+                $response
+                    ->addHeader('X-Status', 'Action completed');
+                return $response;
             }
         }
     }
