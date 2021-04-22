@@ -319,10 +319,17 @@ When clicking on the main tabs, it will also update the url. This way, when you 
 
 This also allows targeting specific pages with a given tab with links.
 
+## Profile and LeftAndMain extension support
+
+Since we apply our extension on `SilverStripe\Admin\LeftAndMain` actions declared in updateCMSActions/getCMSActions are visible in the profile for example.
+
+The issue here is that the `updateItemEditForm` is never called (this is only called by `GridFieldDetailForm_ItemRequest`, so when you are in a GridField item... in ModelAdmin for instance).
+
+For instance, this means that you actions are displayed before the 'save' button provided by the Profile controller. Currently, this module fixes this with a bit of css.
+
 ## Todo
 
 - Explore pages or siteconfig support
-- Support on cms profile for members
 - Mobile ui for utils / Group many buttons into drop
 - Svg icons?
 

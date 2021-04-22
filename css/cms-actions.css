@@ -34,3 +34,12 @@ table .btn-link {
     padding: 0;
     margin: 0;
 }
+
+/* Fix actions display in CMSProfileController */
+.CMSProfileController .btn-toolbar > * {
+    order: 2;
+}
+.CMSProfileController .btn-toolbar > #action_save {
+    order: 1;
+    margin-right: 5px;
+}
