@@ -64,5 +64,110 @@
                 }
             },
         });
+
+        // Handle progressive actions
+        function progressiveCall(inst, url, formData) {
+            $.ajax({
+                headers: { "X-Progressive": 1 },
+                type: "POST",
+                data: formData,
+                url: url,
+                dataType: "json",
+                success: function (data) {
+                    if (data.message) {
+                        jQuery.noticeAdd({
+                            text: data.message,
+                            stayTime: 1000,
+                            inEffect: { left: "0", opacity: "show" },
+                        });
+                    }
+                    // It's finished!
+                    if (data.progress_step >= data.progress_total) {
+                        if (!data.label) {
+                            data.label = "Completed";
+                        }
+                        inst.find("span").text(data.label);
+                        inst.find(".btn__progress").remove();
+
+                        if (data.reload) {
+                            window.reload();
+                        }
+                        return;
+                    }
+                    if (data.progress_step) {
+                        formData["progress_step"] = data.progress_step;
+                    }
+                    if (data.progress_total) {
+                        formData["progress_total"] = data.progress_total;
+                    }
+                    if (data.progress_step && data.progress_total) {
+                        var perc = Math.round(
+                            (data.progress_step / data.progress_total) * 100
+                        );
+                        inst.find("span").text(perc + "%");
+                        inst.find(".btn__progress").css("width", perc);
+                    }
+                    progressiveCall(inst, url, formData);
+                },
+                error: function (e) {
+                    inst.find("span").text("Failed");
+                    console.error("Invalid response");
+                },
+            });
+        }
+        $(".progressive-action").entwine({
+            onclick: function (e) {
+                e.preventDefault();
+
+                if (this.hasClass("disabled")) {
+                    return;
+                }
+
+                if (this.hasClass("confirm")) {
+                    var confirmed = confirm($(this).data("message"));
+                    if (!confirmed) {
+                        return;
+                    }
+                }
+
+                var url = this.data("url");
+                if (!url) {
+                    url = this.attr("href");
+                }
+                var form = this.closest("form");
+                var formData = {};
+                var csrf = form.find('input[name="SecurityID"]').val();
+                // Add csrf
+                if (csrf) {
+                    formData["SecurityID"] = csrf;
+                }
+
+                // Add current button
+                formData[this.attr("name")] = this.val();
+
+                // And step
+                formData["progress_step"] = 0;
+
+                // Total can be preset
+                if (
+                    typeof this.data("progress-total") !== "undefined" &&
+                    this.data("progress-total") !== null
+                ) {
+                    formData["progress_total"] = this.data("progress-total");
+                }
+
+                // Cosmetic things
+                this.addClass("disabled");
+                if (!this.find("span").length) {
+                    this.html("<span>" + this.text() + "</span>");
+                }
+                this.css("width", this.outerWidth());
+                this.find("span").text("Please wait");
+                this.append('<div class="btn__progress"></div>');
+
+                progressiveCall(this, url, formData);
+                return false;
+            },
+        });
     });
 })(jQuery);

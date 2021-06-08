@@ -15,6 +15,7 @@ class CustomLink extends LiteralField
 {
     use CustomButton;
     use DefaultLink;
+    use ProgressiveAction;
 
     /**
      * @var boolean
@@ -46,6 +47,9 @@ class CustomLink extends LiteralField
 
     public function Type()
     {
+        if ($this->progressive) {
+            return 'progressive-action';
+        }
         return 'custom-link';
     }
 
@@ -67,7 +71,11 @@ class CustomLink extends LiteralField
         }
         if ($this->confirmation) {
             $attrs .= ' data-message="' . Convert::raw2htmlatt($this->confirmation) . '"';
-            $attrs .= ' onclick="return confirm(this.dataset.message);"';
+            if ($this->progressive) {
+                $classes .= " confirm";
+            } else {
+                $attrs .= ' onclick="return confirm(this.dataset.message);"';
+            }
         }
 
         $content = '<a href="' . $link . '" class="' . $classes . '"' . $attrs . '>' . $title . '</a>';

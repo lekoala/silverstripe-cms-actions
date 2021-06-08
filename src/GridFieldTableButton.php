@@ -5,9 +5,7 @@ namespace LeKoala\CmsActions;
 use ReflectionClass;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
@@ -19,6 +17,8 @@ use SilverStripe\Forms\GridField\GridField_ActionProvider;
  */
 abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
 {
+    use ProgressiveAction;
+
     /**
      * Fragment to write the button to
      * @string
@@ -101,7 +101,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     {
         $action = $this->getActionName();
 
-        $button = new GridField_FormAction(
+        $button = new CustomGridField_FormAction(
             $gridField,
             $action,
             $this->getButtonLabel(),
@@ -122,6 +122,9 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             if ($promptDefault) {
                 $button->setAttribute('data-prompt-default', $promptDefault);
             }
+        }
+        if ($this->progressive) {
+            $button->setProgressive(true);
         }
         if ($this->confirm) {
             $button->setAttribute('data-confirm', $this->confirm);
@@ -167,8 +170,33 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     {
         if (in_array($actionName, $this->getActions($gridField))) {
             $controller = Controller::curr();
+
+            if ($this->progressive) {
+                // Otherwise we would need some kind of UI
+                if (!Director::is_ajax()) {
+                    return $controller->redirectBack();
+                }
+            }
+
             $result = $this->handle($gridField, $controller);
+            if ((!$result || is_string($result)) && $this->progressive) {
+                // simply increment counter and let's hope last action will return something
+                $step = (int) $controller->getRequest()->postVar("progress_step");
+                $total = (int) $controller->getRequest()->postVar("progress_total");
+                $result = [
+                    'progress_step' => $step + 1,
+                    'progress_total' => $total,
+                    'message' => $result,
+                ];
+            }
             if ($result) {
+                // Send a json response this will be handled by cms-actions.js
+                if ($this->progressive) {
+                    $response = $controller->getResponse();
+                    $response->addHeader('Content-Type', 'application/json');
+                    $response->setBody(json_encode($result));
+                    return $response;
+                }
                 return $result;
             }
 

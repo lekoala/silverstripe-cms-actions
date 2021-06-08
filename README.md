@@ -4,6 +4,12 @@
 [![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/)
 [![Code coverage](https://codecov.io/gh/lekoala/silverstripe-cms-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-cms-actions)
 
+## NEW in 1.2
+
+- Progressive actions!
+
+![progressive action](docs/progressive-action.gif "progressive action")
+
 ## Intro
 
 For those of you missing betterbuttons :-) Because let's face it, adding custom actions in SilverStripe is a real pain.
@@ -326,6 +332,62 @@ Since we apply our extension on `SilverStripe\Admin\LeftAndMain` actions declare
 The issue here is that the `updateItemEditForm` is never called (this is only called by `GridFieldDetailForm_ItemRequest`, so when you are in a GridField item... in ModelAdmin for instance).
 
 For instance, this means that you actions are displayed before the 'save' button provided by the Profile controller. Currently, this module fixes this with a bit of css.
+
+## Progressive actions
+
+Since version 1.2, this module supports progressive actions. Progressive actions are buttons that use a progress bar to display what is happening. Under the hood,
+it translates to multiple ajax calls to the same handler function and passing the following post parameters:
+
+- progress_step: the current step
+- progress_total: this can be either set in advance or provided by the handler function
+
+![progressive action](docs/progressive-action.gif "progressive action")
+
+Progressive actions are supported for `GridFieldTableButton` and `CustomLink`.
+
+Here is a sample implementation. The action needs to return an array with the following keys:
+- progress_step: the updated step. Usually +1.
+- progress_total: the total number of records. It should only be computed once (on the initial run) when none is provided.
+- reload: should we reload at the end ?
+- message: each run can display a short lived notification with specific text
+- label: the end label (by default : Completed).
+
+```php
+class MyProgressiveTableButton extends GridFieldTableButton
+{
+    public function __construct($targetFragment = "buttons-before-right", $buttonLabel = null)
+    {
+        $this->progressive = true;
+        parent::__construct($targetFragment, $buttonLabel);
+    }
+
+    public function handle(GridField $gridField, Controller $controller)
+    {
+        $step = (int) $controller->getRequest()->postVar("progress_step");
+        $total = (int) $controller->getRequest()->postVar("progress_total");
+        if (!$total) {
+            $total = $list->count();
+        }
+        $i = 0;
+        $res = null;
+        foreach ($list as $rec) {
+            if ($i < $step) {
+                $i++;
+                continue;
+            }
+            $res = "Processed record $i";
+            break;
+        }
+        $step++;
+        return [
+            'progress_step' => $step,
+            'progress_total' => $total,
+            'reload' => true,
+            'message' => $res,
+        ];
+    }
+}
+```
 
 ## Todo
 

@@ -415,6 +415,17 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($error) {
             $status = 'bad';
         }
+
+        // Progressive actions return array with json data
+        if (method_exists($clickedAction, 'getProgressive') && $clickedAction->getProgressive()) {
+            $response = $controller->getResponse();
+            $response->addHeader('Content-Type', 'application/json');
+            if ($result) {
+                $response->setBody(json_encode($result));
+            }
+            return $response;
+        }
+
         // We don't have a form, simply return the result
         if (!$form) {
             if ($error) {

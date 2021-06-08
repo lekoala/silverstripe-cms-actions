@@ -43,3 +43,24 @@ table .btn-link {
     order: 1;
     margin-right: 5px;
 }
+
+/* Progressive actions */
+.progressive-action {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.progressive-action span {
+    position: relative;
+    z-index: 2;
+}
+.progressive-action .btn__progress {
+    position: absolute;
+    width: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #368b39;
+    opacity: 0.5;
+    z-index: 1;
+}

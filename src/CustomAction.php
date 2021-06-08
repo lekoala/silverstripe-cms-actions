@@ -41,6 +41,11 @@ class CustomAction extends FormAction
         return rtrim(str_replace('action_doCustomAction[', '', $this->name), ']');
     }
 
+    public function Type()
+    {
+        return 'action';
+    }
+
     public function Field($properties = array())
     {
         if ($this->buttonIcon) {
