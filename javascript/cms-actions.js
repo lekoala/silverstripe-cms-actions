@@ -90,7 +90,7 @@
                         inst.find(".btn__progress").remove();
 
                         if (data.reload) {
-                            window.reload();
+                            window.location.reload();
                         }
                         return;
                     }
