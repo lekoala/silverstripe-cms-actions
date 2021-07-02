@@ -74,6 +74,7 @@
                 url: url,
                 dataType: "json",
                 success: function (data) {
+                    // Progress can return messages
                     if (data.message) {
                         jQuery.noticeAdd({
                             text: data.message,
@@ -94,12 +95,20 @@
                         }
                         return;
                     }
+                    // Update progress data
                     if (data.progress_step) {
                         formData["progress_step"] = data.progress_step;
                     }
                     if (data.progress_total) {
                         formData["progress_total"] = data.progress_total;
                     }
+                    if (data.progress_id) {
+                        formData["progress_id"] = data.progress_id;
+                    }
+                    if (data.progress_data) {
+                        formData["progress_data"] = data.progress_data;
+                    }
+                    // Update UI
                     if (data.progress_step && data.progress_total) {
                         var perc = Math.round(
                             (data.progress_step / data.progress_total) * 100

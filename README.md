@@ -348,6 +348,7 @@ Progressive actions are supported for `GridFieldTableButton` and `CustomLink`.
 Here is a sample implementation. The action needs to return an array with the following keys:
 - progress_step: the updated step. Usually +1.
 - progress_total: the total number of records. It should only be computed once (on the initial run) when none is provided.
+- progress_id: you can return a unique id that will be passed along on each call
 - reload: should we reload at the end ?
 - message: each run can display a short lived notification with specific text
 - label: the end label (by default : Completed).
