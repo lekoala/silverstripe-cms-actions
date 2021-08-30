@@ -3,21 +3,15 @@
 namespace LeKoala\CmsActions;
 
 use ReflectionClass;
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\Director;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
-use SilverStripe\Forms\GridField\GridField_ActionProvider;
 
 /**
- * Provide a simple way to declare buttons that affects a whole GridField
- *
- * This implements a URL Handler that can be called by the button
+ * Provide a simple way to declare links for GridField tables
  */
-abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
+class GridFieldTableLink implements GridField_HTMLProvider
 {
-    use ProgressiveAction;
+    use DefaultLink;
 
     /**
      * Fragment to write the button to
@@ -26,14 +20,9 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     protected $targetFragment;
 
     /**
-     * @var boolean
+     * @var string
      */
-    protected $noAjax = true;
-
-    /**
-     * @var boolean
-     */
-    protected $allowEmptyResponse = false;
+    protected $actionName;
 
     /**
      * @var string
@@ -71,19 +60,30 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     protected $attributes = [];
 
     /**
+     * @var boolean
+     */
+    protected $noAjax = false;
+
+    /**
      * @param string $targetFragment The HTML fragment to write the button into
      * @param string $buttonLabel
      */
-    public function __construct($targetFragment = "buttons-before-right", $buttonLabel = null)
+    public function __construct($targetFragment = "buttons-before-right", $buttonLabel = null, $actionName = null)
     {
         $this->targetFragment = $targetFragment;
         if ($buttonLabel) {
             $this->buttonLabel = $buttonLabel;
         }
+        if ($actionName) {
+            $this->actionName = $actionName;
+        }
     }
 
     public function getActionName()
     {
+        if ($this->actionName) {
+            return $this->actionName;
+        }
         $class = (new ReflectionClass(get_called_class()))->getShortName();
         // ! without lowercase, in does not work
         return strtolower(str_replace('Button', '', $class));
@@ -101,19 +101,16 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     {
         $action = $this->getActionName();
 
-        $button = new CustomGridField_FormAction(
-            $gridField,
+        $button = new CustomLink(
             $action,
             $this->getButtonLabel(),
-            $action,
-            null
         );
         $button->addExtraClass('btn btn-secondary action_' . $action);
-        if ($this->noAjax) {
-            $button->addExtraClass('no-ajax');
-        }
         if ($this->fontIcon) {
             $button->addExtraClass('font-icon-' . $this->fontIcon);
+        }
+        if ($this->noAjax) {
+            $button->setNoAjax($this->noAjax);
         }
         //TODO: replace prompt and confirm with inline js
         if ($this->prompt) {
@@ -123,11 +120,14 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                 $button->setAttribute('data-prompt-default', $promptDefault);
             }
         }
-        if ($this->progressive) {
-            $button->setProgressive(true);
-        }
         if ($this->confirm) {
             $button->setAttribute('data-confirm', $this->confirm);
+        }
+        if ($this->newWindow) {
+            $button->setNewWindow($this->newWindow);
+        }
+        if ($this->link) {
+            $button->setLink($this->link);
         }
         foreach ($this->attributes as $attributeName => $attributeValue) {
             $button->setAttribute($attributeName, $attributeValue);
@@ -165,69 +165,6 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     {
         return array($this->getActionName());
     }
-
-    public function handleAction(GridField $gridField, $actionName, $arguments, $data)
-    {
-        if (in_array($actionName, $this->getActions($gridField))) {
-            $controller = Controller::curr();
-
-            if ($this->progressive) {
-                // Otherwise we would need some kind of UI
-                if (!Director::is_ajax()) {
-                    return $controller->redirectBack();
-                }
-            }
-
-            $result = $this->handle($gridField, $controller);
-            if ((!$result || is_string($result)) && $this->progressive) {
-                // simply increment counter and let's hope last action will return something
-                $step = (int) $controller->getRequest()->postVar("progress_step");
-                $total = (int) $controller->getRequest()->postVar("progress_total");
-                $result = [
-                    'progress_step' => $step + 1,
-                    'progress_total' => $total,
-                    'message' => $result,
-                ];
-            }
-            if ($result) {
-                // Send a json response this will be handled by cms-actions.js
-                if ($this->progressive) {
-                    $response = $controller->getResponse();
-                    $response->addHeader('Content-Type', 'application/json');
-                    $response->setBody(json_encode($result));
-                    return $response;
-                }
-                return $result;
-            }
-
-            if ($this->allowEmptyResponse) {
-                return;
-            }
-
-            // Do something!
-            if ($this->noAjax || !Director::is_ajax()) {
-                return $controller->redirectBack();
-            } else {
-                $response = $controller->getResponse();
-                $response->setBody($gridField->forTemplate());
-                $response
-                    ->addHeader('X-Status', 'Action completed');
-                return $response;
-            }
-        }
-    }
-
-    /**
-     * it is also a URL
-     */
-    public function getURLHandlers($gridField)
-    {
-        return array(
-            $this->getActionName() => 'handle',
-        );
-    }
-
-    abstract public function handle(GridField $gridField, Controller $controller);
 
     /**
      * Get the value of fontIcon
@@ -339,6 +276,27 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function setPromptDefault($promptDefault)
     {
         $this->promptDefault = $promptDefault;
+        return $this;
+    }
+
+    /**
+     * Get the value of noAjax
+     * @return boolean
+     */
+    public function getNoAjax()
+    {
+        return $this->noAjax;
+    }
+
+    /**
+     * Set the value of noAjax
+     *
+     * @param boolean $noAjax
+     * @return $this
+     */
+    public function setNoAjax($noAjax)
+    {
+        $this->noAjax = $noAjax;
         return $this;
     }
 }

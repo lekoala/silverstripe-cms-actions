@@ -363,7 +363,11 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
         if (!$clickedAction) {
             $class = get_class($record);
-            return $this->owner->httpError(403, 'Action not available on ' . $class . '. It must be one of :' . implode(',', $this->getAvailableActions($definedActions)));
+            $availableActions = implode(',', $this->getAvailableActions($definedActions));
+            if (!$availableActions) {
+                $availableActions = "(no available actions, please check getCMSActions)";
+            }
+            return $this->owner->httpError(403, 'Action not available on ' . $class . '. It must be one of : ' . $availableActions);
         }
         $message = null;
         $error = false;
