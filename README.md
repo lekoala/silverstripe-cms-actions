@@ -392,6 +392,13 @@ class MyProgressiveTableButton extends GridFieldTableButton
 }
 ```
 
+## Modal action
+
+What if you need to ask some input from your user when clicking a button ? Like a 'Send Message' button which would display
+a nice textarea ?
+
+This is covered as part of another module: https://github.com/lekoala/silverstripe-pure-modal
+
 ## Todo
 
 - Explore pages or siteconfig support
