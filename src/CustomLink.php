@@ -77,6 +77,9 @@ class CustomLink extends LiteralField
                 $attrs .= ' onclick="return confirm(this.dataset.message);"';
             }
         }
+        foreach ($this->attributes as $attributeKey => $attributeValue) {
+            $attrs .= ' ' . $attributeKey . '="' . $attributeValue . '"';
+        }
 
         $content = '<a href="' . $link . '" class="' . $classes . '"' . $attrs . '>' . $title . '</a>';
         $this->content = $content;
