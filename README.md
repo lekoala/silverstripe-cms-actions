@@ -399,6 +399,9 @@ a nice textarea ?
 
 This is covered as part of another module: https://github.com/lekoala/silverstripe-pure-modal
 
+It requires a modal to be displayed (and modals are a bit of a pain to setup in SilverStripe 4, so I created a module to make
+that much easier). When using both modules it's easy to have actions that open a modal.
+
 ## Todo
 
 - Explore pages or siteconfig support

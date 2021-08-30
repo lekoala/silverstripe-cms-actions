@@ -86,9 +86,9 @@ class CmsInlineFormAction extends LiteralField
     public function FieldHolder($properties = array())
     {
         $classes = $this->extraClass();
-        if($this->buttonIcon) {
+        if ($this->buttonIcon) {
             $classes .= " font-icon";
-            $classes .= ' font-icon-'.$this->buttonIcon;
+            $classes .= ' font-icon-' . $this->buttonIcon;
         }
         $link = $this->getLink();
         $attrs = '';

@@ -50,7 +50,7 @@ class CustomAction extends FormAction
     {
         if ($this->buttonIcon) {
             $this->addExtraClass('font-icon');
-            $this->addExtraClass('font-icon-'.$this->buttonIcon);
+            $this->addExtraClass('font-icon-' . $this->buttonIcon);
         }
         // Note: type should stay "action" to properly submit
         $this->addExtraClass('custom-action');

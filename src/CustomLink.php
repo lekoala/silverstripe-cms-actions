@@ -63,9 +63,9 @@ class CustomLink extends LiteralField
             $classes .= ' no-ajax';
         }
 
-        if($this->buttonIcon) {
+        if ($this->buttonIcon) {
             $classes .= " font-icon";
-            $classes .= ' font-icon-'.$this->buttonIcon;
+            $classes .= ' font-icon-' . $this->buttonIcon;
         }
 
         $attrs = '';
