@@ -96,7 +96,7 @@ class CmsInlineFormAction extends LiteralField
         $content = '<a href="' . $link . '" class="btn ' . $this->extraClass() . ' action no-ajax"' . $attrs . '>';
         $title = $this->content;
         if ($this->buttonIcon) {
-            $title = '<span class="font-icon-' . $this->buttonIcon . '"></span> ' . $title;
+            $title = '<span class="font-icon font-icon-' . $this->buttonIcon . '"></span> ' . $title;
         }
         $content .= $title;
         $content .= '</a>';

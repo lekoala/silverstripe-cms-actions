@@ -44,6 +44,11 @@ table .btn-link {
     margin-right: 5px;
 }
 
+/* Icons might need some help */
+.btn span.font-icon {
+    vertical-align: -0.125em;
+}
+
 /* Progressive actions */
 .progressive-action {
     position: relative;
