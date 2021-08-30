@@ -248,6 +248,8 @@ set a d-none on it:
 ```php
 $actions->push($downloadExcelReport = new CustomLink('downloadExcelReport', 'Download report'));
 $downloadExcelReport->addExtraClass('d-none');
+//or simply...
+//$downloadExcelReport->setHidden();
 ```
 
 ## Adding buttons to a whole GridField

@@ -87,6 +87,18 @@ class CustomLink extends LiteralField
     }
 
     /**
+     * Hide this action as it needs to exist to be forwarded to the model
+     * but you might not want to display it in the action bar
+     *
+     * @return $this
+     */
+    public function setHidden()
+    {
+        $this->addExtraClass("d-none");
+        return $this;
+    }
+
+    /**
      * Get the value of noAjax
      * @return boolean
      */
