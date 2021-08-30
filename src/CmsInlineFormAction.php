@@ -85,6 +85,11 @@ class CmsInlineFormAction extends LiteralField
 
     public function FieldHolder($properties = array())
     {
+        $classes = $this->extraClass();
+        if($this->buttonIcon) {
+            $classes .= " font-icon";
+            $classes .= ' font-icon-'.$this->buttonIcon;
+        }
         $link = $this->getLink();
         $attrs = '';
         if ($this->newWindow) {
@@ -93,11 +98,8 @@ class CmsInlineFormAction extends LiteralField
         if ($this->readonly) {
             $attrs .= ' style="display:none"';
         }
-        $content = '<a href="' . $link . '" class="btn ' . $this->extraClass() . ' action no-ajax"' . $attrs . '>';
+        $content = '<a href="' . $link . '" class="btn ' . $classes . ' action no-ajax"' . $attrs . '>';
         $title = $this->content;
-        if ($this->buttonIcon) {
-            $title = '<span class="font-icon font-icon-' . $this->buttonIcon . '"></span> ' . $title;
-        }
         $content .= $title;
         $content .= '</a>';
         $this->content = $content;
