@@ -77,9 +77,6 @@ trait CustomButton
     protected function getButtonTitle()
     {
         $title = $this->title;
-        if ($this->buttonIcon) {
-            $title = '<span class="font-icon font-icon-' . $this->buttonIcon . '"></span> ' . $title;
-        }
         return $title;
     }
 
