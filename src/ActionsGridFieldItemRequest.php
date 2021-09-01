@@ -327,7 +327,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      * @param string $action
      * @param array $data
      * @param Form $form
-     * @return HTTPResponse|DBHTMLText
+     * @return HTTPResponse|DBHTMLText|string
      */
     protected function forwardActionToRecord($action, $data = [], $form = null)
     {
@@ -443,7 +443,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $controller = $this->getToplevelController();
             $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
-                $controller->getResponse()->addHeader('X-Reload', true);
+                $controller->getResponse()->addHeader('X-Reload', "true");
             }
             // 4xx status makes a red box
             if ($error) {
@@ -466,7 +466,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      * GridFieldCustomLink::getLink
      *
      * @param HTTPRequest $request
-     * @return HTTPResponse|DBHTMLText
+     * @return HTTPResponse|DBHTMLText|string
      */
     public function doCustomLink(HTTPRequest $request)
     {
@@ -487,7 +487,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      *
      * @param array The form data
      * @param Form The form object
-     * @return HTTPResponse|DBHTMLText
+     * @return HTTPResponse|DBHTMLText|string
      */
     public function doCustomAction($data, $form)
     {
@@ -617,7 +617,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      *
      * @param bool $isNewRecord True if this record was just created
      * @param DataObject $record
-     * @return HTTPResponse|DBHTMLText
+     * @return HTTPResponse|DBHTMLText|string
      * @todo  This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
      * because it is a protected method and not visible to a decorator!
      */
