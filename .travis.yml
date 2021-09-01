@@ -26,6 +26,7 @@ jobs:
         - PDO=1
         - PHPCS_TEST=1
         - PHPUNIT_TEST=1
+        - PHPUNIT_COVERAGE_TEST=1
     - php: 7.3
       env:
         - DB=MYSQL
