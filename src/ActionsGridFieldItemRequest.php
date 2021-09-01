@@ -342,10 +342,12 @@ class ActionsGridFieldItemRequest extends DataExtension
                 throw new Exception("Submitted data does not contain and ID and a ClassName");
             }
             $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
+        } elseif ($controller->hasMethod("getRecord")) {
+            $record = $controller->getRecord();
         }
 
         if (!$record) {
-            throw new Exception("No record to handle the action $action");
+            throw new Exception("No record to handle the action $action on " . get_class($controller));
         }
         $definedActions = $record->getCMSActions();
         // Check if the action is indeed available
@@ -571,6 +573,9 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     protected function getToplevelController()
     {
+        if ($this->owner instanceof LeftAndMain) {
+            return $this->owner;
+        }
         if (!$this->owner->hasMethod("getController")) {
             return Controller::curr();
         }

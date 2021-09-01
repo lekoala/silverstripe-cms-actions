@@ -66,7 +66,6 @@ class CmsActionsTest extends SapphireTest
         return $this->objFromFixture(Member::class, 'admin');
     }
 
-
     /**
      * @return Form
      */
@@ -87,9 +86,15 @@ class CmsActionsTest extends SapphireTest
         return $form;
     }
 
-    public function getTestForm()
+    /**
+     * @param Controller $controller
+     * @return Form
+     */
+    public function getTestForm($controller = null)
     {
-        $controller = Controller::curr();
+        if (!$controller) {
+            $controller = Controller::curr();
+        }
 
         $record = $this->getTestModel();
 
@@ -159,14 +164,21 @@ class CmsActionsTest extends SapphireTest
     public function testLeftAndMain()
     {
         $leftAndMain = LeftAndMain::create();
-        $form = $this->getTestForm();
+        $form = $this->getTestForm($leftAndMain);
 
         $page = $this->getTestPage();
         // otherwise getRecord complains
         $leftAndMain->record = $page;
-        $result = $leftAndMain->doCustomAction(['action_doCustomAction' => [
-            'testAction' => 1
-        ], 'ID' => $page->ID, 'ClassName' => $page->ClassName], $form);
+        $result = $leftAndMain->doCustomAction(
+            [
+                'action_doCustomAction' => [
+                    'testAction' => 1
+                ],
+                'ID' => $page->ID,
+                'ClassName' => $page->ClassName
+            ],
+            $form
+        );
 
         $this->assertEquals($page->testAction(), $form->getMessage());
     }
