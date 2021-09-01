@@ -1,6 +1,6 @@
 # SilverStripe Cms Actions module
 
-[![Build Status](https://travis-ci.com/lekoala/silverstripe-cms-actions.svg?branch=master)](https://travis-ci.com/lekoala/silverstripe-cms-actions/)
+[![Build Status](https://app.travis-ci.com/lekoala/silverstripe-cms-actions.svg?branch=master)](https://app.travis-ci.com/lekoala/silverstripe-cms-actions)
 [![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/)
 [![Code coverage](https://codecov.io/gh/lekoala/silverstripe-cms-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-cms-actions)
 
