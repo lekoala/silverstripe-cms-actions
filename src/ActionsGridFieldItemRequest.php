@@ -169,7 +169,7 @@ class ActionsGridFieldItemRequest extends DataExtension
                 // Only necessary pre 4.4
                 $deleteAction->addExtraClass('align-right');
             }
-            // Set custom titlte
+            // Set custom title
             if ($record->hasMethod('getDeleteButtonTitle')) {
                 $deleteAction->setTitle($record->getDeleteButtonTitle());
             }
