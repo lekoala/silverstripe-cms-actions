@@ -85,6 +85,13 @@ may need to refresh the UI, but be careful of not losing any unsaved data.
 $myAction->setShouldRefresh(true);
 ```
 
+You can also put buttons into a drop-up menu.
+
+![Drop-up example](docs/drop-up.gif "Drop-up example")
+```php
+$myAction->setDropUp(true);
+```
+
 Sometimes, you don't want buttons, but links. Use CustomLink instead. This is useful to, say,
 download an excel report or a pdf file.
 
@@ -405,7 +412,7 @@ that much easier). When using both modules it's easy to have actions that open a
 ## Todo
 
 - Explore pages or siteconfig support
-- Mobile ui for utils / Group many buttons into drop
+- Mobile ui for utils
 - Svg icons?
 
 ## Sponsored by

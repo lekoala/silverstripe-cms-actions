@@ -16,6 +16,8 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TabSet;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -113,13 +115,30 @@ class ActionsGridFieldItemRequest extends DataExtension
             $MajorActions = $actions;
         }
 
+        // The Drop-up container may already exist
+        $dropUpContainer = $actions->fieldByName('ActionMenus.MoreOptions');
+
         // Push our actions that are otherwise ignored by SilverStripe
         foreach ($CMSActions as $action) {
-            $actions->push($action);
+            if ($action->getDropUp()) {
+                if (!$dropUpContainer) {
+                    $dropUpContainer = $this->createDropUpContainer($actions);
+                }
+                $dropUpContainer->push($action);
+            } else {
+                $actions->push($action);
+            }
         }
 
         // Add extension hook
         $record->extend('onBeforeUpdateCMSActions', $actions);
+
+        $ActionMenus = $actions->fieldByName('ActionMenus');
+        // Re-insert ActionMenus to make sure they lways follow the buttons
+        if ($ActionMenus) {
+            $actions->remove($ActionMenus);
+            $actions->push($ActionMenus);
+        }
 
         // We have a 4.4 setup, before that there was no RightGroup
         $RightGroup = $actions->fieldByName('RightGroup');
@@ -144,6 +163,26 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Add extension hook
         $record->extend('onAfterUpdateCMSActions', $actions);
+    }
+
+    /**
+     * Prepares a Drop-Up menu
+     * @param FieldList $actions
+     * @return Tab
+     */
+    protected function createDropUpContainer($actions)
+    {
+        $rootTabSet = new TabSet('ActionMenus');
+        $dropUpContainer = new Tab(
+            'MoreOptions',
+            _t(__CLASS__ . '.MoreOptions', 'More options', 'Expands a view for more buttons')
+        );
+        $dropUpContainer->addExtraClass('popover-actions-simulate');
+        $rootTabSet->push($dropUpContainer);
+        $rootTabSet->addExtraClass('ss-ui-action-tabset action-menus noborder');
+
+        $actions->insertBefore('RightGroup', $rootTabSet);
+        return $dropUpContainer;
     }
 
     /**

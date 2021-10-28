@@ -17,6 +17,12 @@ trait CustomButton
     ];
 
     /**
+     * Whether to place the button in a dot-menu
+     * @var boolean
+     */
+    protected $dropUp = false;
+
+    /**
      * An icon for this button
      * @var string
      */
@@ -47,6 +53,28 @@ trait CustomButton
     public function setTitle($title)
     {
         $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * Get the dropUp malue
+     * Called by ActionsGridFieldItemRequest to determine placement
+     *
+     * @return string
+     */
+    public function getDropUp()
+    {
+        return $this->dropUp;
+    }
+
+    /**
+     * Set the value of dropUp
+     *
+     * @return $this
+     */
+    public function setDropUp($is)
+    {
+        $this->dropUp = !!$is;
         return $this;
     }
 
