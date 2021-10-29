@@ -120,7 +120,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Push our actions that are otherwise ignored by SilverStripe
         foreach ($CMSActions as $action) {
-            if ($action->getDropUp()) {
+            if ($action instanceof CustomAction && $action->getDropUp()) {
                 if (!$dropUpContainer) {
                     $dropUpContainer = $this->createDropUpContainer($actions);
                 }
