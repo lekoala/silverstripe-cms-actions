@@ -134,7 +134,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $record->extend('onBeforeUpdateCMSActions', $actions);
 
         $ActionMenus = $actions->fieldByName('ActionMenus');
-        // Re-insert ActionMenus to make sure they lways follow the buttons
+        // Re-insert ActionMenus to make sure they always follow the buttons
         if ($ActionMenus) {
             $actions->remove($ActionMenus);
             $actions->push($ActionMenus);

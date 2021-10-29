@@ -18,7 +18,7 @@ trait CustomButton
 
     /**
      * Whether to place the button in a dot-menu
-     * @var boolean
+     * @var bool
      */
     protected $dropUp = false;
 
@@ -48,6 +48,7 @@ trait CustomButton
     /**
      * Set the value of title
      *
+     * @param string $is
      * @return $this
      */
     public function setTitle($title)
@@ -60,7 +61,7 @@ trait CustomButton
      * Get the dropUp malue
      * Called by ActionsGridFieldItemRequest to determine placement
      *
-     * @return string
+     * @return bool
      */
     public function getDropUp()
     {
@@ -70,6 +71,7 @@ trait CustomButton
     /**
      * Set the value of dropUp
      *
+     * @param bool $is
      * @return $this
      */
     public function setDropUp($is)
@@ -80,7 +82,6 @@ trait CustomButton
 
     /**
      * @param string $type
-     *
      * @return void
      */
     public function setButtonType($type)
