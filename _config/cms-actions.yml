@@ -1,5 +1,6 @@
 ---
 Name: cms-actions
+After: '#versionedgridfield'
 ---
 SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
   extensions:

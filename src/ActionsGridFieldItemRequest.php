@@ -102,6 +102,10 @@ class ActionsGridFieldItemRequest extends DataExtension
         // We get the actions as defined on our record
         $CMSActions = $record->getCMSActions();
 
+        // address Silverstripe bug when SiteTree buttons are broken
+        // @link https://github.com/silverstripe/silverstripe-cms/issues/2702
+        $CMSActions->setForm($form);
+
         // We can the actions from the GridFieldDetailForm_ItemRequest
         // It sets the Save and Delete buttons + Right Group
         $actions = $form->Actions();
