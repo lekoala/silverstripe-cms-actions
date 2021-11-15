@@ -3,7 +3,9 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
+use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\Form;
+use SilverStripe\Forms\TabSet;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Control\Director;
@@ -12,16 +14,16 @@ use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Versioned\Versioned;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\ValidationResult;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
-use SilverStripe\Forms\Tab;
-use SilverStripe\Forms\TabSet;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
  * This is also applied to LeftAndMain to allow actions on pages
+ * Warning: LeftAndMain doesn't call updateItemEditForm
  *
  * This is a lightweight version of BetterButtons that use default getCMSActions functionnality
  * on DataObjects
@@ -84,13 +86,15 @@ class ActionsGridFieldItemRequest extends DataExtension
     /**
      * Updates the detail form to include new form actions and buttons
      *
-     * Reorganize things a bit
+     * This is called by GridFieldDetailForm_ItemRequest
      *
      * @param Form The ItemEditForm object
      */
     public function updateItemEditForm($form)
     {
         $itemRequest = $this->owner;
+
+        /** @var DataObject $record  */
         $record = $itemRequest->record;
         if (!$record) {
             $record = $form->getRecord();
@@ -100,6 +104,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // We get the actions as defined on our record
+        /** @var FieldList $CMSActions  */
         $CMSActions = $record->getCMSActions();
 
         // address Silverstripe bug when SiteTree buttons are broken
@@ -121,6 +126,10 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Push our actions that are otherwise ignored by SilverStripe
         foreach ($CMSActions as $action) {
+            // Avoid duplicated actions (eg: when added by SilverStripe\Versioned\VersionedGridFieldItemRequest)
+            if ($actions->fieldByName($action->getName())) {
+                continue;
+            }
             $actions->push($action);
         }
 

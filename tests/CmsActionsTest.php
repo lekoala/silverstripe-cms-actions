@@ -4,14 +4,17 @@ namespace LeKoala\CmsActions\Test;
 
 use SilverStripe\Forms\Form;
 use SilverStripe\Security\Member;
+use LeKoala\CmsActions\CustomLink;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
-use LeKoala\CmsActions\ActionsGridFieldItemRequest;
-use LeKoala\CmsActions\CustomLink;
-use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\Versioned\Versioned;
+use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\GridField\GridField;
+use LeKoala\CmsActions\ActionsGridFieldItemRequest;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 
 /**
@@ -88,20 +91,25 @@ class CmsActionsTest extends SapphireTest
 
     /**
      * @param Controller $controller
+     * @param DataObject $record
      * @return Form
      */
-    public function getTestForm($controller = null)
+    public function getTestForm($controller = null, $record = null)
     {
         if (!$controller) {
             $controller = Controller::curr();
         }
-
-        $record = $this->getTestModel();
-
+        if (!$record) {
+            $record = $this->getTestModel();
+        }
         $list = Test_CmsActionsModel::get();
         $gridField = new GridField('testGridfield', null, $list);
         $detailForm = new GridFieldDetailForm('testDetailForm');
-        $GridFieldDetailForm = new GridFieldDetailForm_ItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
+        if ($record->hasExtension(Versioned::class)) {
+            $GridFieldDetailForm = new VersionedGridFieldItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
+        } else {
+            $GridFieldDetailForm = new GridFieldDetailForm_ItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
+        }
         $form = $GridFieldDetailForm->ItemEditForm();
         $form->loadDataFrom($record);
 
@@ -163,10 +171,10 @@ class CmsActionsTest extends SapphireTest
 
     public function testLeftAndMain()
     {
-        $leftAndMain = LeftAndMain::create();
-        $form = $this->getTestForm($leftAndMain);
-
         $page = $this->getTestPage();
+        $leftAndMain = LeftAndMain::create();
+        $form = $this->getTestForm($leftAndMain, $page);
+
         // otherwise getRecord complains
         $leftAndMain->record = $page;
         $result = $leftAndMain->doCustomAction(
@@ -181,5 +189,24 @@ class CmsActionsTest extends SapphireTest
         );
 
         $this->assertEquals($page->testAction(), $form->getMessage());
+
+        $list = [];
+        $simpleList = [];
+        foreach ($form->Actions() as $action) {
+            if ($action instanceof CompositeField) {
+                $arr = [];
+                foreach ($action->getChildren() as $subAction) {
+                    $arr[] = $subAction->getName() . ' (' . get_class($subAction) . ')';
+                    $simpleList[] = $subAction->getName();
+                }
+                $list[] = $arr;
+            } else {
+                $list[] = $action->getName() . ' (' . get_class($action) . ')';
+                $simpleList[] = $action->getName();
+            }
+        }
+        $filteredSimpleList = array_unique($simpleList);
+        // We should not have duplicated actions
+        $this->assertEquals($filteredSimpleList, $simpleList);
     }
 }
