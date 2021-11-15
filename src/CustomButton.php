@@ -58,7 +58,7 @@ trait CustomButton
     }
 
     /**
-     * Get the dropUp malue
+     * Get the dropUp value
      * Called by ActionsGridFieldItemRequest to determine placement
      *
      * @return bool

@@ -119,20 +119,14 @@ class ActionsGridFieldItemRequest extends DataExtension
             $MajorActions = $actions;
         }
 
-        // The Drop-up container may already exist
-        $dropUpContainer = $actions->fieldByName('ActionMenus.MoreOptions');
-
         // Push our actions that are otherwise ignored by SilverStripe
         foreach ($CMSActions as $action) {
-            if ($action instanceof CustomAction && $action->getDropUp()) {
-                if (!$dropUpContainer) {
-                    $dropUpContainer = $this->createDropUpContainer($actions);
-                }
-                $dropUpContainer->push($action);
-            } else {
-                $actions->push($action);
-            }
+            $actions->push($action);
         }
+
+        // We create a Drop-Up menu afterwards because it may already exist in the $CMSActions
+        // and we don't want to duplicate it
+        $this->processDropUpMenu($actions);
 
         // Add extension hook
         $record->extend('onBeforeUpdateCMSActions', $actions);
@@ -167,6 +161,27 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Add extension hook
         $record->extend('onAfterUpdateCMSActions', $actions);
+    }
+
+
+    /**
+     * Collect all Drop-Up actions into a menu.
+     * @param FieldList $actions
+     * @return void
+     */
+    protected function processDropUpMenu($actions)
+    {
+        // The Drop-up container may already exist
+        $dropUpContainer = $actions->fieldByName('ActionMenus.MoreOptions');
+        foreach ($actions as $action) {
+            if ($action->hasMethod('getDropUp') && $action->getDropUp()) {
+                if (!$dropUpContainer) {
+                    $dropUpContainer = $this->createDropUpContainer($actions);
+                }
+                $action->getContainerFieldList()->removeByName($action->getName());
+                $dropUpContainer->push($action);
+            }
+        }
     }
 
     /**
