@@ -1,0 +1,12 @@
+de:
+  ActionsGridFieldItemRequest:
+    CREATEANDCLOSE: 'Erstellen and Schließen'
+    DONE: 'Action {action} wurde ausgeführt auf {name}'
+    SAVEANDCLOSE: 'Speichern und Schließen'
+    SAVEANDNEXT: 'Speichern und Nächstes'
+    SAVEANDPREVIOUS: 'Speichern und Vorheriges'
+  CustomButton:
+    CONFIRM_MESSAGE: 'Sind Sie sicher?'
+  HasPrevNextUtils:
+    Next: Nächstes
+    Previous: Vorheriges
