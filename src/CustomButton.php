@@ -82,7 +82,7 @@ trait CustomButton
 
     /**
      * @param string $type
-     * @return void
+     * @return $this
      */
     public function setButtonType($type)
     {
@@ -96,6 +96,8 @@ trait CustomButton
 
         $btn = "btn-$type";
         $this->extraClasses[$btn] = $btn;
+
+        return $this;
     }
 
     /**
