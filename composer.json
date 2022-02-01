@@ -21,7 +21,8 @@
     "require": {
         "php": ">=7.2",
         "silverstripe/recipe-plugin": "^1",
-        "silverstripe/recipe-cms": "^4.4"
+        "silverstripe/admin": "^1.4",
+        "silverstripe/framework": "^4.4"
     },
     "require-dev": {
         "sminnee/phpunit": "^5.7",
