@@ -17,7 +17,9 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\SiteConfig\SiteConfigLeftAndMain;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -403,6 +405,8 @@ class ActionsGridFieldItemRequest extends DataExtension
         $record = null;
         if ($this->owner instanceof GridFieldDetailForm_ItemRequest) {
             $record = $this->owner->record;
+        } elseif ($controller instanceof SiteConfigLeftAndMain) {
+            $record = SiteConfig::current_site_config();
         } elseif ($controller instanceof LeftAndMain) {
             if (empty($data['ClassName']) || empty($data['ID'])) {
                 throw new Exception("Submitted data does not contain and ID and a ClassName");
