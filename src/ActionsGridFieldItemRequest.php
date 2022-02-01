@@ -14,7 +14,6 @@ use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Versioned\Versioned;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Core\Config\Configurable;
