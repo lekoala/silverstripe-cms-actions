@@ -65,6 +65,22 @@
             },
         });
 
+        // Allow posting from CmsInlineFormAction
+        $("button.inline-action[data-action]").entwine({
+            onclick: function (e) {
+                e.preventDefault();
+                var form = this.parents("form");
+                var action = form.attr("action");
+                form.attr("action", this.data("action"));
+
+                // somehow this does nothing?
+                // form.submit();
+
+                $('#Form_ItemEditForm_action_doSave').click();
+                form.attr("action", action);
+            },
+        });
+
         // Handle progressive actions
         function progressiveCall(inst, url, formData) {
             $.ajax({

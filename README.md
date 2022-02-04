@@ -308,6 +308,34 @@ function doCustomAction()
 }
 ```
 
+### Posting with inline actions
+
+You can also post the whole form to another location with `CmsInlineFormAction`.
+
+Simply do this
+
+```php
+    $fields->addFieldToTab('Root.MyTab', $myAction = new CmsInlineFormAction("myAction", "My Action"));
+    $myAction->setPost(true);
+```
+
+And add to your admin class
+
+```php
+    public function myAction()
+    {
+        $RecordID = $this->getRequest()->getVar("ID");
+
+        $message = "My action done";
+        $response = Controller::curr()->getResponse();
+        $response->addHeader('X-Status', rawurlencode($message));
+
+        return $response;
+    }
+```
+
+This will trigger the Save action (through ajax) do your new endpoint, allowing custom behaviour and feedback messages.
+
 ## Show messages instead of actions
 
 If an action is not available/visible, the user may wonder why. Obviously you can display a disabled button, but you can also

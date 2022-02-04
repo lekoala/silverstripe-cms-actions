@@ -30,6 +30,11 @@ class CmsInlineFormAction extends LiteralField
     protected $buttonIcon = null;
 
     /**
+     * @var boolean
+     */
+    protected $post = false;
+
+    /**
      * Create a new action button.
      * @param action The method to call when the button is clicked
      * @param title The label on the button
@@ -98,10 +103,17 @@ class CmsInlineFormAction extends LiteralField
         if ($this->readonly) {
             $attrs .= ' style="display:none"';
         }
-        $content = '<a href="' . $link . '" class="btn ' . $classes . ' action no-ajax"' . $attrs . '>';
         $title = $this->content;
-        $content .= $title;
-        $content .= '</a>';
+        if ($this->post) {
+            // This triggers a save action to the new location
+            $content = '<button data-action="' . $link . '" class="btn ' . $classes . ' no-ajax"' . $attrs . '>';
+            $content .= $title;
+            $content .= '</button>';
+        } else {
+            $content = '<a href="' . $link . '" class="btn ' . $classes . ' action no-ajax"' . $attrs . '>';
+            $content .= $title;
+            $content .= '</a>';
+        }
         $this->content = $content;
 
         return parent::FieldHolder($properties);
@@ -127,6 +139,27 @@ class CmsInlineFormAction extends LiteralField
     public function setParams(array $params)
     {
         $this->params = $params;
+        return $this;
+    }
+
+    /**
+     * Get the value of post
+     * @return boolean
+     */
+    public function getPost()
+    {
+        return $this->post;
+    }
+
+    /**
+     * Set the value of post
+     *
+     * @param boolean $post
+     * @return $this
+     */
+    public function setPost($post)
+    {
+        $this->post = $post;
         return $this;
     }
 }
