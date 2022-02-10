@@ -4,12 +4,6 @@
 [![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/)
 [![Code coverage](https://codecov.io/gh/lekoala/silverstripe-cms-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-cms-actions)
 
-## NEW in 1.2
-
-- Progressive actions!
-
-![progressive action](docs/progressive-action.gif "progressive action")
-
 ## Intro
 
 For those of you missing betterbuttons :-) Because let's face it, adding custom actions in SilverStripe is a real pain.
@@ -22,11 +16,12 @@ This is heavily inspired by betterbuttons module. Thanks to this extension, our 
 Then, we forward our requests to the model (a button declared on Member call the ItemRequest handler which forwards the action to the Member model).
 
 We can declare things in two functions:
-- As actions in getCMSActions : these are displayed next to the regular "save" button
+
+-   As actions in getCMSActions : these are displayed next to the regular "save" button
 
 ![custom action](docs/custom-action.png "custom action")
 
-- As utilities in getCMSUtils : these are displayed on the top right corner, next to the tabs
+-   As utilities in getCMSUtils : these are displayed on the top right corner, next to the tabs
 
 ![cms utils](docs/cms-utils.png "cms utils")
 
@@ -34,8 +29,6 @@ We can declare things in two functions:
 
 This module is mainly targeted at dealing with actions on regular DataObjects. However, in order to support actions on pages, the `ActionsGridFieldItemRequest`
 is also applied on `LeftAndMain`. Therefore, actions defined on pages should work properly as well.
-
-WARNING : this is still a bit experimental even if early tests show that this work well.
 
 ## Add your buttons
 
@@ -88,6 +81,7 @@ $myAction->setShouldRefresh(true);
 You can also put buttons into a drop-up menu.
 
 ![Drop-up example](docs/drop-up.gif "Drop-up example")
+
 ```php
 $myAction->setDropUp(true);
 ```
@@ -277,7 +271,7 @@ class MyGridButton extends GridFieldTableButton
 
 This class can then be added as a regular GridField component
 
-## Adding actions in getCmsFields
+## Adding actions in getCMSFields
 
 If you have a lot of actions, sometimes it might make more sense to add it to your cms fields.
 I've used this to provide template files for instance that needs to be uploaded.
@@ -375,20 +369,21 @@ For instance, this means that you actions are displayed before the 'save' button
 Since version 1.2, this module supports progressive actions. Progressive actions are buttons that use a progress bar to display what is happening. Under the hood,
 it translates to multiple ajax calls to the same handler function and passing the following post parameters:
 
-- progress_step: the current step
-- progress_total: this can be either set in advance or provided by the handler function
+-   progress_step: the current step
+-   progress_total: this can be either set in advance or provided by the handler function
 
 ![progressive action](docs/progressive-action.gif "progressive action")
 
 Progressive actions are supported for `GridFieldTableButton` and `CustomLink`.
 
 Here is a sample implementation. The action needs to return an array with the following keys:
-- progress_step: the updated step. Usually +1.
-- progress_total: the total number of records. It should only be computed once (on the initial run) when none is provided.
-- progress_id: you can return a unique id that will be passed along on each call
-- reload: should we reload at the end ?
-- message: each run can display a short lived notification with specific text
-- label: the end label (by default : Completed).
+
+-   progress_step: the updated step. Usually +1.
+-   progress_total: the total number of records. It should only be computed once (on the initial run) when none is provided.
+-   progress_id: you can return a unique id that will be passed along on each call
+-   reload: should we reload at the end ?
+-   message: each run can display a short lived notification with specific text
+-   label: the end label (by default : Completed).
 
 ```php
 class MyProgressiveTableButton extends GridFieldTableButton
@@ -439,9 +434,8 @@ that much easier). When using both modules it's easy to have actions that open a
 
 ## Todo
 
-- Explore pages or siteconfig support
-- Mobile ui for utils
-- Svg icons?
+-   Mobile ui for utils
+-   Svg icons?
 
 ## Sponsored by
 
@@ -449,7 +443,7 @@ This module is kindly sponsored by [RESTRUCT](restruct.nl)
 
 ## Compatibility
 
-Tested with 4.6 but should work on any ^4.4 projects
+Tested with 4.10 but should work on any ^4.4 projects
 
 ## Maintainer
 
