@@ -68,7 +68,7 @@ table .btn-link {
     margin-left: 10px;
 }
 
-/* GridFieldRowButtons */
-.action.btn {
+/* Align GridFieldRowButtons with the btn class (when no icons are used) */
+td > .action.btn {
     margin-top: -0.4rem;
 }
