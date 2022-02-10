@@ -63,7 +63,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      */
     public function __construct($columnName = null)
     {
-        if($columnName){
+        if ($columnName) {
             $this->columnName = $columnName;
         }
     }
@@ -107,7 +107,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
     public function getColumnAttributes($gridField, $record, $columnName)
     {
         // right-align if this column contains icon-buttons
-        return [ 'class' => $this->fontIcon ? 'grid-field__col-compact' : '' ];
+        return ['class' => $this->fontIcon ? 'grid-field__col-compact' : ''];
     }
 
     /**
@@ -121,9 +121,9 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
     {
         // No titles for action column IF icon button
         if ($columnName == $this->columnName && $this->fontIcon) {
-            return [ 'title' => '' ];
+            return ['title' => ''];
         }
-        return [ 'title' => $columnName ];
+        return ['title' => $columnName];
     }
 
     /**
@@ -134,7 +134,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      */
     public function getColumnsHandled($gridField)
     {
-        return [ $this->columnName ];
+        return [$this->columnName];
     }
 
     /**
@@ -145,7 +145,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      */
     public function getActions($gridField)
     {
-        return [ $this->getActionName() ];
+        return [$this->getActionName()];
     }
 
     /**
@@ -159,6 +159,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
     {
         $actionName = $this->getActionName();
         $actionLabel = $this->getButtonLabel($gridField, $record, $columnName);
+
         $field = GridField_FormAction::create(
             $gridField,
             $actionName . '_' . $record->ID,
@@ -170,7 +171,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
             )
         )
             ->addExtraClass('gridfield-button-' . $actionName)
-            ->setAttribute('title', $this->getButtonLabel($gridField, $record, $columnName));
+            ->setAttribute('title', $actionLabel);
 
         if (!$this->ajax) {
             $field->addExtraClass('no-ajax');

@@ -21,7 +21,7 @@ class Test_GridFieldAction extends GridFieldRowButton implements TestOnly
         return 'test';
     }
 
-    public function getButtonLabel()
+    public function getButtonLabel(GridField $gridField, $record, $columnName)
     {
         return 'Do Test';
     }
