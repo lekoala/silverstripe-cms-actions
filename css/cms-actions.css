@@ -67,3 +67,8 @@ table .btn-link {
 #ActionMenus {
     margin-left: 10px;
 }
+
+/* GridFieldRowButtons */
+.action.btn {
+    margin-top: -0.4rem;
+}
