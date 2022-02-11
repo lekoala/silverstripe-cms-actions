@@ -80,7 +80,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
 
     public function getActionName()
     {
-        $class = (new ReflectionClass($this->record))->getShortName();
+        $class = (new ReflectionClass(get_called_class()))->getShortName();
         // ! without lowercase, in does not work
         return strtolower(str_replace('Button', '', $class));
     }
