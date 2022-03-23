@@ -36,8 +36,8 @@ class CmsInlineFormAction extends LiteralField
 
     /**
      * This will be the selector that's click event gets called by {@see self}'s entwine event.
-     * 
-     * This is a temporary hack since form.sumbit() doesn't seem to be working.     * 
+     *
+     * This is a temporary hack since form.sumbit() doesn't seem to be working.
      * For example setting this up to work on CMSEditPage:
      * ```
      * CmsInlineFormAction::create('myAction', 'My Action')->setSubmitSelector('Form_ItemEditForm_action_save');
@@ -117,7 +117,7 @@ class CmsInlineFormAction extends LiteralField
         if ($this->readonly) {
             $attrs .= ' style="display:none"';
         }
-        if (\strlen($this->submitSelector)) {
+        if (strlen($this->submitSelector)) {
             $attrs .= " data-submit-selector=\"{$this->submitSelector}\"";
         }
         $title = $this->content;
@@ -192,8 +192,8 @@ class CmsInlineFormAction extends LiteralField
 
     /**
      * Set the value of {@see self::$submitSelector}
-     * 
-     * Includes 
+     *
+     * Includes
      *
      * @param string $selector
      * @return $this
