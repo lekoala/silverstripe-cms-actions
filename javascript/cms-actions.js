@@ -71,12 +71,13 @@
                 e.preventDefault();
                 var form = this.parents("form");
                 var action = form.attr("action");
+                var submitSelector = this.data("submit-selector");
                 form.attr("action", this.data("action"));
 
                 // somehow this does nothing?
                 // form.submit();
 
-                $('#Form_ItemEditForm_action_doSave').click();
+                $(submitSelector).click();
                 form.attr("action", action);
             },
         });
