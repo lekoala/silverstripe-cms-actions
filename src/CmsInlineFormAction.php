@@ -35,6 +35,20 @@ class CmsInlineFormAction extends LiteralField
     protected $post = false;
 
     /**
+     * This will be the selector that's click event gets called by {@see self}'s entwine event.
+     * 
+     * This is a temporary hack since form.sumbit() doesn't seem to be working.     * 
+     * For example setting this up to work on CMSEditPage:
+     * ```
+     * CmsInlineFormAction::create('myAction', 'My Action')->setSubmitSelector('Form_ItemEditForm_action_save');
+     * ```
+     * You can also use this to hackishly publish on post.
+     *
+     * @var string
+     */
+    protected $submitSelector = '#Form_ItemEditForm_action_doSave';
+
+    /**
      * Create a new action button.
      * @param action The method to call when the button is clicked
      * @param title The label on the button
@@ -103,6 +117,9 @@ class CmsInlineFormAction extends LiteralField
         if ($this->readonly) {
             $attrs .= ' style="display:none"';
         }
+        if (\strlen($this->submitSelector)) {
+            $attrs .= " data-submit-selector=\"{$this->submitSelector}\"";
+        }
         $title = $this->content;
         if ($this->post) {
             // This triggers a save action to the new location
@@ -160,6 +177,30 @@ class CmsInlineFormAction extends LiteralField
     public function setPost($post)
     {
         $this->post = $post;
+        return $this;
+    }
+
+    /**
+     * Get the value of {@see self::$submitSelector}
+     *
+     * @return string
+     */
+    public function getSubmitSelector()
+    {
+        return $this->submitSelector;
+    }
+
+    /**
+     * Set the value of {@see self::$submitSelector}
+     * 
+     * Includes 
+     *
+     * @param string $selector
+     * @return $this
+     */
+    public function setSubmitSelector($selector)
+    {
+        $this->submitSelector = $selector;
         return $this;
     }
 }
