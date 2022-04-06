@@ -700,8 +700,6 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($this->owner->hasMethod("LinkPageEdit")) {
                 return $controller->redirect($this->owner->LinkPageEdit($record->ID));
             }
-            // Fallback
-            return $controller->redirect($this->owner->Link());
         }
 
         if ($isNewRecord) {
