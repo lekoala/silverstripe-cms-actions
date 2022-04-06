@@ -714,6 +714,10 @@ class ActionsGridFieldItemRequest extends DataExtension
             $url = $controller->getRequest()->getURL();
             $action = $controller->getAction();
             $noActionURL = $url;
+            // Handle GridField detail form editing
+            if (strpos($url, 'ItemEditForm') !== false) {
+                $action = 'ItemEditForm';
+            }
             if ($action) {
                 $noActionURL = $controller->removeAction($url, $action);
             }
