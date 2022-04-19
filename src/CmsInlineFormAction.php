@@ -17,6 +17,7 @@ use LeKoala\CmsActions\DefaultLink;
 class CmsInlineFormAction extends LiteralField
 {
     use DefaultLink;
+    use ProgressiveAction;
 
     /**
      * @var array
@@ -108,6 +109,9 @@ class CmsInlineFormAction extends LiteralField
         if ($this->buttonIcon) {
             $classes .= " font-icon";
             $classes .= ' font-icon-' . $this->buttonIcon;
+        }
+        if ($this->progressive) {
+            $classes .= " progressive-action";
         }
         $link = $this->getLink();
         $attrs = '';

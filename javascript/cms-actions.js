@@ -91,6 +91,14 @@
                 url: url,
                 dataType: "json",
                 success: function (data) {
+                    if (data === null) {
+                        jQuery.noticeAdd({
+                            text: "Invalid handler",
+                            stayTime: 1000,
+                            inEffect: { left: "0", opacity: "show" },
+                        });
+                        return;
+                    }
                     // Progress can return messages
                     if (data.message) {
                         jQuery.noticeAdd({
