@@ -160,6 +160,17 @@ This feature can be disabled with the `enable_save_prev_next` config flag
 
 You can also use the HasPrevNextUtils trait to add navigation in your utils as well.
 
+### Configure UI options per record
+
+Instead of using the global config flags, you can configure the form based on the record being edited.
+
+Your DataObject needs to implement `getCMSActionsOptions`. This function should return an array with the following keys:
+- save_close: true/false
+- save_prev_next: true/false
+- delete_right: true/false
+
+This will be use instead of the default global options if provided.
+
 ### Custom prev/next record
 
 By implementing PrevRecord and NextRecord and your DataObject, you can override the

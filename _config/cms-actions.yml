@@ -16,3 +16,12 @@ LeKoala\CmsActions\ActionsGridFieldItemRequest:
   enable_save_prev_next: true
   enable_save_close: true
   enable_delete_right: true
+---
+Name: cms-actions-tabulator
+Only:
+  moduleexists:
+    - 'lekoala/silverstripe-tabulator'
+---
+LeKoala\Tabulator\TabulatorGrid_ItemRequest:
+  extensions:
+    - LeKoala\CmsActions\ActionsGridFieldItemRequest

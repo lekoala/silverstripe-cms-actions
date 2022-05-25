@@ -157,15 +157,24 @@ class ActionsGridFieldItemRequest extends DataExtension
             $actions->push($RightGroup);
         }
 
-        if (self::config()->enable_save_close) {
+        $opts = [
+            'save_close' => self::config()->enable_save_close,
+            'save_prev_next' => self::config()->enable_save_prev_next,
+            'delete_right' => self::config()->enable_delete_right,
+        ];
+        if ($record->hasMethod('getCMSActionsOptions')) {
+            $opts = array_merge($opts, $record->getCMSActionsOptions());
+        }
+
+        if ($opts['save_close']) {
             $this->addSaveAndClose($actions, $record);
         }
 
-        if (self::config()->enable_save_prev_next) {
+        if ($opts['save_prev_next']) {
             $this->addSaveNextAndPrevious($actions, $record);
         }
 
-        if (self::config()->enable_delete_right) {
+        if ($opts['delete_right']) {
             $this->moveCancelAndDelete($actions, $record);
         }
 
