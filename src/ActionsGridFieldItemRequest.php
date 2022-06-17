@@ -142,6 +142,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Add extension hook
         $this->extend('onBeforeUpdateCMSActions', $actions, $record);
+        $record->extend('onBeforeUpdateCMSActions', $actions);
 
         $ActionMenus = $actions->fieldByName('ActionMenus');
         // Re-insert ActionMenus to make sure they always follow the buttons
@@ -182,6 +183,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Add extension hook
         $this->extend('onAfterUpdateCMSActions', $actions, $record);
+        $record->extend('onAfterUpdateCMSActions', $actions);
     }
 
 
