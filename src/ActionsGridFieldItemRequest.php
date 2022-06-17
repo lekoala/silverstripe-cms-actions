@@ -17,6 +17,7 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
 use SilverStripe\SiteConfig\SiteConfigLeftAndMain;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\SiteConfig\SiteConfig;
@@ -36,6 +37,7 @@ use SilverStripe\SiteConfig\SiteConfig;
 class ActionsGridFieldItemRequest extends DataExtension
 {
     use Configurable;
+    use Extensible;
 
     /**
      * @config
@@ -139,7 +141,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $this->processDropUpMenu($actions);
 
         // Add extension hook
-        $record->extend('onBeforeUpdateCMSActions', $actions);
+        $this->extend('onBeforeUpdateCMSActions', $actions, $record);
 
         $ActionMenus = $actions->fieldByName('ActionMenus');
         // Re-insert ActionMenus to make sure they always follow the buttons
@@ -179,7 +181,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Add extension hook
-        $record->extend('onAfterUpdateCMSActions', $actions);
+        $this->extend('onAfterUpdateCMSActions', $actions, $record);
     }
 
 
