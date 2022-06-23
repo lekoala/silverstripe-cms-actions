@@ -335,14 +335,14 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($getPreviousRecordID) {
             $doSaveAndPrev = new FormAction('doSaveAndPrev', _t('ActionsGridFieldItemRequest.SAVEANDPREVIOUS', 'Save and Previous'));
             $doSaveAndPrev->addExtraClass($this->getBtnClassForRecord($record));
-            $doSaveAndPrev->addExtraClass('font-icon-angle-double-left');
+            $doSaveAndPrev->addExtraClass('font-icon-angle-double-left btn-mobile-collapse');
             $doSaveAndPrev->setUseButtonTag(true);
             $MajorActions->push($doSaveAndPrev);
         }
         if ($getNextRecordID) {
             $doSaveAndNext = new FormAction('doSaveAndNext', _t('ActionsGridFieldItemRequest.SAVEANDNEXT', 'Save and Next'));
             $doSaveAndNext->addExtraClass($this->getBtnClassForRecord($record));
-            $doSaveAndNext->addExtraClass('font-icon-angle-double-right');
+            $doSaveAndNext->addExtraClass('font-icon-angle-double-right btn-mobile-collapse');
             $doSaveAndNext->setUseButtonTag(true);
             $MajorActions->push($doSaveAndNext);
         }
@@ -381,7 +381,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $saveAndClose->setAttribute('data-btn-alternate-add', 'btn-primary');
             $saveAndClose->setAttribute('data-btn-alternate-remove', 'btn-outline-primary');
         }
-        $saveAndClose->addExtraClass('font-icon-level-up');
+        $saveAndClose->addExtraClass('font-icon-level-up btn-mobile-collapse');
         $saveAndClose->setUseButtonTag(true);
         $MajorActions->push($saveAndClose);
     }

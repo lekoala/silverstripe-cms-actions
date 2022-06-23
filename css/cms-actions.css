@@ -74,3 +74,9 @@ td > .action.btn {
     margin-top: -1.2308rem;
     margin-bottom: -1.2308rem;
 }
+
+@media screen and (max-width: 600px) {
+    .btn-mobile-collapse > span {
+        display: none;
+    }
+}

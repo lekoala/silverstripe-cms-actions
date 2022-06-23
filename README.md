@@ -443,6 +443,13 @@ This is covered as part of another module: https://github.com/lekoala/silverstri
 It requires a modal to be displayed (and modals are a bit of a pain to setup in SilverStripe 4, so I created a module to make
 that much easier). When using both modules it's easy to have actions that open a modal.
 
+## Collapsing icons
+
+The icons collapse in mobile view. If you have your own buttons, you can add the ´btn-mobile-collapse` class so that they
+do the same.
+
+![btn mobile collapse](docs/btn-mobile-collapse.png "btn mobile collapse")
+
 ## Todo
 
 -   Mobile ui for utils
