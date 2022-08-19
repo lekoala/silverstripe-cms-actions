@@ -33,14 +33,14 @@ class CmsActionsTest extends SapphireTest
         Test_ActionsPage::class,
     );
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $controller = Controller::curr();
         $controller->config()->set('url_segment', 'test_controller');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
     }
@@ -147,7 +147,7 @@ class CmsActionsTest extends SapphireTest
     {
         $customLink = new CustomLink('doTest');
         $customLink->setConfirmation(true);
-        $this->assertContains('sure', $customLink->getConfirmation());
+        $this->assertStringContainsString('sure', $customLink->getConfirmation());
     }
 
     public function testGridFieldAction()
