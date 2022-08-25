@@ -133,9 +133,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
             $button->setAttribute($attributeName, $attributeValue);
         }
         $button->setForm($gridField->getForm());
-        return array(
-            $this->targetFragment => $button->Field()
-        );
+        return [$this->targetFragment => $button->Field()];
     }
 
     /**
@@ -163,7 +161,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
 
     public function getActions($gridField)
     {
-        return array($this->getActionName());
+        return [$this->getActionName()];
     }
 
     /**

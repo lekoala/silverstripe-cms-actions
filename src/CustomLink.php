@@ -53,7 +53,7 @@ class CustomLink extends LiteralField
         return 'custom-link';
     }
 
-    public function FieldHolder($properties = array())
+    public function FieldHolder($properties = [])
     {
         $link = $this->link;
 

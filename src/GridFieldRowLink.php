@@ -75,7 +75,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
-        return array('class' => 'grid-field__col-compact');
+        return ['class' => 'grid-field__col-compact'];
     }
 
     /**
@@ -88,7 +88,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
     public function getColumnMetadata($gridField, $columnName)
     {
         if ($columnName == 'Actions') {
-            return array('title' => '');
+            return ['title' => ''];
         }
         return [];
     }
@@ -101,7 +101,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
      */
     public function getColumnsHandled($gridField)
     {
-        return array('Actions');
+        return ['Actions'];
     }
 
     /**
@@ -127,12 +127,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
             $this->addExtraClass('no-ajax');
         }
 
-        $data = new ArrayData(array(
-            'Link' => $this->getLink($gridField, $record, $columnName),
-            'ExtraClass' => $this->getExtraClass(),
-            'Title' => $this->title,
-            'NewWindow' => $this->newWindow,
-        ));
+        $data = new ArrayData(['Link' => $this->getLink($gridField, $record, $columnName), 'ExtraClass' => $this->getExtraClass(), 'Title' => $this->title, 'NewWindow' => $this->newWindow]);
 
         $template = SSViewer::get_templates_by_class($this, '', __CLASS__);
         return $data->renderWith($template);

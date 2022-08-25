@@ -66,13 +66,13 @@ class ActionsGridFieldItemRequest extends DataExtension
     /**
      * @var array Allowed controller actions
      */
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'doSaveAndClose',
         'doSaveAndNext',
         'doSaveAndPrev',
         'doCustomAction', // For CustomAction
         'doCustomLink', // For CustomLink
-    );
+    ];
 
     /**
      * @return array
@@ -475,10 +475,7 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $message = _t(
                     'ActionsGridFieldItemRequest.FAILED',
                     'Action {action} failed on {name}',
-                    array(
-                        'action' => $clickedAction->getTitle(),
-                        'name' => $record->i18n_singular_name(),
-                    )
+                    ['action' => $clickedAction->getTitle(), 'name' => $record->i18n_singular_name()]
                 );
             } elseif (is_string($result)) {
                 // Result is a message
@@ -494,10 +491,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $message = _t(
                 'ActionsGridFieldItemRequest.DONE',
                 'Action {action} was done on {name}',
-                array(
-                    'action' => $clickedAction->getTitle(),
-                    'name' => $record->i18n_singular_name(),
-                )
+                ['action' => $clickedAction->getTitle(), 'name' => $record->i18n_singular_name()]
             );
         }
         $status = 'good';

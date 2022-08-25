@@ -165,10 +165,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
             $actionName . '_' . $record->ID,
             ($this->fontIcon ? false : $actionLabel),
             $actionName,
-            array(
-                'RecordID' => $record->ID,
-                'ParentID' => $this->parentID
-            )
+            ['RecordID' => $record->ID, 'ParentID' => $this->parentID]
         )
             ->addExtraClass('gridfield-button-' . $actionName)
             ->setAttribute('title', $actionLabel);

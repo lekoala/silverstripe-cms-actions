@@ -133,9 +133,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             $button->setAttribute($attributeName, $attributeValue);
         }
         $button->setForm($gridField->getForm());
-        return array(
-            $this->targetFragment => $button->Field()
-        );
+        return [$this->targetFragment => $button->Field()];
     }
 
     /**
@@ -163,7 +161,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
 
     public function getActions($gridField)
     {
-        return array($this->getActionName());
+        return [$this->getActionName()];
     }
 
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
@@ -222,9 +220,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
      */
     public function getURLHandlers($gridField)
     {
-        return array(
-            $this->getActionName() => 'handle',
-        );
+        return [$this->getActionName() => 'handle'];
     }
 
     abstract public function handle(GridField $gridField, Controller $controller);

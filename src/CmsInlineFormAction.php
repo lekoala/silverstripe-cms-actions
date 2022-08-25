@@ -103,7 +103,7 @@ class CmsInlineFormAction extends LiteralField
         return 'inline-action';
     }
 
-    public function FieldHolder($properties = array())
+    public function FieldHolder($properties = [])
     {
         $classes = $this->extraClass();
         if ($this->buttonIcon) {

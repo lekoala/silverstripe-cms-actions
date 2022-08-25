@@ -46,7 +46,7 @@ class CustomAction extends FormAction
         return 'action';
     }
 
-    public function Field($properties = array())
+    public function Field($properties = [])
     {
         if ($this->buttonIcon) {
             $this->addExtraClass('font-icon');
