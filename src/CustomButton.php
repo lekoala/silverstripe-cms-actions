@@ -124,7 +124,7 @@ trait CustomButton
     /**
      * Set an icon for this button
      *
-     * Feel free to use SilverStripeIcons constants
+     * Feel free to use {@link https://github.com/CSoellinger/silverstripe-admin-icons}
      *
      * @param string $buttonIcon An icon for this button
      * @return $this

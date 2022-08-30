@@ -65,10 +65,10 @@ public function doCustomAction() {
 }
 ```
 
-You can set icon. See SilverStripeIcons class for available icons. We use base silverstripe icons.
+You can set icon. See We use base silverstripe icons.
 
 ```php
-$downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
+$downloadExcelReport->setButtonIcon('export');
 ```
 
 CustomActions are buttons and submitted through ajax. If it changes the state of your record you
@@ -95,7 +95,7 @@ public function getCMSActions()
     $actions = parent::getCMSActions();
 
     $actions->push($downloadExcelReport = new CustomLink('downloadExcelReport','Download report'));
-    $downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
+    $downloadExcelReport->setButtonIcon('export');
 
     return $actions;
 }
