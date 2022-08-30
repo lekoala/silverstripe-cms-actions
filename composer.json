@@ -23,7 +23,7 @@
         "silverstripe/recipe-plugin": "^1",
         "silverstripe/admin": "^1.4",
         "silverstripe/framework": "^4.4",
-        "csoellinger/silverstripe-admin-icons": "^1.11"
+        "csoellinger/silverstripe-admin-icons": "^1.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
