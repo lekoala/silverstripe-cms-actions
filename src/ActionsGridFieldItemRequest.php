@@ -2,6 +2,7 @@
 
 namespace LeKoala\CmsActions;
 
+use Csoellinger\Silverstripe\AdminIcons\AdminIconCss;
 use Exception;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\Form;
@@ -335,14 +336,14 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($getPreviousRecordID) {
             $doSaveAndPrev = new FormAction('doSaveAndPrev', _t('ActionsGridFieldItemRequest.SAVEANDPREVIOUS', 'Save and Previous'));
             $doSaveAndPrev->addExtraClass($this->getBtnClassForRecord($record));
-            $doSaveAndPrev->addExtraClass('font-icon-angle-double-left btn-mobile-collapse');
+            $doSaveAndPrev->addExtraClass('btn-mobile-collapse ' . AdminIconCss::ANGLE_DOUBLE_LEFT);
             $doSaveAndPrev->setUseButtonTag(true);
             $MajorActions->push($doSaveAndPrev);
         }
         if ($getNextRecordID) {
             $doSaveAndNext = new FormAction('doSaveAndNext', _t('ActionsGridFieldItemRequest.SAVEANDNEXT', 'Save and Next'));
             $doSaveAndNext->addExtraClass($this->getBtnClassForRecord($record));
-            $doSaveAndNext->addExtraClass('font-icon-angle-double-right btn-mobile-collapse');
+            $doSaveAndNext->addExtraClass('btn-mobile-collapse ' . AdminIconCss::ANGLE_DOUBLE_RIGHT);
             $doSaveAndNext->setUseButtonTag(true);
             $MajorActions->push($doSaveAndNext);
         }
@@ -381,7 +382,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $saveAndClose->setAttribute('data-btn-alternate-add', 'btn-primary');
             $saveAndClose->setAttribute('data-btn-alternate-remove', 'btn-outline-primary');
         }
-        $saveAndClose->addExtraClass('font-icon-level-up btn-mobile-collapse');
+        $saveAndClose->addExtraClass('btn-mobile-collapse ' . AdminIconCss::LEVEL_UP);
         $saveAndClose->setUseButtonTag(true);
         $MajorActions->push($saveAndClose);
     }
