@@ -405,7 +405,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $result = null;
 
         foreach ($definedActions as $definedAction) {
-            if(is_a($definedAction, \SilverStripe\Forms\CompositeField::class)) {
+            if (is_a($definedAction, \SilverStripe\Forms\CompositeField::class)) {
                 $result = self::findAction($action, $definedAction->FieldList());
             }
 
