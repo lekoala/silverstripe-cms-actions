@@ -400,6 +400,28 @@ class ActionsGridFieldItemRequest extends DataExtension
         return 'btn-primary';
     }
 
+    protected static function findAction($action, $definedActions)
+    {
+        $result = null;
+
+        foreach ($definedActions as $definedAction) {
+            if(is_a($definedAction, \SilverStripe\Forms\CompositeField::class)) {
+                $result = self::findAction($action, $definedAction->FieldList());
+            }
+
+            $definedActionName = $definedAction->getName();
+
+            if ($definedAction->hasMethod('actionName')) {
+                $definedActionName = $definedAction->actionName();
+            }
+            if ($definedActionName == $action) {
+                $result = $definedAction;
+            }
+        }
+
+        return $result;
+    }
+    
     /**
      * Forward a given action to a DataObject
      *
@@ -436,15 +458,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         // Check if the action is indeed available
         $clickedAction = null;
         if (!empty($definedActions)) {
-            foreach ($definedActions as $definedAction) {
-                $definedActionName = $definedAction->getName();
-                if ($definedAction->hasMethod('actionName')) {
-                    $definedActionName = $definedAction->actionName();
-                }
-                if ($definedActionName == $action) {
-                    $clickedAction = $definedAction;
-                }
-            }
+            $clickedAction = self::findAction($action, $definedActions);
         }
         if (!$clickedAction) {
             $class = get_class($record);
