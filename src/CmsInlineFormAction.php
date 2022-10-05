@@ -134,14 +134,16 @@ class CmsInlineFormAction extends LiteralField
         }
         $title = $this->content;
         if ($this->post) {
-            $content = sprintf('<button data-action="%s" class="btn no-ajax %s" %s>%s</button>',
+            $content = sprintf(
+                '<button data-action="%s" class="btn no-ajax %s" %s>%s</button>',
                 $link,
                 implode(' ', $classes),
                 implode('', $attrs),
                 $title
             );
         } else {
-            $content = sprintf('<a href="%s" class="btn action no-ajax %s" %s>%s</a>',
+            $content = sprintf(
+                '<a href="%s" class="btn action no-ajax %s" %s>%s</a>',
                 $link,
                 implode(' ', $classes),
                 implode('', $attrs),

@@ -94,7 +94,8 @@ class CustomLink extends LiteralField
             $attrs[] = sprintf('%s="%s"', $attributeKey, $attributeValue);
         }
 
-        $content = sprintf('<a href="%s" class="%s" %s>%s</a>',
+        $content = sprintf(
+            '<a href="%s" class="%s" %s>%s</a>',
             $link,
             implode(' ', $classes),
             implode(' ', $attrs),

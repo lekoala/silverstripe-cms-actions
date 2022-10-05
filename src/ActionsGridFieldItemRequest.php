@@ -780,6 +780,5 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller->getRequest()->addHeader('X-Pjax', 'Content');
 
         return $controller->redirect($noActionURL, 302);
-
     }
 }

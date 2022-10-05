@@ -76,7 +76,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * @param string $columnName
      * @return string Label for the gridfield button
      */
-    abstract function getButtonLabel(GridField $gridField, $record, $columnName);
+    abstract public function getButtonLabel(GridField $gridField, $record, $columnName);
 
     /**
      * @param GridField $gridField
@@ -85,7 +85,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * @param $data
      * @return mixed
      */
-    abstract function doHandle(GridField $gridField, $actionName, $arguments, $data);
+    abstract public function doHandle(GridField $gridField, $actionName, $arguments, $data);
 
     /**
      * @return string

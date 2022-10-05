@@ -30,7 +30,8 @@ trait HasPrevNextUtils
                 $NextBtnLink = new CmsInlineFormAction(
                     'NextBtnLink',
                     _t('HasPrevNextUtils.Next', 'Next') . ' >',
-                    'btn-secondary')
+                    'btn-secondary'
+                )
             );
             $NextBtnLink->setLink(str_replace($search, sprintf($replaceStr, $getPreviousRecordID), $url));
         }
@@ -39,7 +40,8 @@ trait HasPrevNextUtils
                 $PrevBtnLink = new CmsInlineFormAction(
                     'PrevBtnLink',
                     '< ' . _t('HasPrevNextUtils.Previous', 'Previous'),
-                    'btn-secondary')
+                    'btn-secondary'
+                )
             );
             $PrevBtnLink->setLink(str_replace($search, sprintf($replaceStr, $getNextRecordID), $url));
         }

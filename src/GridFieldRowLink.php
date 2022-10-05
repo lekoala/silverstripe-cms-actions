@@ -129,7 +129,8 @@ class GridFieldRowLink implements GridField_ColumnProvider
             $this->addExtraClass('no-ajax');
         }
 
-        $data = new ArrayData([
+        $data = new ArrayData(
+            [
             'Link' => $this->getLink($gridField, $record, $columnName),
             'ExtraClass' => $this->getExtraClass(),
             'Title' => $this->title,
