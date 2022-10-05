@@ -6,9 +6,9 @@ use ReflectionClass;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_URLHandler;
-use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
+use SilverStripe\Forms\GridField\GridField_HTMLProvider;
+use SilverStripe\Forms\GridField\GridField_URLHandler;
 
 /**
  * Provide a simple way to declare buttons that affects a whole GridField
@@ -85,6 +85,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function getActionName()
     {
         $class = (new ReflectionClass(get_called_class()))->getShortName();
+
         // ! without lowercase, in does not work
         return strtolower(str_replace('Button', '', $class));
     }
@@ -133,6 +134,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             $button->setAttribute($attributeName, $attributeValue);
         }
         $button->setForm($gridField->getForm());
+
         return [$this->targetFragment => $button->Field()];
     }
 
@@ -144,6 +146,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function setAttribute($name, $value)
     {
         $this->attributes[$name] = $value;
+
         return $this;
     }
 
@@ -153,17 +156,25 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
      */
     public function getAttribute($name)
     {
-        if (isset($this->attributes[$name])) {
-            return $this->attributes[$name];
-        }
-        return null;
+        return $this->attributes[$name] ?? null;
     }
 
+    /**
+     * @param $gridField
+     * @return array
+     */
     public function getActions($gridField)
     {
         return [$this->getActionName()];
     }
 
+    /**
+     * @param GridField $gridField
+     * @param $actionName
+     * @param $arguments
+     * @param $data
+     * @return array|\SilverStripe\Control\HTTPResponse|void
+     */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
         if (in_array($actionName, $this->getActions($gridField))) {
@@ -179,12 +190,12 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             $result = $this->handle($gridField, $controller);
             if ((!$result || is_string($result)) && $this->progressive) {
                 // simply increment counter and let's hope last action will return something
-                $step = (int) $controller->getRequest()->postVar("progress_step");
-                $total = (int) $controller->getRequest()->postVar("progress_total");
+                $step = (int)$controller->getRequest()->postVar("progress_step");
+                $total = (int)$controller->getRequest()->postVar("progress_total");
                 $result = [
-                    'progress_step' => $step + 1,
+                    'progress_step'  => $step + 1,
                     'progress_total' => $total,
-                    'message' => $result,
+                    'message'        => $result,
                 ];
             }
             if ($result) {
@@ -193,8 +204,10 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                     $response = $controller->getResponse();
                     $response->addHeader('Content-Type', 'application/json');
                     $response->setBody(json_encode($result));
+
                     return $response;
                 }
+
                 return $result;
             }
 
@@ -210,6 +223,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                 $response->setBody($gridField->forTemplate());
                 $response
                     ->addHeader('X-Status', 'Action completed');
+
                 return $response;
             }
         }
@@ -223,6 +237,11 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
         return [$this->getActionName() => 'handle'];
     }
 
+    /**
+     * @param GridField $gridField
+     * @param Controller $controller
+     * @return mixed
+     */
     abstract public function handle(GridField $gridField, Controller $controller);
 
     /**
@@ -269,6 +288,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function setParentID($id)
     {
         $this->parentID = $id;
+
         return $this;
     }
 
@@ -291,6 +311,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function setConfirm($confirm)
     {
         $this->confirm = $confirm;
+
         return $this;
     }
 
@@ -313,6 +334,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function setPrompt($prompt)
     {
         $this->prompt = $prompt;
+
         return $this;
     }
 
@@ -335,6 +357,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     public function setPromptDefault($promptDefault)
     {
         $this->promptDefault = $promptDefault;
+
         return $this;
     }
 }

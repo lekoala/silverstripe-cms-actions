@@ -42,7 +42,7 @@ trait DefaultLink
         $allParams = $ctrl->getRequest()->allParams();
         $ID = $allParams['ID'] ?? 0;
         $params = array_merge(['CustomLink' => $action], $params);
-        $action = '/EditForm/field/' . $fieldName . '/item/' . $ID . '/doCustomLink';
+        $action = sprintf('/EditForm/field/%s/item/%d/doCustomLink', $fieldName, $ID);
 
         return $this->getControllerLink($action, $params);
     }
@@ -53,7 +53,7 @@ trait DefaultLink
      * If you want to call actions on a model, use getModelLink
      *
      * @param string $action
-     * @param array $params
+     * @param array|null $params
      * @return string
      */
     public function getControllerLink($action, array $params = null)
@@ -65,12 +65,13 @@ trait DefaultLink
         if ($ctrl instanceof ModelAdmin) {
             $allParams = $ctrl->getRequest()->allParams();
             $modelClass = $ctrl->getRequest()->param('ModelClass');
-            $action = $modelClass . '/' . $action;
+            $action = sprintf('%s/%s', $modelClass, $action);
             $params = array_merge($allParams, $params);
         }
         if (!empty($params)) {
             $action .= '?' . http_build_query($params);
         }
+
         return $ctrl->Link($action);
     }
 
@@ -90,6 +91,7 @@ trait DefaultLink
     public function setLink($link)
     {
         $this->link = $link;
+
         return $this;
     }
 
@@ -109,6 +111,7 @@ trait DefaultLink
     public function setNewWindow($newWindow)
     {
         $this->newWindow = $newWindow;
+
         return $this;
     }
 }

@@ -54,6 +54,7 @@ trait CustomButton
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -77,6 +78,7 @@ trait CustomButton
     public function setDropUp($is)
     {
         $this->dropUp = !!$is;
+
         return $this;
     }
 
@@ -94,7 +96,7 @@ trait CustomButton
             }
         }
 
-        $btn = "btn-$type";
+        $btn = sprintf('btn-%s', $type);
         $this->extraClasses[$btn] = $btn;
 
         return $this;
@@ -107,8 +109,7 @@ trait CustomButton
      */
     protected function getButtonTitle()
     {
-        $title = $this->title;
-        return $title;
+        return $this->title;
     }
 
     /**
@@ -132,6 +133,7 @@ trait CustomButton
     public function setButtonIcon(string $buttonIcon)
     {
         $this->buttonIcon = $buttonIcon;
+
         return $this;
     }
 
@@ -155,6 +157,7 @@ trait CustomButton
             $confirmation = _t('CustomButton.CONFIRM_MESSAGE', 'Are you sure?');
         }
         $this->confirmation = $confirmation;
+
         return $this;
     }
 }

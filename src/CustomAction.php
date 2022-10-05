@@ -2,8 +2,8 @@
 
 namespace LeKoala\CmsActions;
 
-use SilverStripe\Forms\FormAction;
 use SilverStripe\Core\Convert;
+use SilverStripe\Forms\FormAction;
 
 /**
  * Custom actions to use in getCMSActions
@@ -58,6 +58,7 @@ class CustomAction extends FormAction
             $this->setAttribute('data-message', Convert::raw2htmlatt($this->confirmation));
             $this->setAttribute('onclick', 'return confirm(this.dataset.message);return false;');
         }
+
         return parent::Field($properties);
     }
 
@@ -79,6 +80,7 @@ class CustomAction extends FormAction
     public function setShouldRefresh($shouldRefresh)
     {
         $this->shouldRefresh = $shouldRefresh;
+
         return $this;
     }
 }

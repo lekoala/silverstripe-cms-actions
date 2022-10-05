@@ -2,9 +2,8 @@
 
 namespace LeKoala\CmsActions;
 
-use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\LiteralField;
-use LeKoala\CmsActions\DefaultLink;
 
 /**
  * A simple button that links to a given action or url
@@ -51,9 +50,9 @@ class CmsInlineFormAction extends LiteralField
 
     /**
      * Create a new action button.
-     * @param action The method to call when the button is clicked
-     * @param title The label on the button
-     * @param extraClass A CSS class to apply to the button in addition to 'action'
+     * @param action $action The method to call when the button is clicked
+     * @param title $title The label on the button
+     * @param extraClass $extraClass A CSS class to apply to the button in addition to 'action'
      */
     public function __construct($action, $title = "", $extraClass = 'btn-primary')
     {
@@ -71,6 +70,7 @@ class CmsInlineFormAction extends LiteralField
         if (!$this->link) {
             $this->link = $this->getControllerLink($this->name, $this->params);
         }
+
         return $this->link;
     }
 
@@ -95,45 +95,58 @@ class CmsInlineFormAction extends LiteralField
     public function setButtonIcon(string $buttonIcon)
     {
         $this->buttonIcon = $buttonIcon;
+
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function Type()
     {
         return 'inline-action';
     }
 
+    /**
+     * @param $properties
+     * @return FormField|string
+     */
     public function FieldHolder($properties = [])
     {
-        $classes = $this->extraClass();
+        $classes = [$this->extraClass()];
         if ($this->buttonIcon) {
-            $classes .= " font-icon";
-            $classes .= ' font-icon-' . $this->buttonIcon;
+            $classes[] = "font-icon";
+            $classes[] = sprintf('font-icon-%s', $this->buttonIcon);
         }
         if ($this->progressive) {
-            $classes .= " progressive-action";
+            $classes[] = "progressive-action";
         }
         $link = $this->getLink();
-        $attrs = '';
+        $attrs = [];
         if ($this->newWindow) {
-            $attrs .= ' target="_blank"';
+            $attrs[] = 'target="_blank"';
         }
         if ($this->readonly) {
-            $attrs .= ' style="display:none"';
+            $attrs[] = 'style="display:none"';
         }
         if (strlen($this->submitSelector)) {
-            $attrs .= " data-submit-selector=\"{$this->submitSelector}\"";
+            $attrs[] = sprintf('data-submit-selector="%s"', $this->submitSelector);
         }
         $title = $this->content;
         if ($this->post) {
-            // This triggers a save action to the new location
-            $content = '<button data-action="' . $link . '" class="btn ' . $classes . ' no-ajax"' . $attrs . '>';
-            $content .= $title;
-            $content .= '</button>';
+            $content = sprintf('<button data-action="%s" class="btn no-ajax %s" %s>%s</button>',
+                $link,
+                implode(' ', $classes),
+                implode('', $attrs),
+                $title
+            );
         } else {
-            $content = '<a href="' . $link . '" class="btn ' . $classes . ' action no-ajax"' . $attrs . '>';
-            $content .= $title;
-            $content .= '</a>';
+            $content = sprintf('<a href="%s" class="btn action no-ajax %s" %s>%s</a>',
+                $link,
+                implode(' ', $classes),
+                implode('', $attrs),
+                $title
+            );
         }
         $this->content = $content;
 
@@ -153,13 +166,14 @@ class CmsInlineFormAction extends LiteralField
     /**
      * Set the value of params
      *
-     * @param  array  $params
+     * @param array $params
      *
      * @return $this
      */
     public function setParams(array $params)
     {
         $this->params = $params;
+
         return $this;
     }
 
@@ -181,6 +195,7 @@ class CmsInlineFormAction extends LiteralField
     public function setPost($post)
     {
         $this->post = $post;
+
         return $this;
     }
 
@@ -205,6 +220,7 @@ class CmsInlineFormAction extends LiteralField
     public function setSubmitSelector($selector)
     {
         $this->submitSelector = $selector;
+
         return $this;
     }
 }

@@ -3,27 +3,31 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
-use SilverStripe\Forms\Tab;
-use SilverStripe\Forms\Form;
-use SilverStripe\Forms\TabSet;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Control\Director;
-use SilverStripe\Forms\FormAction;
 use SilverStripe\Admin\LeftAndMain;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\ORM\ValidationResult;
+use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
-use SilverStripe\SiteConfig\SiteConfigLeftAndMain;
+use SilverStripe\Forms\CompositeField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TabSet;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\ORM\ValidationResult;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\SiteConfig\SiteConfigLeftAndMain;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
+ *
  * This is also applied to LeftAndMain to allow actions on pages
  * Warning: LeftAndMain doesn't call updateItemEditForm
  *
@@ -32,7 +36,7 @@ use SilverStripe\SiteConfig\SiteConfig;
  *
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons/blob/master/src/Extensions/GridFieldBetterButtonsItemRequest.php
- * @property \SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest|\SilverStripe\Admin\LeftAndMain $owner
+ * @property LeftAndMain|GridFieldDetailForm_ItemRequest|ActionsGridFieldItemRequest $owner
  */
 class ActionsGridFieldItemRequest extends DataExtension
 {
@@ -83,6 +87,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         foreach ($actions as $action) {
             $list[] = $action->getName();
         }
+
         return $list;
     }
 
@@ -91,23 +96,20 @@ class ActionsGridFieldItemRequest extends DataExtension
      *
      * This is called by GridFieldDetailForm_ItemRequest
      *
-     * @param Form The ItemEditForm object
+     * @param Form $form The ItemEditForm object
      */
     public function updateItemEditForm($form)
     {
         $itemRequest = $this->owner;
 
-        /** @var DataObject $record  */
+        /** @var DataObject $record */
         $record = $itemRequest->record;
-        if (!$record) {
-            $record = $form->getRecord();
-        }
-        if (!$record) {
+        if (!$this->checkCan($record)) {
             return;
         }
 
         // We get the actions as defined on our record
-        /** @var FieldList $CMSActions  */
+        /** @var FieldList $CMSActions */
         $CMSActions = $record->getCMSActions();
 
         // address Silverstripe bug when SiteTree buttons are broken
@@ -161,9 +163,9 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         $opts = [
-            'save_close' => self::config()->enable_save_close,
+            'save_close'     => self::config()->enable_save_close,
             'save_prev_next' => self::config()->enable_save_prev_next,
-            'delete_right' => self::config()->enable_delete_right,
+            'delete_right'   => self::config()->enable_delete_right,
         ];
         if ($record->hasMethod('getCMSActionsOptions')) {
             $opts = array_merge($opts, $record->getCMSActionsOptions());
@@ -224,7 +226,22 @@ class ActionsGridFieldItemRequest extends DataExtension
         $rootTabSet->addExtraClass('ss-ui-action-tabset action-menus noborder');
 
         $actions->insertBefore('RightGroup', $rootTabSet);
+
         return $dropUpContainer;
+    }
+
+    /**
+     * Check if a record can be edited/created/exists
+     * @param DataObject $record
+     * @return bool
+     */
+    protected function checkCan($record)
+    {
+        if (!$record->canEdit() || (!$record->ID && !$record->canCreate())) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -244,9 +261,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $actions->remove($deleteAction);
             $actions->push($deleteAction);
 
-            if ($RightGroup) {
-                // Stack position is enough to have it on the left
-            } else {
+            if (!$RightGroup) {
                 // Only necessary pre 4.4
                 $deleteAction->addExtraClass('align-right');
             }
@@ -261,9 +276,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             // Move at the end of the stack
             $actions->remove($cancelButton);
             $actions->push($cancelButton);
-            if ($RightGroup) {
-                // Stack position is enough to have it on the left
-            } else {
+            if (!$RightGroup) {
                 // Only necessary pre 4.4
                 $cancelButton->addExtraClass('align-right');
             }
@@ -283,6 +296,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($record->hasMethod('PrevRecord')) {
             return $record->PrevRecord()->ID ?? 0;
         }
+
         return $this->owner->getPreviousRecordID();
     }
 
@@ -295,6 +309,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($record->hasMethod('NextRecord')) {
             return $record->NextRecord()->ID ?? 0;
         }
+
         return $this->owner->getNextRecordID();
     }
 
@@ -305,10 +320,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function addSaveNextAndPrevious(FieldList $actions, DataObject $record)
     {
-        if (!$record->canEdit()) {
-            return;
-        }
-        if (!$record->ID) {
+        if (!$record->canEdit() || !$record->ID) {
             return;
         }
 
@@ -325,7 +337,8 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Coupling for HasPrevNextUtils
         if (Controller::has_curr()) {
-            $request =  Controller::curr()->getRequest();
+            /** @var HTTPRequest $request */
+            $request = Controller::curr()->getRequest();
             $routeParams = $request->routeParams();
             $routeParams['PreviousRecordID'] = $getPreviousRecordID;
             $routeParams['NextRecordID'] = $getNextRecordID;
@@ -355,10 +368,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function addSaveAndClose(FieldList $actions, DataObject $record)
     {
-        if (!$record->canEdit()) {
-            return;
-        }
-        if (!$record->ID && !$record->canCreate()) {
+        if (!$this->checkCan($record)) {
             return;
         }
 
@@ -397,15 +407,21 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($record->ID) {
             return 'btn-outline-primary';
         }
+
         return 'btn-primary';
     }
 
+    /**
+     * @param $action
+     * @param $definedActions
+     * @return mixed|CompositeField|null
+     */
     protected static function findAction($action, $definedActions)
     {
         $result = null;
 
         foreach ($definedActions as $definedAction) {
-            if (is_a($definedAction, \SilverStripe\Forms\CompositeField::class)) {
+            if (is_a($definedAction, CompositeField::class)) {
                 $result = self::findAction($action, $definedAction->FieldList());
             }
 
@@ -414,14 +430,14 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($definedAction->hasMethod('actionName')) {
                 $definedActionName = $definedAction->actionName();
             }
-            if ($definedActionName == $action) {
+            if ($definedActionName === $action) {
                 $result = $definedAction;
             }
         }
 
         return $result;
     }
-    
+
     /**
      * Forward a given action to a DataObject
      *
@@ -431,6 +447,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      * @param array $data
      * @param Form $form
      * @return HTTPResponse|DBHTMLText|string
+     * @throws HTTPResponse_Exception
      */
     protected function forwardActionToRecord($action, $data = [], $form = null)
     {
@@ -466,20 +483,25 @@ class ActionsGridFieldItemRequest extends DataExtension
             if (!$availableActions) {
                 $availableActions = "(no available actions, please check getCMSActions)";
             }
-            return $this->owner->httpError(403, 'Action not available on ' . $class . '. It must be one of : ' . $availableActions);
+
+            return $this->owner->httpError(403, sprintf(
+                'Action not available on %s. It must be one of : %s',
+                $class,
+                $availableActions
+            ));
         }
         $message = null;
         $error = false;
 
         // Check record BEFORE the action
-        // It can be deleted by the action and it will return to the list
-        $isNewRecord = $record->ID == 0;
+        // It can be deleted by the action, and it will return to the list
+        $isNewRecord = $record->ID === 0;
 
         try {
             $result = $record->$action($data, $form, $controller);
 
             // We have a response
-            if ($result && $result instanceof HTTPResponse) {
+            if ($result instanceof HTTPResponse) {
                 return $result;
             }
 
@@ -520,6 +542,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($result) {
                 $response->setBody(json_encode($result));
             }
+
             return $response;
         }
 
@@ -528,6 +551,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             if ($error) {
                 return $this->owner->httpError(403, $message);
             }
+
             return $message;
         }
         if (Director::is_ajax()) {
@@ -543,6 +567,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         } else {
             $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
         }
+
         // Redirect after action
         return $this->redirectAfterAction($isNewRecord, $record);
     }
@@ -558,10 +583,12 @@ class ActionsGridFieldItemRequest extends DataExtension
      *
      * @param HTTPRequest $request
      * @return HTTPResponse|DBHTMLText|string
+     * @throws Exception
      */
     public function doCustomLink(HTTPRequest $request)
     {
         $action = $request->getVar('CustomLink');
+
         return $this->forwardActionToRecord($action);
     }
 
@@ -576,41 +603,44 @@ class ActionsGridFieldItemRequest extends DataExtension
      *   [doTestAction] => 1
      * )
      *
-     * @param array The form data
-     * @param Form The form object
+     * @param array $data The form data
+     * @param Form $form The form object
      * @return HTTPResponse|DBHTMLText|string
+     * @throws Exception
      */
     public function doCustomAction($data, $form)
     {
         $action = key($data['action_doCustomAction']);
+
         return $this->forwardActionToRecord($action, $data, $form);
     }
 
     /**
      * Saves the form and goes back to list view
      *
-     * @param array The form data
-     * @param Form The form object
+     * @param array $data The form data
+     * @param Form $form The form object
      */
     public function doSaveAndClose($data, $form)
     {
-        $result = $this->owner->doSave($data, $form);
+        $this->owner->doSave($data, $form);
         // Redirect after save
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
+
         return $controller->redirect($this->getBackLink());
     }
 
     /**
      * Saves the form and goes back to the next item
      *
-     * @param array The form data
-     * @param Form The form object
+     * @param array $data The form data
+     * @param Form $form The form object
      */
     public function doSaveAndNext($data, $form)
     {
         $record = $this->owner->record;
-        $result = $this->owner->doSave($data, $form);
+        $this->owner->doSave($data, $form);
         // Redirect after save
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
@@ -623,21 +653,22 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Link to a specific tab if set, see cms-actions.js
         if ($next && !empty($data['_activetab'])) {
-            $link .= '#' . $data['_activetab'];
+            $link .= sprintf('#%s', $data['_activetab']);
         }
+
         return $controller->redirect($link);
     }
 
     /**
      * Saves the form and goes to the previous item
      *
-     * @param array The form data
-     * @param Form The form object
+     * @param array $data The form data
+     * @param Form $form The form object
      */
     public function doSaveAndPrev($data, $form)
     {
         $record = $this->owner->record;
-        $result = $this->owner->doSave($data, $form);
+        $this->owner->doSave($data, $form);
         // Redirect after save
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
@@ -650,8 +681,9 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // Link to a specific tab if set, see cms-actions.js
         if ($prev && !empty($data['_activetab'])) {
-            $link .= '#' . $data['_activetab'];
+            $link .= sprintf('#%s', $data['_activetab']);
         }
+
         return $controller->redirect($link);
     }
 
@@ -670,11 +702,12 @@ class ActionsGridFieldItemRequest extends DataExtension
         if (!$this->owner->hasMethod("getController")) {
             return Controller::curr();
         }
-        $c = $this->owner->getController();
-        while ($c && $c instanceof GridFieldDetailForm_ItemRequest) {
-            $c = $c->getController();
+        $controller = $this->owner->getController();
+        while ($controller instanceof GridFieldDetailForm_ItemRequest) {
+            $controller = $controller->getController();
         }
-        return $c;
+
+        return $controller;
     }
 
     /**
@@ -689,7 +722,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         // TODO Coupling with CMS
         $backlink = '';
         $toplevelController = $this->getToplevelController();
-        if ($toplevelController && $toplevelController instanceof LeftAndMain) {
+        if ($toplevelController instanceof LeftAndMain) {
             if ($toplevelController->hasMethod('Backlink')) {
                 $backlink = $toplevelController->Backlink();
             } elseif ($this->owner->getController()->hasMethod('Breadcrumbs')) {
@@ -700,6 +733,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         if (!$backlink) {
             $backlink = $toplevelController->Link();
         }
+
         return $backlink;
     }
 
@@ -725,25 +759,27 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         if ($isNewRecord) {
             return $controller->redirect($this->owner->Link());
-        } elseif ($this->owner->gridField && $this->owner->gridField->getList()->byID($this->owner->record->ID)) {
+        }
+        if ($this->owner->gridField && $this->owner->gridField->getList()->byID($this->owner->record->ID)) {
             // Return new view, as we can't do a "virtual redirect" via the CMS Ajax
             // to the same URL (it assumes that its content is already current, and doesn't reload)
             return $this->owner->edit($controller->getRequest());
-        } else {
-            // Changes to the record properties might've excluded the record from
-            // a filtered list, so return back to the main view if it can't be found
-            $url = $controller->getRequest()->getURL();
-            $action = $controller->getAction();
-            $noActionURL = $url;
-            // Handle GridField detail form editing
-            if (strpos($url, 'ItemEditForm') !== false) {
-                $action = 'ItemEditForm';
-            }
-            if ($action) {
-                $noActionURL = $controller->removeAction($url, $action);
-            }
-            $controller->getRequest()->addHeader('X-Pjax', 'Content');
-            return $controller->redirect($noActionURL, 302);
         }
+        // Changes to the record properties might've excluded the record from
+        // a filtered list, so return back to the main view if it can't be found
+        $url = $controller->getRequest()->getURL();
+        $action = $controller->getAction();
+        $noActionURL = $url;
+        // Handle GridField detail form editing
+        if (strpos($url, 'ItemEditForm') !== false) {
+            $action = 'ItemEditForm';
+        }
+        if ($action) {
+            $noActionURL = $controller->removeAction($url, $action);
+        }
+        $controller->getRequest()->addHeader('X-Pjax', 'Content');
+
+        return $controller->redirect($noActionURL, 302);
+
     }
 }

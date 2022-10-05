@@ -3,7 +3,6 @@
 namespace LeKoala\CmsActions;
 
 use ReflectionClass;
-use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 
 /**
@@ -79,16 +78,23 @@ class GridFieldTableLink implements GridField_HTMLProvider
         }
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getActionName()
     {
         if ($this->actionName) {
             return $this->actionName;
         }
         $class = (new ReflectionClass(get_called_class()))->getShortName();
+
         // ! without lowercase, in does not work
         return strtolower(str_replace('Button', '', $class));
     }
 
+    /**
+     * @return string
+     */
     public function getButtonLabel()
     {
         return $this->buttonLabel;
@@ -133,6 +139,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
             $button->setAttribute($attributeName, $attributeValue);
         }
         $button->setForm($gridField->getForm());
+
         return [$this->targetFragment => $button->Field()];
     }
 
@@ -144,6 +151,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     public function setAttribute($name, $value)
     {
         $this->attributes[$name] = $value;
+
         return $this;
     }
 
@@ -156,6 +164,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
+
         return null;
     }
 
@@ -208,6 +217,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     public function setParentID($id)
     {
         $this->parentID = $id;
+
         return $this;
     }
 
@@ -230,6 +240,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     public function setConfirm($confirm)
     {
         $this->confirm = $confirm;
+
         return $this;
     }
 
@@ -252,6 +263,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     public function setPrompt($prompt)
     {
         $this->prompt = $prompt;
+
         return $this;
     }
 
@@ -274,6 +286,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     public function setPromptDefault($promptDefault)
     {
         $this->promptDefault = $promptDefault;
+
         return $this;
     }
 
@@ -295,6 +308,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     public function setNoAjax($noAjax)
     {
         $this->noAjax = $noAjax;
+
         return $this;
     }
 }
