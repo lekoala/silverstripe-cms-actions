@@ -13,6 +13,7 @@ class CustomGridField_FormAction extends GridField_FormAction
         if ($this->progressive) {
             return 'progressive-action';
         }
+
         return 'action';
     }
 }

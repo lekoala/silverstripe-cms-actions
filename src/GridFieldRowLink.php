@@ -2,11 +2,12 @@
 
 namespace LeKoala\CmsActions;
 
-use SilverStripe\View\SSViewer;
+use SilverStripe\Control\Controller;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridField_ColumnProvider;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\ArrayData;
-use SilverStripe\Control\Controller;
-use SilverStripe\Forms\GridField\GridField_ColumnProvider;
+use SilverStripe\View\SSViewer;
 
 /**
  * Provides a custom link for a single record
@@ -22,7 +23,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
      */
     protected $extraClass = [
         'grid-field__icon-action--hidden-on-hover' => true,
-        'btn--icon-large' => true
+        'btn--icon-large'                          => true
     ];
 
     /**
@@ -87,9 +88,10 @@ class GridFieldRowLink implements GridField_ColumnProvider
      */
     public function getColumnMetadata($gridField, $columnName)
     {
-        if ($columnName == 'Actions') {
+        if ($columnName === 'Actions') {
             return ['title' => ''];
         }
+
         return [];
     }
 
@@ -127,9 +129,16 @@ class GridFieldRowLink implements GridField_ColumnProvider
             $this->addExtraClass('no-ajax');
         }
 
-        $data = new ArrayData(['Link' => $this->getLink($gridField, $record, $columnName), 'ExtraClass' => $this->getExtraClass(), 'Title' => $this->title, 'NewWindow' => $this->newWindow]);
+        $data = new ArrayData(
+            [
+            'Link' => $this->getLink($gridField, $record, $columnName),
+            'ExtraClass' => $this->getExtraClass(),
+            'Title' => $this->title,
+            'NewWindow' => $this->newWindow]
+        );
 
         $template = SSViewer::get_templates_by_class($this, '', __CLASS__);
+
         return $data->renderWith($template);
     }
 
@@ -234,6 +243,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
     public function setNewWindow($newWindow)
     {
         $this->newWindow = $newWindow;
+
         return $this;
     }
 }

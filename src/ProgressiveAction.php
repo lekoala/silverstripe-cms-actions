@@ -24,6 +24,7 @@ trait ProgressiveAction
     public function setProgressive($progressive)
     {
         $this->progressive = $progressive;
+
         return $this;
     }
 }

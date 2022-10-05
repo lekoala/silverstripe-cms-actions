@@ -4,15 +4,17 @@ namespace LeKoala\CmsActions;
 
 use ReflectionClass;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_ColumnProvider;
+use SilverStripe\Forms\GridField\GridField_FormAction;
+use SilverStripe\ORM\DataObject;
 
 /**
  * A boilerplate to create row level buttons
  *
- * It create the "Actions" (or custom) column if it doesn't exist yet
+ * It creates the "Actions" (or custom) column if it doesn't exist yet
  *
  * @link https://docs.silverstripe.org/en/4/developer_guides/forms/how_tos/create_a_gridfield_actionprovider/
  */
@@ -74,13 +76,24 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * @param string $columnName
      * @return string Label for the gridfield button
      */
-    abstract function getButtonLabel(GridField $gridField, $record, $columnName);
+    abstract public function getButtonLabel(GridField $gridField, $record, $columnName);
 
-    abstract function doHandle(GridField $gridField, $actionName, $arguments, $data);
+    /**
+     * @param GridField $gridField
+     * @param $actionName
+     * @param $arguments
+     * @param $data
+     * @return mixed
+     */
+    abstract public function doHandle(GridField $gridField, $actionName, $arguments, $data);
 
+    /**
+     * @return string
+     */
     public function getActionName()
     {
         $class = (new ReflectionClass(get_called_class()))->getShortName();
+
         // ! without lowercase, in does not work
         return strtolower(str_replace('Button', '', $class));
     }
@@ -123,6 +136,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
         if ($columnName == $this->columnName && $this->fontIcon) {
             return ['title' => ''];
         }
+
         return ['title' => $columnName];
     }
 
@@ -162,7 +176,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
 
         $field = GridField_FormAction::create(
             $gridField,
-            $actionName . '_' . $record->ID,
+            sprintf('%s_%s', $actionName, $record->ID),
             ($this->fontIcon ? false : $actionLabel),
             $actionName,
             ['RecordID' => $record->ID, 'ParentID' => $this->parentID]
@@ -195,7 +209,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * @param string $actionName
      * @param mixed $arguments
      * @param array $data - form data
-     * @return void
+     * @return HTTPResponse|void
      */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
@@ -206,8 +220,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
             }
 
             // Do something!
-            $controller =  Controller::curr();
-            return $controller->redirectBack();
+            return Controller::curr()->redirectBack();
         }
     }
 
@@ -232,6 +245,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
     public function setParentID($id)
     {
         $this->parentID = $id;
+
         return $this;
     }
 
@@ -248,13 +262,14 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
     /**
      * Set a silverstripe icon
      *
-     * @param  string  $fontIcon  A silverstripe icon
+     * @param string $fontIcon A silverstripe icon
      *
      * @return $this
      */
     public function setFontIcon(string $fontIcon)
     {
         $this->fontIcon = $fontIcon;
+
         return $this;
     }
 
@@ -271,13 +286,14 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
     /**
      * Set adds class grid-field__icon-action--hidden-on-hover if set
      *
-     * @param  boolean  $hiddenOnHover  Adds class grid-field__icon-action--hidden-on-hover if set
+     * @param boolean $hiddenOnHover Adds class grid-field__icon-action--hidden-on-hover if set
      *
      * @return $this
      */
     public function setHiddenOnHover(bool $hiddenOnHover)
     {
         $this->hiddenOnHover = $hiddenOnHover;
+
         return $this;
     }
 }

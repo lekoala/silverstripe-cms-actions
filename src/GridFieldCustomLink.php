@@ -4,6 +4,7 @@ namespace LeKoala\CmsActions;
 
 use SilverStripe\Control\Controller;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\ORM\DataObject;
 
 /**
  * Expose a custom link in a GridField at row level

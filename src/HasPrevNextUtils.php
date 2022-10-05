@@ -2,8 +2,8 @@
 
 namespace LeKoala\CmsActions;
 
-use SilverStripe\Forms\FieldList;
 use SilverStripe\Control\Controller;
+use SilverStripe\Forms\FieldList;
 
 /**
  * Add prev next in utils
@@ -11,7 +11,7 @@ use SilverStripe\Control\Controller;
 trait HasPrevNextUtils
 {
     /**
-     * @param FieldList $actions
+     * @param FieldList $utils
      * @return FieldList
      */
     public function addPrevNextUtils(FieldList $utils)
@@ -23,14 +23,29 @@ trait HasPrevNextUtils
         $getPreviousRecordID = $request->param('PreviousRecordID');
         $getNextRecordID = $request->param('NextRecordID');
 
+        $search = sprintf('/%d/', $this->ID);
+        $replaceStr = '/%d/';
         if ($this->ID && $getPreviousRecordID) {
-            $utils->unshift($NextBtnLink = new CmsInlineFormAction('NextBtnLink', _t('HasPrevNextUtils.Next', 'Next') . ' >', 'btn-secondary'));
-            $NextBtnLink->setLink(str_replace('/' . $this->ID . '/', '/' . $getPreviousRecordID . '/', $url));
+            $utils->unshift(
+                $NextBtnLink = new CmsInlineFormAction(
+                    'NextBtnLink',
+                    _t('HasPrevNextUtils.Next', 'Next') . ' >',
+                    'btn-secondary'
+                )
+            );
+            $NextBtnLink->setLink(str_replace($search, sprintf($replaceStr, $getPreviousRecordID), $url));
         }
-        if ($this->ID &&  $getNextRecordID) {
-            $utils->unshift($PrevBtnLink = new CmsInlineFormAction('PrevBtnLink', '< ' . _t('HasPrevNextUtils.Previous', 'Previous'), 'btn-secondary'));
-            $PrevBtnLink->setLink(str_replace('/' . $this->ID . '/', '/' .  $getNextRecordID . '/', $url));
+        if ($this->ID && $getNextRecordID) {
+            $utils->unshift(
+                $PrevBtnLink = new CmsInlineFormAction(
+                    'PrevBtnLink',
+                    '< ' . _t('HasPrevNextUtils.Previous', 'Previous'),
+                    'btn-secondary'
+                )
+            );
+            $PrevBtnLink->setLink(str_replace($search, sprintf($replaceStr, $getNextRecordID), $url));
         }
+
         return $utils;
     }
 }
