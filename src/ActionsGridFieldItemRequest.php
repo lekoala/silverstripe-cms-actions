@@ -3,6 +3,7 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
+use LeKoala\Admini\SiteConfigLeftAndMain as AdminiSiteConfigLeftAndMain;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -453,16 +454,15 @@ class ActionsGridFieldItemRequest extends DataExtension
     {
         $controller = $this->getToplevelController();
 
-        // We have an item request
+        // We have an item request or a controller that can provide a record
         $record = null;
-        if ($this->owner instanceof GridFieldDetailForm_ItemRequest) {
+        if ($this->owner->hasMethod('ItemEditForm')) {
+            // It's a request handler. Don't check for a specific class as it may be subclassed
             $record = $this->owner->record;
-        } elseif ($controller instanceof SiteConfigLeftAndMain) {
+        } elseif ($controller->hasMethod('save_siteconfig')) {
+            // Check for any type of siteconfig controller
             $record = SiteConfig::current_site_config();
-        } elseif ($controller instanceof LeftAndMain) {
-            if (empty($data['ClassName']) || empty($data['ID'])) {
-                throw new Exception("Submitted data does not contain and ID and a ClassName");
-            }
+        } elseif (!empty($data['ClassName']) && !empty($data['ID'])) {
             $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
         } elseif ($controller->hasMethod("getRecord")) {
             $record = $controller->getRecord();
@@ -565,7 +565,12 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $controller->getResponse()->setStatusCode(400);
             }
         } else {
-            $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
+            // If the controller support sessionMessage, use it instead of form
+            if ($controller->hasMethod('sessionMessage')) {
+                $controller->sessionMessage($message, $status, ValidationResult::CAST_HTML);
+            } else {
+                $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
+            }
         }
 
         // Redirect after action

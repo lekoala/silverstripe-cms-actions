@@ -1,6 +1,16 @@
 ---
 Name: cms-actions
+---
+LeKoala\CmsActions\ActionsGridFieldItemRequest:
+  enable_save_prev_next: true
+  enable_save_close: true
+  enable_delete_right: true
+---
+Name: cms-actions-silverstripe
 After: '#versionedgridfield'
+Only:
+  moduleexists:
+    - 'silverstripe/admin'
 ---
 SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
   extensions:
@@ -12,10 +22,6 @@ SilverStripe\Admin\LeftAndMain:
     - "lekoala/silverstripe-cms-actions:javascript/cms-actions.js"
   extra_requirements_css:
     - "lekoala/silverstripe-cms-actions:css/cms-actions.css"
-LeKoala\CmsActions\ActionsGridFieldItemRequest:
-  enable_save_prev_next: true
-  enable_save_close: true
-  enable_delete_right: true
 ---
 Name: cms-actions-tabulator
 Only:
@@ -23,5 +29,14 @@ Only:
     - 'lekoala/silverstripe-tabulator'
 ---
 LeKoala\Tabulator\TabulatorGrid_ItemRequest:
+  extensions:
+    - LeKoala\CmsActions\ActionsGridFieldItemRequest
+---
+Name: cms-actions-admini
+Only:
+  moduleexists:
+    - 'lekoala/silverstripe-admini'
+---
+LeKoala\Admini\LeftAndMAin:
   extensions:
     - LeKoala\CmsActions\ActionsGridFieldItemRequest
