@@ -772,16 +772,24 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
         // Changes to the record properties might've excluded the record from
         // a filtered list, so return back to the main view if it can't be found
-        $url = $controller->getRequest()->getURL();
-        $action = $controller->getAction();
-        $noActionURL = $url;
-        // Handle GridField detail form editing
-        if (strpos($url, 'ItemEditForm') !== false) {
-            $action = 'ItemEditForm';
+        $noActionURL = $url = $controller->getRequest()->getURL();
+
+        // The controller may not have these
+        if ($controller->hasMethod('getAction')) {
+            $action = $controller->getAction();
+            // Handle GridField detail form editing
+            if (strpos($url, 'ItemEditForm') !== false) {
+                $action = 'ItemEditForm';
+            }
+            if ($action) {
+                $noActionURL = $controller->removeAction($url, $action);
+            }
+        } else {
+            // Simple fallback
+            $pos = strpos($url ?? '', 'ItemEditForm');
+            $noActionURL = substr($url ?? '', 0, $pos);
         }
-        if ($action) {
-            $noActionURL = $controller->removeAction($url, $action);
-        }
+
         $controller->getRequest()->addHeader('X-Pjax', 'Content');
 
         return $controller->redirect($noActionURL, 302);
