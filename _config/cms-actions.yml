@@ -5,6 +5,9 @@ LeKoala\CmsActions\ActionsGridFieldItemRequest:
   enable_save_prev_next: true
   enable_save_close: true
   enable_delete_right: true
+SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
+  extensions:
+    - LeKoala\CmsActions\ActionsGridFieldItemRequest
 ---
 Name: cms-actions-silverstripe
 After: '#versionedgridfield'
@@ -12,9 +15,6 @@ Only:
   moduleexists:
     - 'silverstripe/admin'
 ---
-SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
-  extensions:
-    - LeKoala\CmsActions\ActionsGridFieldItemRequest
 SilverStripe\Admin\LeftAndMain:
   extensions:
     - LeKoala\CmsActions\ActionsGridFieldItemRequest

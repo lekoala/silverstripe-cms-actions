@@ -3,7 +3,6 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
-use LeKoala\Admini\SiteConfigLeftAndMain as AdminiSiteConfigLeftAndMain;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -24,7 +23,6 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\SiteConfig\SiteConfigLeftAndMain;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -701,7 +699,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     protected function getToplevelController()
     {
-        if ($this->owner instanceof LeftAndMain) {
+        if ($this->isLeftAndMain($this->owner)) {
             return $this->owner;
         }
         if (!$this->owner->hasMethod("getController")) {
@@ -713,6 +711,11 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         return $controller;
+    }
+
+    protected function isLeftAndMain($controller)
+    {
+        return is_subclass_of($controller, LeftAndMain::class);
     }
 
     /**
@@ -727,7 +730,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         // TODO Coupling with CMS
         $backlink = '';
         $toplevelController = $this->getToplevelController();
-        if ($toplevelController instanceof LeftAndMain) {
+        if ($this->isLeftAndMain($toplevelController)) {
             if ($toplevelController->hasMethod('Backlink')) {
                 $backlink = $toplevelController->Backlink();
             } elseif ($this->owner->getController()->hasMethod('Breadcrumbs')) {
@@ -755,7 +758,7 @@ class ActionsGridFieldItemRequest extends DataExtension
     {
         $controller = $this->getToplevelController();
 
-        if ($controller instanceof LeftAndMain) {
+        if ($this->isLeftAndMain($controller)) {
             // CMSMain => redirect to show
             if ($this->owner->hasMethod("LinkPageEdit")) {
                 return $controller->redirect($this->owner->LinkPageEdit($record->ID));
@@ -785,8 +788,8 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $noActionURL = $controller->removeAction($url, $action);
             }
         } else {
-            // Simple fallback
-            $pos = strpos($url ?? '', 'ItemEditForm');
+            // Simple fallback (last index of)
+            $pos = strrpos($url ?? '', 'ItemEditForm');
             $noActionURL = substr($url ?? '', 0, $pos);
         }
 

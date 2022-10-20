@@ -5,8 +5,13 @@ namespace LeKoala\CmsActions\Test;
 use SilverStripe\Dev\TestOnly;
 use LeKoala\CmsActions\CustomAction;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\DataObject;
 
-class Test_ActionsPage extends SiteTree implements TestOnly
+if (!class_exists(SiteTree::class)) {
+    return;
+}
+
+class Test_ActionsPage extends DataObject implements TestOnly
 {
     private static $table_name = 'ActionsPage';
 

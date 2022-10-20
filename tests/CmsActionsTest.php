@@ -8,14 +8,13 @@ use LeKoala\CmsActions\CustomLink;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\GridField\GridField;
-use LeKoala\CmsActions\ActionsGridFieldItemRequest;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\CMS\Model\SiteTree;
 
 /**
  * Tests for Cms Actions module
@@ -27,11 +26,29 @@ class CmsActionsTest extends SapphireTest
      * @var string
      */
     protected static $fixture_file = 'CmsActionsTest.yml';
+    protected static $fixture_file_simple = 'CmsActionsSimpleTest.yml';
 
     protected static $extra_dataobjects = array(
         Test_CmsActionsModel::class,
-        Test_ActionsPage::class,
     );
+
+    public static function get_fixture_file()
+    {
+        if (class_exists(SiteTree::class)) {
+            return self::$fixture_file;
+        }
+        return self::$fixture_file_simple;
+    }
+
+    public static function getExtraDataObjects()
+    {
+        $arr = parent::getExtraDataObjects();
+        if (class_exists(SiteTree::class)) {
+            $arr[] = Test_ActionsPage::class;
+        }
+        return $arr;
+    }
+
 
     public function setUp(): void
     {
@@ -119,6 +136,8 @@ class CmsActionsTest extends SapphireTest
     public function testCustomDeleteTitle()
     {
         $form = $this->getTestForm();
+
+        /** @var Test_CmsActionsModel $record */
         $record = $form->getRecord();
 
         $delete = $form->Actions()->fieldByName("action_doDelete");
@@ -171,6 +190,10 @@ class CmsActionsTest extends SapphireTest
 
     public function testLeftAndMain()
     {
+        if (!class_exists(SiteTree::class)) {
+            $this->assertTrue(true); // make phpunit happy
+            return;
+        }
         $page = $this->getTestPage();
         $leftAndMain = LeftAndMain::create();
         $form = $this->getTestForm($leftAndMain, $page);
