@@ -5,6 +5,13 @@
 [![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/)
 [![Code coverage](https://codecov.io/gh/lekoala/silverstripe-cms-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-cms-actions)
 
+[![Latest Stable Version](https://poser.pugx.org/lekoala/silverstripe-cms-actions/version)](https://packagist.org/packages/lekoala/silverstripe-cms-actions)
+[![Latest Unstable Version](https://poser.pugx.org/lekoala/silverstripe-cms-actions/v/unstable)](//packagist.org/packages/lekoala/silverstripe-cms-actions)
+[![Total Downloads](https://poser.pugx.org/lekoala/silverstripe-cms-actions/downloads)](https://packagist.org/packages/lekoala/silverstripe-cms-actions)
+[![License](https://poser.pugx.org/lekoala/silverstripe-cms-actions/license)](https://packagist.org/packages/lekoala/silverstripe-cms-actions)
+[![Monthly Downloads](https://poser.pugx.org/lekoala/silverstripe-cms-actions/d/monthly)](https://packagist.org/packages/lekoala/silverstripe-cms-actions)
+[![Daily Downloads](https://poser.pugx.org/lekoala/silverstripe-cms-actions/d/daily)](https://packagist.org/packages/lekoala/silverstripe-cms-actions)
+
 ## Intro
 
 For those of you missing betterbuttons :-) Because let's face it, adding custom actions in SilverStripe is a real pain.
