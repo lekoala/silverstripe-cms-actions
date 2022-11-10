@@ -41,7 +41,7 @@ trait DefaultLink
         $fieldName = $ctrl->getRequest()->param('ModelClass');
         $allParams = $ctrl->getRequest()->allParams();
         $ID = $allParams['ID'] ?? 0;
-        $fieldName = $fieldName ?? $allParams['OtherID'];
+        $fieldName = $fieldName ?? $allParams['OtherID'] ?? null;
         $params = array_merge(['CustomLink' => $action], $params);
         $action = sprintf('/EditForm/field/%s/item/%d/doCustomLink', $fieldName, $ID);
 
