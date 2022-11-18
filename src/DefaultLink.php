@@ -48,7 +48,7 @@ trait DefaultLink
         }
 
         $dirParts = explode('/', $url);
-        // replace the current action
+        // replace the current action if it's not an ID
         if (!is_numeric(end($dirParts))) {
             array_pop($dirParts);
         }

@@ -253,6 +253,11 @@ class CmsActionsTest extends SapphireTest
         $link = $action->getModelLink("testAction");
         $this->assertEquals('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/doCustomLink?CustomLink=testAction', $link);
 
+        // in model admin with just an id
+        $controller->getRequest()->setUrl('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/');
+        $link = $action->getModelLink("testAction");
+        $this->assertEquals('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/doCustomLink?CustomLink=testAction', $link);
+
         // in nested grid
         $controller->getRequest()->setUrl('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/ItemEditForm/field/OtherModel/item/0/edit');
         $link = $action->getModelLink("testAction");
