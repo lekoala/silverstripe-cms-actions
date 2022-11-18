@@ -49,7 +49,10 @@ trait DefaultLink
 
         $dirParts = explode('/', $url);
         // replace the current action
-        array_pop($dirParts);
+        if (!is_numeric(end($dirParts))) {
+            array_pop($dirParts);
+        }
+
         $dirParts[] = 'doCustomLink';
 
         $action = implode('/', $dirParts);
