@@ -37,22 +37,27 @@ trait DefaultLink
         if ($params === null) {
             $params = [];
         }
-        
+
         $params = array_merge(['CustomLink' => $action], $params);
 
         $ctrl = Controller::curr();
-        $url = $ctrl->getRequest()->getURL();
-        $dirParts = explode('/', $url);
-        
-        // remove admin/pages/edit or admin/my-admin/ClassName
-        $dirParts = array_slice($dirParts, 3);
+        $request = $ctrl->getRequest();
+        $url = $request->getURL();
+        if (!$url) {
+            return $this->getControllerLink($action, $params);
+        }
 
+        $dirParts = explode('/', $url);
         // replace the current action
         array_pop($dirParts);
         $dirParts[] = 'doCustomLink';
-    
+
         $action = implode('/', $dirParts);
-        return $this->getControllerLink($action, $params);
+        if (!empty($params)) {
+            $action .= '?' . http_build_query($params);
+        }
+
+        return $action;
     }
 
     /**

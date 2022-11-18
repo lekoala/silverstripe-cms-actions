@@ -232,4 +232,32 @@ class CmsActionsTest extends SapphireTest
         // We should not have duplicated actions
         $this->assertEquals($filteredSimpleList, $simpleList);
     }
+
+    public function testGetModelLink()
+    {
+        $action = new CustomLink("testAction", "test");
+
+        $controller = Controller::curr();
+
+        // Without an url, we link on the current controller
+        $link = $action->getModelLink("testAction");
+        $this->assertEquals('test_controller/testAction/?CustomLink=testAction', $link);
+
+        // in settings
+        $controller->getRequest()->setUrl('admin/settings/EditForm/field/MyModel/item/1/edit');
+        $link = $action->getModelLink("testAction");
+        $this->assertEquals('admin/settings/EditForm/field/MyModel/item/1/doCustomLink?CustomLink=testAction', $link);
+
+        // in model admin
+        $controller->getRequest()->setUrl('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/edit');
+        $link = $action->getModelLink("testAction");
+        $this->assertEquals('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/doCustomLink?CustomLink=testAction', $link);
+
+        // in nested grid
+        $controller->getRequest()->setUrl('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/ItemEditForm/field/OtherModel/item/0/edit');
+        $link = $action->getModelLink("testAction");
+        $this->assertEquals('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/ItemEditForm/field/OtherModel/item/0/doCustomLink?CustomLink=testAction', $link);
+
+        $controller->getRequest()->setUrl('');
+    }
 }

@@ -591,7 +591,6 @@ class ActionsGridFieldItemRequest extends DataExtension
     public function doCustomLink(HTTPRequest $request)
     {
         $action = $request->getVar('CustomLink');
-
         return $this->forwardActionToRecord($action);
     }
 
