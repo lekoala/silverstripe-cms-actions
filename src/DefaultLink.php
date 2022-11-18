@@ -37,14 +37,21 @@ trait DefaultLink
         if ($params === null) {
             $params = [];
         }
-        $ctrl = Controller::curr();
-        $fieldName = $ctrl->getRequest()->param('ModelClass');
-        $allParams = $ctrl->getRequest()->allParams();
-        $ID = $allParams['ID'] ?? 0;
-        $fieldName = $fieldName ?? $allParams['OtherID'] ?? null;
+        
         $params = array_merge(['CustomLink' => $action], $params);
-        $action = sprintf('/EditForm/field/%s/item/%d/doCustomLink', $fieldName, $ID);
 
+        $ctrl = Controller::curr();
+        $url = $ctrl->getRequest()->getURL();
+        $dirParts = explode('/', $url);
+        
+        // remove admin/pages/edit or admin/my-admin/ClassName
+        $dirParts = array_slice($dirParts, 3);
+
+        // replace the current action
+        array_pop($dirParts);
+        $dirParts[] = 'doCustomLink';
+    
+        $action = implode('/', $dirParts);
         return $this->getControllerLink($action, $params);
     }
 
