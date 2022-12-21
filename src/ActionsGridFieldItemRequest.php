@@ -628,9 +628,13 @@ class ActionsGridFieldItemRequest extends DataExtension
         $this->owner->doSave($data, $form);
         // Redirect after save
         $controller = $this->getToplevelController();
-        $controller->getResponse()->addHeader("X-Pjax", "Content");
 
-        return $controller->redirect($this->getBackLink());
+        $location = $this->getBackLink();
+        $controller->getResponse()->addHeader("X-Pjax", "Content");
+        // Prevent Already directed to errors
+        $controller->getResponse()->addHeader("Location", $location);
+
+        return $controller->redirect($location);
     }
 
     /**
@@ -726,16 +730,14 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function getBackLink()
     {
-        // TODO Coupling with CMS
         $backlink = '';
         $toplevelController = $this->getToplevelController();
-        if ($this->isLeftAndMain($toplevelController)) {
-            if ($toplevelController->hasMethod('Backlink')) {
-                $backlink = $toplevelController->Backlink();
-            } elseif ($this->owner->getController()->hasMethod('Breadcrumbs')) {
-                $parents = $this->owner->getController()->Breadcrumbs(false)->items;
-                $backlink = array_pop($parents)->Link;
-            }
+        // Check for LeftAndMain and alike controllers with a Backlink or Breadcrumbs methods
+        if ($toplevelController->hasMethod('Backlink')) {
+            $backlink = $toplevelController->Backlink();
+        } elseif ($this->owner->getController()->hasMethod('Breadcrumbs')) {
+            $parents = $this->owner->getController()->Breadcrumbs(false)->items;
+            $backlink = array_pop($parents)->Link;
         }
         if (!$backlink) {
             $backlink = $toplevelController->Link();
