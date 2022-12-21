@@ -103,7 +103,10 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         /** @var DataObject $record */
         $record = $itemRequest->record;
-        if (!$this->checkCan($record)) {
+        if (!$record) {
+            $record = $form->getRecord();
+        }
+        if (!$record) {
             return;
         }
 
@@ -230,20 +233,6 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * Check if a record can be edited/created/exists
-     * @param DataObject $record
-     * @return bool
-     */
-    protected function checkCan($record)
-    {
-        if (!$record->canEdit() || (!$record->ID && !$record->canCreate())) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * @param FieldList $actions
      * @param DataObject $record
      * @return void
@@ -319,7 +308,10 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function addSaveNextAndPrevious(FieldList $actions, DataObject $record)
     {
-        if (!$record->canEdit() || !$record->ID) {
+        if (!$record->canEdit()) {
+            return;
+        }
+        if (!$record->ID) {
             return;
         }
 
@@ -367,7 +359,10 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function addSaveAndClose(FieldList $actions, DataObject $record)
     {
-        if (!$this->checkCan($record)) {
+        if (!$record->canEdit()) {
+            return;
+        }
+        if (!$record->ID && !$record->canCreate()) {
             return;
         }
 
