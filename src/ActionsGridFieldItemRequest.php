@@ -103,7 +103,10 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         /** @var DataObject $record */
         $record = $itemRequest->record;
-        if (!$this->checkCan($record)) {
+        if (!$record) {
+            $record = $form->getRecord();
+        }
+        if (!$record) {
             return;
         }
 
