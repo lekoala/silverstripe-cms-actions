@@ -129,6 +129,32 @@ You can also put buttons into a drop-up menu.
 $myAction->setDropUp(true);
 ```
 
+### Last icon
+
+You can use an unlimited set of icons using [last-icon](https://github.com/lekoala/last-icon).
+
+Simply make sure you included the required javascript (the css is already included by default as it is limited and has no side-effect):
+
+```php
+Requirements::javascript("https://cdn.jsdelivr.net/npm/last-icon@2/last-icon.min.js");
+```
+
+or with yml
+
+```yml
+SilverStripe\Admin\LeftAndMain:
+  extra_requirements_js:
+    - "https://cdn.jsdelivr.net/npm/last-icon@2/last-icon.min.js"
+```
+
+And add the icon of your choice:
+
+```php
+$my_action->setLastIcon('star');
+```
+
+You can pass additional parameters or pass directly an array.
+
 #### Grouping
 Buttons can be grouped in the same manner as the "Save"/"Save and close" usually are when enclosed in `ActionButtonsGroup` container.
 

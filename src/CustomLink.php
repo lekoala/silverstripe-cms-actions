@@ -91,15 +91,23 @@ class CustomLink extends LiteralField
                 $attrs[] = 'onclick="return confirm(this.dataset.message);"';
             }
         }
+
+        $lastIcon = null;
+        if ($this->hasLastIcon()) {
+            $lastIcon = $this->renderLastIcon() . ' ';
+            $classes[] = "btn-mobile-collapse";
+        }
+
         foreach ($this->attributes as $attributeKey => $attributeValue) {
             $attrs[] = sprintf('%s="%s"', $attributeKey, $attributeValue);
         }
 
         $content = sprintf(
-            '<a href="%s" class="%s" %s><span>%s</span></a>',
+            '<a href="%s" class="%s" %s>%s<span class="btn__title">%s</span></a>',
             $link,
             implode(' ', $classes),
             implode(' ', $attrs),
+            $lastIcon,
             $title
         );
         $this->content = $content;

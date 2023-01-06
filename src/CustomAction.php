@@ -61,6 +61,10 @@ class CustomAction extends FormAction
             $this->setAttribute('onclick', 'return confirm(this.dataset.message);return false;');
         }
 
+        if ($this->hasLastIcon()) {
+            $this->addExtraClass('btn-mobile-collapse'); // we can collapse by default on mobile with an icon
+        }
+
         return parent::Field($properties);
     }
 

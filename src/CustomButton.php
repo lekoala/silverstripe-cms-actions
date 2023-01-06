@@ -2,6 +2,8 @@
 
 namespace LeKoala\CmsActions;
 
+use SilverStripe\View\HTML;
+
 /**
  * Common button functionnality that is shared between CustomAction and CustomLink
  */
@@ -27,6 +29,12 @@ trait CustomButton
      * @var string
      */
     protected $buttonIcon;
+
+    /**
+     * An icon using l-i element
+     * @var array
+     */
+    protected $lastIcon = [];
 
     /**
      * The confirmation message
@@ -135,6 +143,65 @@ trait CustomButton
         $this->buttonIcon = $buttonIcon;
 
         return $this;
+    }
+
+    /**
+     * Get an icon for this button
+     *
+     * @return array
+     */
+    public function getLastIcon()
+    {
+        return $this->lastIcon;
+    }
+
+    /**
+     * Set an icon for this button
+     *
+     * @param string|array $lastIcon An icon for this button
+     * @param string $set
+     * @param string $type
+     * @param string $size
+     * @return $this
+     */
+    public function setLastIcon($lastIcon, $set = null, $type = null, $size = null)
+    {
+        if (is_string($lastIcon)) {
+            $lastIcon = [
+                'name' => $lastIcon
+            ];
+        }
+        if ($set) {
+            $lastIcon['set'] = $set;
+        }
+        if ($type) {
+            $lastIcon['type'] = $type;
+        }
+        if ($size) {
+            $lastIcon['size'] = $size;
+        }
+        $this->lastIcon = $lastIcon;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasLastIcon()
+    {
+        return !empty($this->lastIcon['name']);
+    }
+
+    /**
+     * @return string
+     */
+    public function renderLastIcon()
+    {
+        if (!$this->hasLastIcon()) {
+            return '';
+        }
+        return HTML::createTag('l-i', $this->lastIcon);
     }
 
     /**
