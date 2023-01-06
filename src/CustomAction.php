@@ -48,9 +48,11 @@ class CustomAction extends FormAction
 
     public function Field($properties = [])
     {
-        if ($this->buttonIcon) {
+        $icon = $this->buttonIcon ?? $this->icon;
+        if ($icon) {
             $this->addExtraClass('font-icon');
-            $this->addExtraClass('font-icon-' . $this->buttonIcon);
+            $this->addExtraClass('font-icon-' . $icon);
+            $this->addExtraClass('btn-mobile-collapse'); // we can collapse by default on mobile with an icon
         }
         // Note: type should stay "action" to properly submit
         $this->addExtraClass('custom-action');

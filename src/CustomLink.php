@@ -74,6 +74,7 @@ class CustomLink extends LiteralField
         if ($this->buttonIcon) {
             $classes[] = "font-icon";
             $classes[] = sprintf('font-icon-%s', $this->buttonIcon);
+            $classes[] = "btn-mobile-collapse";
         }
 
         $attrs = [];
@@ -95,7 +96,7 @@ class CustomLink extends LiteralField
         }
 
         $content = sprintf(
-            '<a href="%s" class="%s" %s>%s</a>',
+            '<a href="%s" class="%s" %s><span>%s</span></a>',
             $link,
             implode(' ', $classes),
             implode(' ', $attrs),

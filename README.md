@@ -119,6 +119,8 @@ You can set icon. See SilverStripeIcons class for available icons. We use base s
 $downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
 ```
 
+The native `setIcon` from SilverStripe is also supported for `FormAction`.
+
 You can also put buttons into a drop-up menu.
 
 ![Drop-up example](docs/drop-up.gif "Drop-up example")
@@ -473,15 +475,12 @@ that much easier). When using both modules it's easy to have actions that open a
 
 ## Collapsing icons
 
-The icons collapse in mobile view. If you have your own buttons, you can add the ´btn-mobile-collapse` class so that they
-do the same.
+The icons collapse in mobile view. If you have your own buttons, you can add the `btn-mobile-collapse` class so that they
+do the same. This will be added by default if you set an icon on your buttons.
+
+You can also hide buttons completely with `btn-mobile-hidden`
 
 ![btn mobile collapse](docs/btn-mobile-collapse.png "btn mobile collapse")
-
-## Todo
-
--   Mobile ui for utils
--   Svg icons?
 
 ## Sponsored by
 

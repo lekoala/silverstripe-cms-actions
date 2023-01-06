@@ -76,7 +76,20 @@ td > .action.btn {
 }
 
 @media screen and (max-width: 600px) {
-    .btn-mobile-collapse > span {
-        display: none;
+    .btn-mobile-hidden {
+        display: none !important;
     }
+    .btn-mobile-collapse > span {
+        display: none !important;
+    }
+    .btn[class*=font-icon-].btn-mobile-collapse:before {
+        margin-right: 0;
+    }
+}
+
+/* Show all buttons in toolbar-south */
+.toolbar--south {
+    min-height: 53px;
+    height: auto;
+    max-height: none;
 }
