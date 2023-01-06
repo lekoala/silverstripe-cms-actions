@@ -75,6 +75,7 @@ td > .action.btn {
     margin-bottom: -1.2308rem;
 }
 
+/* Mobile UI */
 @media screen and (max-width: 600px) {
     .btn-mobile-hidden {
         display: none !important;
@@ -82,7 +83,7 @@ td > .action.btn {
     .btn-mobile-collapse > span {
         display: none !important;
     }
-    .btn[class*=font-icon-].btn-mobile-collapse:before {
+    .btn[class*="font-icon-"].btn-mobile-collapse:before {
         margin-right: 0;
     }
 }
@@ -92,4 +93,10 @@ td > .action.btn {
     min-height: 53px;
     height: auto;
     max-height: none;
+}
+
+/* Grouping tweaks */
+.toolbar--south .btn-toolbar > .btn-group:not(:first-child) {
+    margin-left: 5px;
+    margin-right: 0;
 }
