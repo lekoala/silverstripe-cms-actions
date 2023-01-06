@@ -2,6 +2,7 @@
 
 namespace LeKoala\CmsActions\Test;
 
+use LeKoala\CmsActions\ActionButtonsGroup;
 use LeKoala\CmsActions\CustomAction;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\Forms\FieldList;
@@ -19,6 +20,14 @@ class Test_CmsActionsModel extends DataObject implements TestOnly
     {
         $actions = parent::getCMSActions();
         $actions->push(new CustomAction('testAction', 'Test Action'));
+
+        $groupedButtons = [
+            new CustomAction("groupedAction1", "Grouped Action 1"),
+            new CustomAction("groupedAction2", "Grouped Action 2"),
+        ];
+        $btnGroup = new ActionButtonsGroup($groupedButtons);
+        $actions->push($btnGroup);
+
         return $actions;
     }
 
@@ -41,6 +50,16 @@ class Test_CmsActionsModel extends DataObject implements TestOnly
     public function testAction()
     {
         return 'called testAction';
+    }
+
+    public function groupedAction1()
+    {
+        return 'called groupedAction1';
+    }
+
+    public function groupedAction2()
+    {
+        return 'called groupedAction2';
     }
 
     public function getDeleteButtonTitle()
