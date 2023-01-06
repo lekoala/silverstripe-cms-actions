@@ -73,25 +73,11 @@ public function doCustomAction() {
 }
 ```
 
-You can set icon. See SilverStripeIcons class for available icons. We use base silverstripe icons.
-
-```php
-$downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
-```
-
 CustomActions are buttons and submitted through ajax. If it changes the state of your record you
 may need to refresh the UI, but be careful of not losing any unsaved data.
 
 ```php
 $myAction->setShouldRefresh(true);
-```
-
-You can also put buttons into a drop-up menu.
-
-![Drop-up example](docs/drop-up.gif "Drop-up example")
-
-```php
-$myAction->setDropUp(true);
 ```
 
 Sometimes, you don't want buttons, but links. Use CustomLink instead. This is useful to, say,
@@ -124,6 +110,40 @@ CustomLink calls by default an action on the model matching its name. But really
 #### Confirm actions
 
 If an action is potentially dangerous or avoid misclicks, you can set a confirmation message using `setConfirmation('Are you sure')` or simply pass `true` for a generic message.
+
+### Decoration & Placement
+
+You can set icon. See SilverStripeIcons class for available icons. We use base silverstripe icons.
+
+```php
+$downloadExcelReport->setButtonIcon(SilverStripeIcons::ICON_EXPORT);
+```
+
+You can also put buttons into a drop-up menu.
+
+![Drop-up example](docs/drop-up.gif "Drop-up example")
+
+```php
+$myAction->setDropUp(true);
+```
+
+#### Grouping
+Buttons can be grouped in the same manner as the "Save"/"Save and close" usually are when enclosed in `ActionButtonsGroup` container.
+
+![Grouping example](docs/grouping.gif "Grouping example")
+
+```php
+$groupedButtons = [
+    CustomAction::create("doAction1", "Action1")
+        ->addExtraClass('btn-outline-info')
+        ->removeExtraClass('btn-info'),
+    CustomAction::create("doAction2", "Action2")
+        ->addExtraClass('btn-outline-info')
+        ->removeExtraClass('btn-info'),
+];
+$btnGroup = ActionButtonsGroup::create($groupedButtons);
+$actions->push($btnGroup);
+```
 
 ### Utils
 

@@ -84,7 +84,11 @@ class ActionsGridFieldItemRequest extends DataExtension
     {
         $list = [];
         foreach ($actions as $action) {
-            $list[] = $action->getName();
+            if (is_a($action, CompositeField::class)) {
+                $list = array_merge($list, $this->getAvailableActions($action->FieldList()));
+            } else {
+                $list[] = $action->getName();
+            }
         }
 
         return $list;
@@ -425,6 +429,9 @@ class ActionsGridFieldItemRequest extends DataExtension
         foreach ($definedActions as $definedAction) {
             if (is_a($definedAction, CompositeField::class)) {
                 $result = self::findAction($action, $definedAction->FieldList());
+                if ($result) {
+                    break;
+                }
             }
 
             $definedActionName = $definedAction->getName();
@@ -434,6 +441,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             }
             if ($definedActionName === $action) {
                 $result = $definedAction;
+                break;
             }
         }
 
