@@ -28,6 +28,11 @@ class CustomAction extends FormAction
      */
     protected $shouldRefresh = false;
 
+    /**
+     * @var string
+     */
+    protected $redirectURL = null;
+
     public function __construct($name, $title, $form = null)
     {
         // Actually, an array works just fine!
@@ -86,6 +91,28 @@ class CustomAction extends FormAction
     public function setShouldRefresh($shouldRefresh)
     {
         $this->shouldRefresh = $shouldRefresh;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of redirectURL
+     * @return mixed
+     */
+    public function getRedirectURL()
+    {
+        return $this->redirectURL;
+    }
+
+    /**
+     * Set the value of redirectURL
+     *
+     * @param mixed $redirectURL
+     * @return $this
+     */
+    public function setRedirectURL($redirectURL)
+    {
+        $this->redirectURL = $redirectURL;
 
         return $this;
     }

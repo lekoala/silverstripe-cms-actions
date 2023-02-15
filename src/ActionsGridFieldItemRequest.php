@@ -563,8 +563,8 @@ class ActionsGridFieldItemRequest extends DataExtension
 
             return $message;
         }
+
         if (Director::is_ajax()) {
-            $controller = $this->getToplevelController();
             $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
                 $controller->getResponse()->addHeader('X-Reload', "true");
@@ -580,6 +580,12 @@ class ActionsGridFieldItemRequest extends DataExtension
             } else {
                 $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
             }
+        }
+
+        // Custom redirect
+        if (method_exists($clickedAction, 'getRedirectURL') && $clickedAction->getRedirectURL()) {
+            $controller->getResponse()->addHeader('X-Reload', "true"); // we probably need a full ui refresh
+            return $controller->redirect($clickedAction->getRedirectURL());
         }
 
         // Redirect after action

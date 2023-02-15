@@ -80,6 +80,13 @@ may need to refresh the UI, but be careful of not losing any unsaved data.
 $myAction->setShouldRefresh(true);
 ```
 
+You can also redirect to a custom URL (eg: to the main list) after the action
+
+```php
+$fields->push($doRedirect = new CustomAction('doRedirect', 'Redirect'));
+$doRedirect->setRedirectURL("/admin/my_section/my_model");
+```
+
 Sometimes, you don't want buttons, but links. Use CustomLink instead. This is useful to, say,
 download an excel report or a pdf file.
 
