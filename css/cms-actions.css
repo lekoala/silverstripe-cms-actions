@@ -120,3 +120,13 @@ a l-i,
 span l-i {
     vertical-align: -0.125em;
 }
+l-i i {
+    font-size: var(--size) !important;
+    color: currentColor;
+}
+.material-icons-two-tone {
+    background-color: currentColor;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
