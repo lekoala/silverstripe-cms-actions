@@ -105,6 +105,12 @@ class ActionsGridFieldItemRequest extends DataExtension
     {
         $itemRequest = $this->owner;
 
+        // Maybe this is not really needed on search forms?
+        $url = $itemRequest->getRequest()->getURL();
+        if (strpos($url, 'schema/SearchForm') !== false) {
+            return;
+        }
+
         /** @var DataObject $record */
         $record = $itemRequest->record;
         if (!$record) {
@@ -299,10 +305,10 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function getCustomPreviousRecordID(DataObject $record)
     {
-        if ($record->hasMethod('PrevRecord')) {
-            return $record->PrevRecord()->ID ?? 0;
-        }
-
+        // This won't work properly with GridState
+        // if ($record->hasMethod('PrevRecord')) {
+        //     return $record->PrevRecord()->ID ?? 0;
+        // }
         return $this->owner->getPreviousRecordID();
     }
 
@@ -312,10 +318,10 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function getCustomNextRecordID(DataObject $record)
     {
-        if ($record->hasMethod('NextRecord')) {
-            return $record->NextRecord()->ID ?? 0;
-        }
-
+        // This won't work properly with GridState
+        // if ($record->hasMethod('NextRecord')) {
+        //     return $record->NextRecord()->ID ?? 0;
+        // }
         return $this->owner->getNextRecordID();
     }
 
@@ -337,7 +343,8 @@ class ActionsGridFieldItemRequest extends DataExtension
             $MajorActions = $actions;
         }
 
-        // TODO: check why with paginator, after the first page, getPreviousRecordID/getNextRecordID tend to not work properly
+        // TODO: state is having a hard time on post
+        // @link https://github.com/silverstripe/silverstripe-framework/issues/10742
         $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
         $getNextRecordID = $this->getCustomNextRecordID($record);
 
