@@ -30,16 +30,18 @@ You can also use it on your own classes with .btn-icon-end */
 label.btn {
     margin-bottom: 0;
 }
+
 table .btn-link {
     padding: 0;
     margin: 0;
 }
 
 /* Fix actions display in CMSProfileController */
-.CMSProfileController .btn-toolbar > * {
+.CMSProfileController .btn-toolbar>* {
     order: 2;
 }
-.CMSProfileController .btn-toolbar > #action_save {
+
+.CMSProfileController .btn-toolbar>#action_save {
     order: 1;
     margin-right: 5px;
 }
@@ -50,10 +52,12 @@ table .btn-link {
     overflow: hidden;
     white-space: nowrap;
 }
+
 .progressive-action span {
     position: relative;
     z-index: 2;
 }
+
 .progressive-action .btn__progress {
     position: absolute;
     width: 0;
@@ -64,12 +68,13 @@ table .btn-link {
     opacity: 0.5;
     z-index: 1;
 }
+
 #ActionMenus {
     margin-left: 10px;
 }
 
 /* Align GridFieldRowButtons with the btn class (when no icons are used) */
-td > .action.btn {
+td>.action.btn {
     padding: 1.2308rem 0.6154rem;
     margin-top: -1.2308rem;
     margin-bottom: -1.2308rem;
@@ -80,9 +85,11 @@ td > .action.btn {
     .btn-mobile-hidden {
         display: none !important;
     }
-    .btn-mobile-collapse > span {
+
+    .btn-mobile-collapse>span {
         display: none !important;
     }
+
     .btn[class*="font-icon-"].btn-mobile-collapse:before {
         margin-right: 0;
     }
@@ -96,7 +103,7 @@ td > .action.btn {
 }
 
 /* Grouping tweaks */
-.toolbar--south .btn-toolbar > .btn-group:not(:first-child) {
+.toolbar--south .btn-toolbar>.btn-group:not(:first-child) {
     margin-left: 5px;
     margin-right: 0;
 }
@@ -109,21 +116,25 @@ l-i {
     height: var(--size);
     vertical-align: middle;
 }
+
 l-i svg {
     display: block;
     width: 100%;
     height: 100%;
 }
+
 p l-i,
 button l-i,
 a l-i,
 span l-i {
     vertical-align: -0.125em;
 }
+
 l-i i {
     font-size: var(--size) !important;
     color: currentColor;
 }
+
 .material-icons-two-tone {
     background-color: currentColor;
     background-clip: text;

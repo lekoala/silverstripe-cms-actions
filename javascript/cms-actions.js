@@ -7,6 +7,8 @@
     $.entwine("ss", function ($) {
         // Load tab if set in url
         var tabLoaded = false;
+        var scrollInterval = null;
+        var scrollChecks = 0;
         $("ul.ui-tabs-nav a").entwine({
             onmatch: function () {
                 this._super();
@@ -24,6 +26,20 @@
                     if (currHash == hash) {
                         this.trigger("click");
                         tabLoaded = true;
+
+                        //TODO: find a better solution than this
+                        scrollInterval = setInterval(function () {
+                            scrollChecks++;
+                            if (document.body.scrollTop > 0) {
+                                // Anchor scrolled the page and may have hidden the header
+                                document.body.scrollTop = 0;
+                                window.scrollTo(0, 0);
+                                clearInterval(scrollInterval);
+                            }
+                            if (scrollChecks > 20 && scrollInterval) {
+                                clearInterval(scrollInterval);
+                            }
+                        }, 100);
                     }
                 }
             },
