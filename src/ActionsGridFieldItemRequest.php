@@ -646,12 +646,15 @@ class ActionsGridFieldItemRequest extends DataExtension
         // Redirect after save
         $controller = $this->getToplevelController();
 
-        $location = $this->getBackLink();
+        $link = $this->getBackLink();
+
+        $link = $this->addGridState($link, $data);
+
         $controller->getResponse()->addHeader("X-Pjax", "Content");
         // Prevent Already directed to errors
-        $controller->getResponse()->addHeader("Location", $location);
+        $controller->getResponse()->addHeader("Location", $link);
 
-        return $controller->redirect($location);
+        return $controller->redirect($link);
     }
 
     /**
@@ -673,6 +676,8 @@ class ActionsGridFieldItemRequest extends DataExtension
         $next = $class::get()->byID($getNextRecordID);
 
         $link = $this->owner->getEditLink($getNextRecordID);
+
+        $link = $this->addGridState($link, $data);
 
         // Link to a specific tab if set, see cms-actions.js
         if ($next && !empty($data['_activetab'])) {
@@ -708,6 +713,18 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         return $controller->redirect($link);
+    }
+
+    protected function addGridState($url, $data)
+    {
+        $BackURL = $data['BackURL'] ?? null;
+        if ($BackURL) {
+            $query = parse_url($BackURL, PHP_URL_QUERY);
+            if ($query) {
+                $url .= '?' . $query;
+            }
+        }
+        return $url;
     }
 
     /**
