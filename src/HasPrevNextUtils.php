@@ -22,6 +22,11 @@ trait HasPrevNextUtils
         $request = $controller->getRequest();
         $url = rtrim($request->getURL(), '/') . '/';
 
+        $query = $_GET;
+        if (!empty($query)) {
+            $url .= '?' . http_build_query($query);
+        }
+
         $routeParams = $request->routeParams();
         $getPreviousRecordID = $routeParams['PreviousRecordID'] ?? $request->param('PreviousRecordID');
         $getNextRecordID = $routeParams['NextRecordID'] ?? $request->param('NextRecordID');
