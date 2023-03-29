@@ -726,10 +726,12 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     protected function addGridState($url, $data)
     {
+        // This should not be necessary at all if the state is correctly passed along
         $BackURL = $data['BackURL'] ?? null;
         if ($BackURL) {
             $query = parse_url($BackURL, PHP_URL_QUERY);
             if ($query) {
+                $url = strtok($url, '?');
                 $url .= '?' . $query;
             }
         }
