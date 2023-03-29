@@ -3,26 +3,28 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
-use SilverStripe\Admin\LeftAndMain;
-use SilverStripe\Control\Controller;
+use ReflectionObject;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\TabSet;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Core\Extensible;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Control\Director;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Extensible;
 use SilverStripe\Forms\CompositeField;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\Form;
-use SilverStripe\Forms\FormAction;
-use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
-use SilverStripe\Forms\Tab;
-use SilverStripe\Forms\TabSet;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
