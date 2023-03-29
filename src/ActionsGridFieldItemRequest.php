@@ -25,6 +25,7 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\Forms\HiddenField;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -307,10 +308,10 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function getCustomPreviousRecordID(DataObject $record)
     {
-        // This won't work properly with GridState
-        // if ($record->hasMethod('PrevRecord')) {
-        //     return $record->PrevRecord()->ID ?? 0;
-        // }
+        // This will overwrite state provided record
+        if (self::config()->enable_custom_prevnext && $record->hasMethod('PrevRecord')) {
+            return $record->PrevRecord()->ID ?? 0;
+        }
         return $this->owner->getPreviousRecordID();
     }
 
@@ -320,10 +321,11 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function getCustomNextRecordID(DataObject $record)
     {
-        // This won't work properly with GridState
-        // if ($record->hasMethod('NextRecord')) {
-        //     return $record->NextRecord()->ID ?? 0;
-        // }
+
+        // This will overwrite state provided record
+        if (self::config()->enable_custom_prevnext && $record->hasMethod('NextRecord')) {
+            return $record->NextRecord()->ID ?? 0;
+        }
         return $this->owner->getNextRecordID();
     }
 
@@ -349,6 +351,12 @@ class ActionsGridFieldItemRequest extends DataExtension
         // @link https://github.com/silverstripe/silverstripe-framework/issues/10742
         $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
         $getNextRecordID = $this->getCustomNextRecordID($record);
+
+        // Somehow grid state is sometimes lost, therefore we store prev/next ourselves
+        // TODO: this is a really ugly hack, but at least it works :-) fine a better solution later
+        $class = get_class($record);
+        $actions->push(new HiddenField("_cmsactions[prev][$class]", null, $getPreviousRecordID));
+        $actions->push(new HiddenField("_cmsactions[next][$class]", null, $getNextRecordID));
 
         // Coupling for HasPrevNextUtils
         if (Controller::has_curr()) {
@@ -680,12 +688,12 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
-        $getNextRecordID = $this->getCustomNextRecordID($record);
+        $class = get_class($record);
+        $getNextRecordID = $data['_cmsactions']['next'][$class] ?? $this->getCustomNextRecordID($record);
         $class = get_class($record);
         $next = $class::get()->byID($getNextRecordID);
 
         $link = $this->owner->getEditLink($getNextRecordID);
-
         $link = $this->addGridState($link, $data);
 
         // Link to a specific tab if set, see cms-actions.js
@@ -710,11 +718,13 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
-        $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
+        $class = get_class($record);
+        $getPreviousRecordID = $data['_cmsactions']['prev'][$class] ?? $this->getPreviousRecordID($record);
         $class = get_class($record);
         $prev = $class::get()->byID($getPreviousRecordID);
 
         $link = $this->owner->getEditLink($getPreviousRecordID);
+        $link = $this->addGridState($link, $data);
 
         // Link to a specific tab if set, see cms-actions.js
         if ($prev && !empty($data['_activetab'])) {

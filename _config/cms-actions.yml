@@ -5,6 +5,7 @@ LeKoala\CmsActions\ActionsGridFieldItemRequest:
   enable_save_prev_next: true
   enable_save_close: true
   enable_delete_right: true
+  enable_custom_prevnext: true
 SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
   extensions:
     - LeKoala\CmsActions\ActionsGridFieldItemRequest
