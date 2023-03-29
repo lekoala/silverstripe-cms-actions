@@ -1,3 +1,9 @@
+/* Fix anchors scrolling the content */
+html,
+.panel--scrollable {
+    scroll-padding-top: 53px;
+}
+
 /* Only necessary pre 4.4 */
 #Form_ItemEditForm_action_doDelete.align-right {
     position: absolute;

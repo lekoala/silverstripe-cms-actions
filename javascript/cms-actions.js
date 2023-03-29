@@ -28,6 +28,7 @@
                         tabLoaded = true;
 
                         //TODO: find a better solution than this
+                        // Also check .scroll-padding-top in .css file
                         scrollInterval = setInterval(function () {
                             scrollChecks++;
                             if (document.body.scrollTop > 0) {
