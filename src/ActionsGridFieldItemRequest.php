@@ -734,6 +734,9 @@ class ActionsGridFieldItemRequest extends DataExtension
             $link .= sprintf('#%s', $data['_activetab']);
         }
 
+        // Prevent Already directed to errors
+        $controller->getResponse()->addHeader("Location", $link);
+
         return $controller->redirect($link);
     }
 
