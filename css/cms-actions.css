@@ -114,6 +114,12 @@ td>.action.btn {
     margin-right: 0;
 }
 
+/* a.btn */
+.ui-widget.ui-widget-content a.btn,
+.ui-widget a.btn {
+    color: #fff;
+}
+
 /* Last icon */
 l-i {
     --size: 1em;
