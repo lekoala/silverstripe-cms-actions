@@ -115,8 +115,8 @@ td>.action.btn {
 }
 
 /* a.btn */
-.ui-widget.ui-widget-content a.btn,
-.ui-widget a.btn {
+.ui-widget.ui-widget-content a.btn.custom-action,
+.ui-widget a.btn.custom-action {
     color: #fff;
 }
 
