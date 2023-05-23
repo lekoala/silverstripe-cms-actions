@@ -239,9 +239,20 @@ class CmsActionsTest extends SapphireTest
 
         $controller = Controller::curr();
 
+        // SS5 trailing slashes
+        // @link https://docs.silverstripe.org/en/5/changelogs/5.0.0/#trailing-slash
+        $add_trailing_slash = $controller::config()->add_trailing_slash;
+
         // Without an url, we link on the current controller
         $link = $action->getModelLink("testAction");
-        $this->assertEquals('test_controller/testAction/?CustomLink=testAction', $link);
+        if ($add_trailing_slash === null) {
+            $this->assertEquals('test_controller/testAction/?CustomLink=testAction', $link);
+        } elseif ($add_trailing_slash === false) {
+            $this->assertEquals('test_controller/testAction?CustomLink=testAction', $link);
+        } elseif ($add_trailing_slash === true) {
+            $this->assertEquals('test_controller/testAction/?CustomLink=testAction', $link);
+        }
+
 
         // in settings
         $controller->getRequest()->setUrl('admin/settings/EditForm/field/MyModel/item/1/edit');
