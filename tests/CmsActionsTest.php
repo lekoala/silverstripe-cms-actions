@@ -241,7 +241,7 @@ class CmsActionsTest extends SapphireTest
 
         // Without an url, we link on the current controller
         $link = $action->getModelLink("testAction");
-        $this->assertEquals('test_controller/testAction/?CustomLink=testAction', $link);
+        $this->assertEquals('test_controller/testAction?CustomLink=testAction', $link);
 
         // in settings
         $controller->getRequest()->setUrl('admin/settings/EditForm/field/MyModel/item/1/edit');
