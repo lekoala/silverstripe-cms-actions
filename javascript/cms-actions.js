@@ -135,6 +135,9 @@
                         if (data.reload) {
                             window.location.reload();
                         }
+                        if (data.url) {
+                            window.location.href = data.url;
+                        }
                         return;
                     }
                     // Update progress data
