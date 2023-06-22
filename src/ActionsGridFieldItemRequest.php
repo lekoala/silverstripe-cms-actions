@@ -664,12 +664,12 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller = $this->getToplevelController();
 
         $link = $this->getBackLink();
-
         $link = $this->addGridState($link, $data);
 
         $controller->getResponse()->addHeader("X-Pjax", "Content");
+
         // Prevent Already directed to errors
-        $controller->getResponse()->addHeader("Location", $link);
+        // $controller->getResponse()->addHeader("Location", $link);
 
         return $controller->redirect($link);
     }
@@ -702,7 +702,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Prevent Already directed to errors
-        $controller->getResponse()->addHeader("Location", $link);
+        // $controller->getResponse()->addHeader("Location", $link);
 
         return $controller->redirect($link);
     }
@@ -735,7 +735,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Prevent Already directed to errors
-        $controller->getResponse()->addHeader("Location", $link);
+        // $controller->getResponse()->addHeader("Location", $link);
 
         return $controller->redirect($link);
     }
