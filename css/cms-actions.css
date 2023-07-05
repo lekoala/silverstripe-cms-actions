@@ -117,9 +117,13 @@ td>.action.btn {
 /* a.btn */
 .ui-widget.ui-widget-content a.btn.custom-action,
 .ui-widget a.btn.custom-action,
-.ui-widget.ui-widget-content a.btn.custom-link,
-.ui-widget a.btn.custom-link {
+.ui-widget.ui-widget-content .cms-content-actions a.btn.custom-link,
+.ui-widget .cms-content-actions a.btn.custom-link {
     color: #fff;
+}
+
+.ui-widget a.btn.btn-secondary.custom-link {
+    color: #566b8d;
 }
 
 /* Last icon */
