@@ -2,7 +2,6 @@
 
 namespace LeKoala\CmsActions;
 
-use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Control\Controller;
 
 /**
@@ -78,9 +77,10 @@ trait DefaultLink
             $params = [];
         }
         $ctrl = Controller::curr();
-        if ($ctrl instanceof ModelAdmin) {
-            $allParams = $ctrl->getRequest()->allParams();
-            $modelClass = $ctrl->getRequest()->param('ModelClass');
+        $request = $ctrl->getRequest();
+        $modelClass = $request->param('ModelClass');
+        if ($modelClass) {
+            $allParams = $request->allParams();
             $action = sprintf('%s/%s', $modelClass, $action);
             $params = array_merge($allParams, $params);
         }
