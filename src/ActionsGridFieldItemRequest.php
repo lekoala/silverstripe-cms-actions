@@ -3,7 +3,6 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
-use ReflectionObject;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\TabSet;
@@ -23,7 +22,6 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\Forms\HiddenField;
 
@@ -98,42 +96,34 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * Updates the detail form to include new form actions and buttons
+     * Called by CMSMain, typically in the CMS or in the SiteConfig admin
+     * CMSMain already uses getCMSActions so we are good to go with anything defined there
      *
-     * This is called by GridFieldDetailForm_ItemRequest
-     *
-     * @param Form $form The ItemEditForm object
+     * @param Form $form
+     * @return void
      */
-    public function updateItemEditForm($form)
+    public function updateEditForm(Form $form)
     {
-        $itemRequest = $this->owner;
+        $actions = $form->Actions();
 
-        // Maybe this is not really needed on search forms?
-        $url = $itemRequest->getRequest()->getURL();
-        if (strpos($url, 'schema/SearchForm') !== false) {
-            return;
-        }
+        // We create a Drop-Up menu afterwards because it may already exist in the $CMSActions
+        // and we don't want to duplicate it
+        $this->processDropUpMenu($actions);
+    }
 
-        /** @var DataObject $record */
-        $record = $itemRequest->record;
-        if (!$record) {
-            $record = $form->getRecord();
-        }
-        if (!$record) {
-            return;
-        }
+    /**
+     * Called by GridField_ItemRequest
+     * GridField_ItemRequest defines its own set of actions so we need to add ours
+     * We add our custom save&close, save&next and other tweaks
+     * Actions can be made readonly after this extension point
+     */
+    public function updateFormActions($actions)
+    {
+        $record = $this->owner->getRecord();
 
         // We get the actions as defined on our record
         /** @var FieldList $CMSActions */
         $CMSActions = $record->getCMSActions();
-
-        // address Silverstripe bug when SiteTree buttons are broken
-        // @link https://github.com/silverstripe/silverstripe-cms/issues/2702
-        $CMSActions->setForm($form);
-
-        // We can the actions from the GridFieldDetailForm_ItemRequest
-        // It sets the Save and Delete buttons + Right Group
-        $actions = $form->Actions();
 
         // The default button group that contains the Save or Create action
         // @link https://docs.silverstripe.org/en/4/developer_guides/customising_the_admin_interface/how_tos/extend_cms_interface/#extending-the-cms-actions
@@ -202,7 +192,6 @@ class ActionsGridFieldItemRequest extends DataExtension
         $this->extend('onAfterUpdateCMSActions', $actions, $record);
         $record->extend('onAfterUpdateCMSActions', $actions);
     }
-
 
     /**
      * Collect all Drop-Up actions into a menu.
@@ -353,7 +342,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $getNextRecordID = $this->getCustomNextRecordID($record);
 
         // Somehow grid state is sometimes lost, therefore we store prev/next ourselves
-        // TODO: this is a really ugly hack, but at least it works :-) fine a better solution later
+        // TODO: this is a really ugly hack, but at least it works :-) find a better solution later
         $class = get_class($record);
         $actions->push(new HiddenField("_cmsactions[prev][$class]", null, $getPreviousRecordID));
         $actions->push(new HiddenField("_cmsactions[next][$class]", null, $getNextRecordID));
