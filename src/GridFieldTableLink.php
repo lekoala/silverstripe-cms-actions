@@ -3,6 +3,7 @@
 namespace LeKoala\CmsActions;
 
 use ReflectionClass;
+use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 
 /**
@@ -34,7 +35,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     protected $fontIcon;
 
     /**
-     * @var string
+     * @var int
      */
     protected $parentID;
 
@@ -54,7 +55,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     protected $promptDefault;
 
     /**
-     * @var array
+     * @var array<string,mixed>
      */
     protected $attributes = [];
 
@@ -66,6 +67,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     /**
      * @param string $targetFragment The HTML fragment to write the button into
      * @param string $buttonLabel
+     * @param string $actionName
      */
     public function __construct($targetFragment = "buttons-before-right", $buttonLabel = null, $actionName = null)
     {
@@ -102,6 +104,8 @@ class GridFieldTableLink implements GridField_HTMLProvider
 
     /**
      * Place the export button in a <p> tag below the field
+     * @param GridField $gridField
+     * @return array<string,mixed>
      */
     public function getHTMLFragments($gridField)
     {
@@ -157,7 +161,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
 
     /**
      * @param string $name
-     * @return string
+     * @return string|null
      */
     public function getAttribute($name)
     {
@@ -168,6 +172,10 @@ class GridFieldTableLink implements GridField_HTMLProvider
         return null;
     }
 
+    /**
+     * @param GridField $gridField
+     * @return array<string>
+     */
     public function getActions($gridField)
     {
         return [$this->getActionName()];

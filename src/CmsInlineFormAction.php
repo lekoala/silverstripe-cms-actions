@@ -19,13 +19,13 @@ class CmsInlineFormAction extends LiteralField
     use ProgressiveAction;
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     protected $params = [];
 
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $buttonIcon = null;
 
@@ -50,9 +50,9 @@ class CmsInlineFormAction extends LiteralField
 
     /**
      * Create a new action button.
-     * @param action $action The method to call when the button is clicked
-     * @param title $title The label on the button
-     * @param extraClass $extraClass A CSS class to apply to the button in addition to 'action'
+     * @param string $action The method to call when the button is clicked
+     * @param string $title The label on the button
+     * @param string $extraClass A CSS class to apply to the button in addition to 'action'
      */
     public function __construct($action, $title = "", $extraClass = 'btn-primary')
     {
@@ -60,11 +60,17 @@ class CmsInlineFormAction extends LiteralField
         $this->addExtraClass($extraClass);
     }
 
+    /**
+     * @return FormField
+     */
     public function performReadonlyTransformation()
     {
         return $this->castedCopy(self::class);
     }
 
+    /**
+     * @return string
+     */
     public function getLink()
     {
         if (!$this->link) {
@@ -77,7 +83,7 @@ class CmsInlineFormAction extends LiteralField
     /**
      * Get an icon for this button
      *
-     * @return string
+     * @return string|null
      */
     public function getButtonIcon()
     {
@@ -89,13 +95,12 @@ class CmsInlineFormAction extends LiteralField
      *
      * Feel free to use SilverStripeIcons constants
      *
-     * @param string $buttonIcon An icon for this button
+     * @param string|null $buttonIcon An icon for this button
      * @return $this
      */
-    public function setButtonIcon(string $buttonIcon)
+    public function setButtonIcon(string $buttonIcon = null)
     {
         $this->buttonIcon = $buttonIcon;
-
         return $this;
     }
 
@@ -108,7 +113,7 @@ class CmsInlineFormAction extends LiteralField
     }
 
     /**
-     * @param $properties
+     * @param array<string,mixed> $properties
      * @return FormField|string
      */
     public function FieldHolder($properties = [])
@@ -158,7 +163,7 @@ class CmsInlineFormAction extends LiteralField
     /**
      * Get the value of params
      *
-     * @return  array
+     * @return array<mixed>
      */
     public function getParams()
     {
@@ -168,8 +173,7 @@ class CmsInlineFormAction extends LiteralField
     /**
      * Set the value of params
      *
-     * @param array $params
-     *
+     * @param array<mixed> $params
      * @return $this
      */
     public function setParams(array $params)
@@ -213,8 +217,6 @@ class CmsInlineFormAction extends LiteralField
 
     /**
      * Set the value of {@see self::$submitSelector}
-     *
-     * Includes
      *
      * @param string $selector
      * @return $this

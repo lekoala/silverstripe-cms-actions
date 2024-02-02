@@ -26,7 +26,7 @@ trait CustomButton
 
     /**
      * An icon for this button
-     * @var string
+     * @var string|null
      */
     protected $buttonIcon;
 

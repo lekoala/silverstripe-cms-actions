@@ -80,9 +80,9 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
 
     /**
      * @param GridField $gridField
-     * @param $actionName
-     * @param $arguments
-     * @param $data
+     * @param string $actionName
+     * @param array<mixed> $arguments
+     * @param array<mixed> $data
      * @return mixed
      */
     abstract public function doHandle(GridField $gridField, $actionName, $arguments, $data);
@@ -100,7 +100,8 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
 
     /**
      * @param GridField $gridField
-     * @param array $columns
+     * @param array<string> $columns
+     * @return void
      */
     public function augmentColumns($gridField, &$columns)
     {
@@ -115,7 +116,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * @param GridField $gridField
      * @param DataObject $record
      * @param string $columnName
-     * @return array
+     * @return array<string,string>
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
@@ -128,7 +129,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      *
      * @param GridField $gridField
      * @param string $columnName
-     * @return array
+     * @return array<string,string>
      */
     public function getColumnMetadata($gridField, $columnName)
     {
@@ -144,7 +145,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * Which columns are handled by this component
      *
      * @param GridField $gridField
-     * @return array
+     * @return array<string>
      */
     public function getColumnsHandled($gridField)
     {
@@ -155,7 +156,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * Which GridField actions are this component handling
      *
      * @param GridField $gridField
-     * @return array
+     * @return array<string>
      */
     public function getActions($gridField)
     {
@@ -208,7 +209,7 @@ abstract class GridFieldRowButton implements GridField_ColumnProvider, GridField
      * @param GridField $gridField
      * @param string $actionName
      * @param mixed $arguments
-     * @param array $data - form data
+     * @param array<string,mixed> $data - form data
      * @return HTTPResponse|void
      */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)

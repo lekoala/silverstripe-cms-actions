@@ -9,9 +9,11 @@ use SilverStripe\Forms\TabSet;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormField;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\Forms\HiddenField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
@@ -23,7 +25,6 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
-use SilverStripe\Forms\HiddenField;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -36,7 +37,7 @@ use SilverStripe\Forms\HiddenField;
  *
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons/blob/master/src/Extensions/GridFieldBetterButtonsItemRequest.php
- * @property LeftAndMain|GridFieldDetailForm_ItemRequest|ActionsGridFieldItemRequest $owner
+ * @property LeftAndMain&GridFieldDetailForm_ItemRequest&ActionsGridFieldItemRequest $owner
  */
 class ActionsGridFieldItemRequest extends DataExtension
 {
@@ -68,7 +69,7 @@ class ActionsGridFieldItemRequest extends DataExtension
     private static $enable_utils_prev_next = false;
 
     /**
-     * @var array Allowed controller actions
+     * @var array<string> Allowed controller actions
      */
     private static $allowed_actions = [
         'doSaveAndClose',
@@ -79,7 +80,8 @@ class ActionsGridFieldItemRequest extends DataExtension
     ];
 
     /**
-     * @return array
+     * @param FieldList $actions
+     * @return array<string>
      */
     protected function getAvailableActions($actions)
     {
@@ -116,6 +118,8 @@ class ActionsGridFieldItemRequest extends DataExtension
      * GridField_ItemRequest defines its own set of actions so we need to add ours
      * We add our custom save&close, save&next and other tweaks
      * Actions can be made readonly after this extension point
+     * @param FieldList $actions
+     * @return void
      */
     public function updateFormActions($actions)
     {
@@ -201,8 +205,10 @@ class ActionsGridFieldItemRequest extends DataExtension
     protected function processDropUpMenu($actions)
     {
         // The Drop-up container may already exist
+        /** @var ?Tab $dropUpContainer */
         $dropUpContainer = $actions->fieldByName('ActionMenus.MoreOptions');
         foreach ($actions as $action) {
+            //@phpstan-ignore-next-line
             if ($action->hasMethod('getDropUp') && $action->getDropUp()) {
                 if (!$dropUpContainer) {
                     $dropUpContainer = $this->createDropUpContainer($actions);
@@ -271,6 +277,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             }
             // Set custom title
             if ($record->hasMethod('getDeleteButtonTitle')) {
+                //@phpstan-ignore-next-line
                 $deleteAction->setTitle($record->getDeleteButtonTitle());
             }
         }
@@ -286,6 +293,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             }
             // Set custom titlte
             if ($record->hasMethod('getCancelButtonTitle')) {
+                //@phpstan-ignore-next-line
                 $cancelButton->setTitle($record->getCancelButtonTitle());
             }
         }
@@ -299,6 +307,7 @@ class ActionsGridFieldItemRequest extends DataExtension
     {
         // This will overwrite state provided record
         if (self::config()->enable_custom_prevnext && $record->hasMethod('PrevRecord')) {
+            //@phpstan-ignore-next-line
             return $record->PrevRecord()->ID ?? 0;
         }
         return $this->owner->getPreviousRecordID();
@@ -313,9 +322,26 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         // This will overwrite state provided record
         if (self::config()->enable_custom_prevnext && $record->hasMethod('NextRecord')) {
+            //@phpstan-ignore-next-line
             return $record->NextRecord()->ID ?? 0;
         }
         return $this->owner->getNextRecordID();
+    }
+
+    /**
+     * @param FieldList $actions
+     * @return CompositeField|FieldList
+     */
+    protected function getMajorActions(FieldList $actions)
+    {
+        /** @var ?CompositeField $MajorActions */
+        $MajorActions = $actions->fieldByName('MajorActions');
+
+        // If it doesn't exist, push to default group
+        if (!$MajorActions) {
+            $MajorActions = $actions;
+        }
+        return $MajorActions;
     }
 
     /**
@@ -329,12 +355,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             return;
         }
 
-        $MajorActions = $actions->fieldByName('MajorActions');
-
-        // If it doesn't exist, push to default group
-        if (!$MajorActions) {
-            $MajorActions = $actions;
-        }
+        $MajorActions = $this->getMajorActions($actions);
 
         // TODO: state is having a hard time on post
         // @link https://github.com/silverstripe/silverstripe-framework/issues/10742
@@ -384,12 +405,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             return;
         }
 
-        $MajorActions = $actions->fieldByName('MajorActions');
-
-        // If it doesn't exist, push to default group
-        if (!$MajorActions) {
-            $MajorActions = $actions;
-        }
+        $MajorActions = $this->getMajorActions($actions);
 
         if ($record->ID) {
             $label = _t('ActionsGridFieldItemRequest.SAVEANDCLOSE', 'Save and Close');
@@ -419,13 +435,12 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($record->ID) {
             return 'btn-outline-primary';
         }
-
         return 'btn-primary';
     }
 
     /**
-     * @param $action
-     * @param $definedActions
+     * @param string $action
+     * @param array<FormField>|FieldList $definedActions
      * @return mixed|CompositeField|null
      */
     protected static function findAction($action, $definedActions)
@@ -443,6 +458,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             $definedActionName = $definedAction->getName();
 
             if ($definedAction->hasMethod('actionName')) {
+                //@phpstan-ignore-next-line
                 $definedActionName = $definedAction->actionName();
             }
             if ($definedActionName === $action) {
@@ -460,7 +476,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      * Action must be declared in getCMSActions to be called
      *
      * @param string $action
-     * @param array $data
+     * @param array<string,mixed> $data
      * @param Form $form
      * @return HTTPResponse|DBHTMLText|string
      * @throws HTTPResponse_Exception
@@ -480,6 +496,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         } elseif (!empty($data['ClassName']) && !empty($data['ID'])) {
             $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
         } elseif ($controller->hasMethod("getRecord")) {
+            //@phpstan-ignore-next-line
             $record = $controller->getRecord();
         }
 
@@ -533,6 +550,7 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $message = $result;
             }
         } catch (Exception $ex) {
+            $result = null;
             $error = true;
             $message = $ex->getMessage();
         }
@@ -551,11 +569,16 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Progressive actions return array with json data
+        //@phpstan-ignore-next-line
         if (method_exists($clickedAction, 'getProgressive') && $clickedAction->getProgressive()) {
             $response = $controller->getResponse();
             $response->addHeader('Content-Type', 'application/json');
             if ($result) {
-                $response->setBody(json_encode($result));
+                $encodedResult = json_encode($result);
+                if (!$encodedResult) {
+                    $encodedResult = json_last_error_msg();
+                }
+                $response->setBody($encodedResult);
             }
 
             return $response;
@@ -572,6 +595,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         if (Director::is_ajax()) {
             $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
+            //@phpstan-ignore-next-line
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
                 $controller->getResponse()->addHeader('X-Reload', "true");
             }
@@ -582,6 +606,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         } else {
             // If the controller support sessionMessage, use it instead of form
             if ($controller->hasMethod('sessionMessage')) {
+                //@phpstan-ignore-next-line
                 $controller->sessionMessage($message, $status, ValidationResult::CAST_HTML);
             } else {
                 $form->sessionMessage($message, $status, ValidationResult::CAST_HTML);
@@ -589,8 +614,10 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Custom redirect
+        //@phpstan-ignore-next-line
         if (method_exists($clickedAction, 'getRedirectURL') && $clickedAction->getRedirectURL()) {
             $controller->getResponse()->addHeader('X-Reload', "true"); // we probably need a full ui refresh
+            //@phpstan-ignore-next-line
             return $controller->redirect($clickedAction->getRedirectURL());
         }
 
@@ -628,7 +655,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      *   [doTestAction] => 1
      * )
      *
-     * @param array $data The form data
+     * @param array<string,mixed> $data The form data
      * @param Form $form The form object
      * @return HTTPResponse|DBHTMLText|string
      * @throws Exception
@@ -636,15 +663,15 @@ class ActionsGridFieldItemRequest extends DataExtension
     public function doCustomAction($data, $form)
     {
         $action = key($data['action_doCustomAction']);
-
         return $this->forwardActionToRecord($action, $data, $form);
     }
 
     /**
      * Saves the form and goes back to list view
      *
-     * @param array $data The form data
+     * @param array<string,mixed> $data The form data
      * @param Form $form The form object
+     * @return HTTPResponse
      */
     public function doSaveAndClose($data, $form)
     {
@@ -666,8 +693,9 @@ class ActionsGridFieldItemRequest extends DataExtension
     /**
      * Saves the form and goes back to the next item
      *
-     * @param array $data The form data
+     * @param array<string,mixed> $data The form data
      * @param Form $form The form object
+     * @return HTTPResponse
      */
     public function doSaveAndNext($data, $form)
     {
@@ -680,6 +708,10 @@ class ActionsGridFieldItemRequest extends DataExtension
         $class = get_class($record);
         $getNextRecordID = $data['_cmsactions']['next'][$class] ?? $this->getCustomNextRecordID($record);
         $class = get_class($record);
+        if (!$class) {
+            throw new Exception("Could not get class");
+        }
+        /** @var ?DataObject $next */
         $next = $class::get()->byID($getNextRecordID);
 
         $link = $this->owner->getEditLink($getNextRecordID);
@@ -699,8 +731,9 @@ class ActionsGridFieldItemRequest extends DataExtension
     /**
      * Saves the form and goes to the previous item
      *
-     * @param array $data The form data
+     * @param array<string,mixed> $data The form data
      * @param Form $form The form object
+     * @return HTTPResponse
      */
     public function doSaveAndPrev($data, $form)
     {
@@ -711,8 +744,13 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
         $class = get_class($record);
-        $getPreviousRecordID = $data['_cmsactions']['prev'][$class] ?? $this->getPreviousRecordID($record);
+        $getPreviousRecordID = $data['_cmsactions']['prev'][$class] ?? $this->getCustomPreviousRecordID($record);
         $class = get_class($record);
+        if (!$class) {
+            throw new Exception("Could not get class");
+        }
+
+        /** @var ?DataObject $prev */
         $prev = $class::get()->byID($getPreviousRecordID);
 
         $link = $this->owner->getEditLink($getPreviousRecordID);
@@ -729,6 +767,11 @@ class ActionsGridFieldItemRequest extends DataExtension
         return $controller->redirect($link);
     }
 
+    /**
+     * @param string $url
+     * @param array<mixed> $data
+     * @return string
+     */
     protected function addGridState($url, $data)
     {
         // This should not be necessary at all if the state is correctly passed along
@@ -766,6 +809,10 @@ class ActionsGridFieldItemRequest extends DataExtension
         return $controller;
     }
 
+    /**
+     * @param Controller $controller
+     * @return boolean
+     */
     protected function isLeftAndMain($controller)
     {
         return is_subclass_of($controller, LeftAndMain::class);
@@ -775,8 +822,6 @@ class ActionsGridFieldItemRequest extends DataExtension
      * Gets the back link
      *
      * @return string
-     * @todo This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
-     * because it is a protected method and not visible to a decorator!
      */
     public function getBackLink()
     {
@@ -784,6 +829,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $toplevelController = $this->getToplevelController();
         // Check for LeftAndMain and alike controllers with a Backlink or Breadcrumbs methods
         if ($toplevelController->hasMethod('Backlink')) {
+            //@phpstan-ignore-next-line
             $backlink = $toplevelController->Backlink();
         } elseif ($this->owner->getController()->hasMethod('Breadcrumbs')) {
             $parents = $this->owner->getController()->Breadcrumbs(false)->items;
@@ -827,6 +873,9 @@ class ActionsGridFieldItemRequest extends DataExtension
         // Changes to the record properties might've excluded the record from
         // a filtered list, so return back to the main view if it can't be found
         $noActionURL = $url = $controller->getRequest()->getURL();
+        if (!$url) {
+            $url = '';
+        }
 
         // The controller may not have these
         if ($controller->hasMethod('getAction')) {
@@ -840,12 +889,13 @@ class ActionsGridFieldItemRequest extends DataExtension
             }
         } else {
             // Simple fallback (last index of)
-            $pos = strrpos($url ?? '', 'ItemEditForm');
-            $noActionURL = substr($url ?? '', 0, $pos);
+            $pos = strrpos($url, 'ItemEditForm');
+            if (is_int($pos)) {
+                $noActionURL = substr($url, 0, $pos);
+            }
         }
 
         $controller->getRequest()->addHeader('X-Pjax', 'Content');
-
         return $controller->redirect($noActionURL, 302);
     }
 }

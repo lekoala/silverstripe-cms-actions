@@ -46,7 +46,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     protected $fontIcon;
 
     /**
-     * @var string
+     * @var int
      */
     protected $parentID;
 
@@ -66,7 +66,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     protected $promptDefault;
 
     /**
-     * @var array
+     * @var array<string,mixed>
      */
     protected $attributes = [];
 
@@ -82,6 +82,9 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
         }
     }
 
+    /**
+     * @return string
+     */
     public function getActionName()
     {
         $class = (new ReflectionClass(get_called_class()))->getShortName();
@@ -90,6 +93,9 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
         return strtolower(str_replace('Button', '', $class));
     }
 
+    /**
+     * @return string
+     */
     public function getButtonLabel()
     {
         return $this->buttonLabel;
@@ -97,6 +103,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
 
     /**
      * Place the export button in a <p> tag below the field
+     * @return array<string,mixed>
      */
     public function getHTMLFragments($gridField)
     {
@@ -107,7 +114,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             $action,
             $this->getButtonLabel(),
             $action,
-            null
+            []
         );
         $button->addExtraClass('btn btn-secondary action_' . $action);
         if ($this->noAjax) {
@@ -161,7 +168,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
 
     /**
      * @param $gridField
-     * @return array
+     * @return array<string>
      */
     public function getActions($gridField)
     {
@@ -170,10 +177,10 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
 
     /**
      * @param GridField $gridField
-     * @param $actionName
-     * @param $arguments
-     * @param $data
-     * @return array|\SilverStripe\Control\HTTPResponse|void
+     * @param string $actionName
+     * @param array<mixed> $arguments
+     * @param array<mixed> $data
+     * @return array<mixed>|\SilverStripe\Control\HTTPResponse|void
      */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
@@ -203,7 +210,11 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                 if ($this->progressive) {
                     $response = $controller->getResponse();
                     $response->addHeader('Content-Type', 'application/json');
-                    $response->setBody(json_encode($result));
+                    $encodedResult = json_encode($result);
+                    if ($encodedResult === false) {
+                        $encodedResult = json_last_error_msg();
+                    }
+                    $response->setBody($encodedResult);
 
                     return $response;
                 }
@@ -231,6 +242,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
 
     /**
      * it is also a URL
+     * @return array<string,string>
      */
     public function getURLHandlers($gridField)
     {

@@ -19,7 +19,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
     /**
      * HTML classes to be added to GridField buttons
      *
-     * @var string[]
+     * @var array<string,mixed>
      */
     protected $extraClass = [
         'grid-field__icon-action--hidden-on-hover' => true,
@@ -57,7 +57,8 @@ class GridFieldRowLink implements GridField_ColumnProvider
      * Add a column 'Actions'
      *
      * @param GridField $gridField
-     * @param array $columns
+     * @param array<string> $columns
+     * @return void
      */
     public function augmentColumns($gridField, &$columns)
     {
@@ -72,7 +73,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
      * @param GridField $gridField
      * @param DataObject $record
      * @param string $columnName
-     * @return array
+     * @return array<string,string>
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
@@ -84,7 +85,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
      *
      * @param GridField $gridField
      * @param string $columnName
-     * @return array
+     * @return array<string|int,string|null>
      */
     public function getColumnMetadata($gridField, $columnName)
     {
@@ -99,7 +100,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
      * Which columns are handled by this component
      *
      * @param GridField $gridField
-     * @return array
+     * @return array<string>
      */
     public function getColumnsHandled($gridField)
     {
@@ -131,10 +132,11 @@ class GridFieldRowLink implements GridField_ColumnProvider
 
         $data = new ArrayData(
             [
-            'Link' => $this->getLink($gridField, $record, $columnName),
-            'ExtraClass' => $this->getExtraClass(),
-            'Title' => $this->title,
-            'NewWindow' => $this->newWindow]
+                'Link' => $this->getLink($gridField, $record, $columnName),
+                'ExtraClass' => $this->getExtraClass(),
+                'Title' => $this->title,
+                'NewWindow' => $this->newWindow
+            ]
         );
 
         $template = SSViewer::get_templates_by_class($this, '', __CLASS__);
@@ -229,6 +231,7 @@ class GridFieldRowLink implements GridField_ColumnProvider
 
     /**
      * Get the value of newWindow
+     * @return bool
      */
     public function getNewWindow()
     {
@@ -238,12 +241,12 @@ class GridFieldRowLink implements GridField_ColumnProvider
     /**
      * Set the value of newWindow
      *
+     * @param bool $newWindow
      * @return $this
      */
     public function setNewWindow($newWindow)
     {
         $this->newWindow = $newWindow;
-
         return $this;
     }
 }

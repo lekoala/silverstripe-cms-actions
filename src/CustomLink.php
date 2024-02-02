@@ -25,7 +25,7 @@ class CustomLink extends LiteralField
     /**
      * @param string $name
      * @param string $title
-     * @param string|array $link Will default to name of link on current record if not set
+     * @param string|array<mixed> $link Will default to name of link on current record if not set
      */
     public function __construct($name, $title = null, $link = null)
     {
@@ -41,6 +41,7 @@ class CustomLink extends LiteralField
         if ($link && is_string($link)) {
             $this->link = $link;
         } else {
+            //@phpstan-ignore-next-line
             $this->link = $this->getModelLink($name, $link);
         }
     }
@@ -58,7 +59,7 @@ class CustomLink extends LiteralField
     }
 
     /**
-     * @param array $properties
+     * @param array<string,mixed> $properties
      * @return FormField|string
      */
     public function FieldHolder($properties = [])
@@ -84,7 +85,9 @@ class CustomLink extends LiteralField
             $attrs[] = 'target="_blank"';
         }
         if ($this->confirmation) {
-            $attrs[] = sprintf('data-message="%s"', Convert::raw2htmlatt($this->confirmation));
+            /** @var string $att */
+            $att = Convert::raw2htmlatt($this->confirmation);
+            $attrs[] = sprintf('data-message="%s"', $att);
             if ($this->progressive) {
                 $classes[] = "confirm";
             } else {

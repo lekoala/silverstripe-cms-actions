@@ -4,6 +4,7 @@ namespace LeKoala\CmsActions;
 
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 
 /**
  * Custom actions to use in getCMSActions
@@ -51,9 +52,16 @@ class CustomAction extends FormAction
         return 'action';
     }
 
+    /**
+     * @param array<string,mixed> $properties
+     * @return DBHTMLText
+     */
     public function Field($properties = [])
     {
-        $icon = $this->buttonIcon ?? $this->icon;
+        $icon = $this->buttonIcon;
+        if (!$icon) {
+            $icon = $this->icon;
+        }
         if ($icon) {
             $this->addExtraClass('font-icon');
             $this->addExtraClass('font-icon-' . $icon);

@@ -8,12 +8,14 @@ class CustomGridField_FormAction extends GridField_FormAction
 {
     use ProgressiveAction;
 
+    /**
+     * @return string
+     */
     public function Type()
     {
         if ($this->progressive) {
             return 'progressive-action';
         }
-
         return 'action';
     }
 }

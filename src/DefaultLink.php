@@ -28,7 +28,7 @@ trait DefaultLink
      * If you want to call actions on the controller (ModelAdmin), use getControllerLink
      *
      * @param string $action
-     * @param array $params
+     * @param array<mixed>|null $params
      * @return string
      */
     public function getModelLink($action, array $params = null)
