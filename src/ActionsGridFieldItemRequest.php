@@ -98,6 +98,24 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
+     * This module does not interact with the /schema/SearchForm endpoint
+     * and therefore all requests for these urls don't need any special treatement
+     *
+     * @return bool
+     */
+    protected function isSearchFormRequest(): bool
+    {
+        if (!Controller::has_curr()) {
+            return false;
+        }
+        $curr =  Controller::curr();
+        if ($curr) {
+            return str_contains($curr->getRequest()->getURL(), '/schema/SearchForm');
+        }
+        return false;
+    }
+
+    /**
      * Called by CMSMain, typically in the CMS or in the SiteConfig admin
      * CMSMain already uses getCMSActions so we are good to go with anything defined there
      *
@@ -106,6 +124,11 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function updateEditForm(Form $form)
     {
+        // Ignore search form requests
+        if ($this->isSearchFormRequest()) {
+            return;
+        }
+
         $actions = $form->Actions();
 
         // We create a Drop-Up menu afterwards because it may already exist in the $CMSActions
@@ -123,6 +146,11 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function updateFormActions($actions)
     {
+        // Ignore search form requests
+        if ($this->isSearchFormRequest()) {
+            return;
+        }
+
         $record = $this->owner->getRecord();
 
         // We get the actions as defined on our record
