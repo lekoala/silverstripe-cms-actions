@@ -595,9 +595,13 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         if (Director::is_ajax()) {
             $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
+
             //@phpstan-ignore-next-line
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
                 $controller->getResponse()->addHeader('X-Reload', "true");
+                // Requires a ControllerURL as well, see https://github.com/silverstripe/silverstripe-admin/blob/a3aa41cea4c4df82050eef65ad5efcfae7bfde69/client/src/legacy/LeftAndMain.js#L773-L780
+                $url = $controller->getReferer();
+                $controller->getResponse()->addHeader('X-ControllerURL', $url);
             }
             // 4xx status makes a red box
             if ($error) {
