@@ -521,7 +521,7 @@ This module is kindly sponsored by [RESTRUCT](restruct.nl)
 
 ## Compatibility
 
-Tested with 4.10 but should work on any ^4.4 projects
+Tested with 5.1 but should work on any ^5.1 projects
 
 ## Maintainer
 
