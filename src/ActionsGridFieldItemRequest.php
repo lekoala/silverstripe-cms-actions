@@ -799,11 +799,12 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
         $class = get_class($record);
-        $getNextRecordID = $this->getCustomNextRecordID($record);
-        $class = get_class($record);
         if (!$class) {
             throw new Exception("Could not get class");
         }
+
+        $getNextRecordID = $this->getCustomNextRecordID($record);
+
         /** @var ?DataObject $next */
         $next = $class::get()->byID($getNextRecordID);
 
@@ -837,8 +838,11 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
         $class = get_class($record);
+        if (!$class) {
+            throw new Exception("Could not get class");
+        }
+
         $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
-        $class = get_class($record);
         if (!$class) {
             throw new Exception("Could not get class");
         }
