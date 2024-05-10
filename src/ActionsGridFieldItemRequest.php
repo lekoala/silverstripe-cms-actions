@@ -26,6 +26,8 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\Forms\GridField\GridFieldStateManagerInterface;
+use SilverStripe\Forms\GridField\GridFieldPaginator;
+use ReflectionObject;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -138,6 +140,21 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
+     * @return FieldList|false
+     */
+    public function recordCmsUtils()
+    {
+        $record = $this->owner->getRecord();
+        if ($record->hasMethod('getCMSUtils')) {
+            $utils = $record->getCMSUtils();
+            $this->extend('onCMSUtils', $utils, $record);
+            $record->extend('onCMSUtils', $utils);
+            return $utils;
+        }
+        return false;
+    }
+
+    /**
      * Called by GridField_ItemRequest
      * GridField_ItemRequest defines its own set of actions so we need to add ours
      * We add our custom save&close, save&next and other tweaks
@@ -192,7 +209,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // We have a 4.4 setup, before that there was no RightGroup
-        $RightGroup = $actions->fieldByName('RightGroup');
+        $RightGroup = $this->getRightGroupActions($actions);
 
         // Insert again to make sure our actions are properly placed after apply changes
         if ($RightGroup) {
@@ -338,12 +355,24 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     /**
      * @param DataObject $record
+     * @return bool
+     */
+    public function useCustomPrevNext(DataObject $record): bool
+    {
+        if (self::config()->enable_custom_prevnext) {
+            return $record->hasMethod('PrevRecord') && $record->hasMethod('NextRecord');
+        }
+        return false;
+    }
+
+    /**
+     * @param DataObject $record
      * @return int
      */
     public function getCustomPreviousRecordID(DataObject $record)
     {
         // This will overwrite state provided record
-        if (self::config()->enable_custom_prevnext && $record->hasMethod('PrevRecord')) {
+        if ($this->useCustomPrevNext($record)) {
             //@phpstan-ignore-next-line
             return $record->PrevRecord()->ID ?? 0;
         }
@@ -358,7 +387,7 @@ class ActionsGridFieldItemRequest extends DataExtension
     {
 
         // This will overwrite state provided record
-        if (self::config()->enable_custom_prevnext && $record->hasMethod('NextRecord')) {
+        if ($this->useCustomPrevNext($record)) {
             //@phpstan-ignore-next-line
             return $record->NextRecord()->ID ?? 0;
         }
@@ -383,6 +412,17 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     /**
      * @param FieldList $actions
+     * @return CompositeField
+     */
+    protected function getRightGroupActions(FieldList $actions)
+    {
+        /** @var ?CompositeField $RightGroup */
+        $RightGroup = $actions->fieldByName('RightGroup');
+        return $RightGroup;
+    }
+
+    /**
+     * @param FieldList $actions
      * @param DataObject $record
      * @return void
      */
@@ -397,14 +437,33 @@ class ActionsGridFieldItemRequest extends DataExtension
         // @link https://github.com/silverstripe/silverstripe-framework/issues/10742
         $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
         $getNextRecordID = $this->getCustomNextRecordID($record);
+        $isCustom  = $this->useCustomPrevNext($record);
 
         // Coupling for HasPrevNextUtils
         if (Controller::has_curr()) {
+            $prevLink = $nextLink = null;
+            if (!$isCustom && $this->owner instanceof GridFieldDetailForm_ItemRequest) {
+                $this->owner->getStateManager();
+                $reflObject = new ReflectionObject($this->owner);
+                $reflMethod = $reflObject->getMethod('getEditLinkForAdjacentRecord');
+                $reflMethod->setAccessible(true);
+
+                if ($getPreviousRecordID) {
+                    $prevLink = $reflMethod->invoke($this->owner, -1);
+                }
+                if ($getNextRecordID) {
+                    $nextLink = $reflMethod->invoke($this->owner, +1);
+                }
+            }
+
             /** @var HTTPRequest $request */
             $request = Controller::curr()->getRequest();
             $routeParams = $request->routeParams();
-            $routeParams['PreviousRecordID'] = $getPreviousRecordID;
-            $routeParams['NextRecordID'] = $getNextRecordID;
+            $recordClass = get_class($record);
+            $routeParams['cmsactions'][$recordClass]['PreviousRecordID'] = $getPreviousRecordID;
+            $routeParams['cmsactions'][$recordClass]['NextRecordID'] = $getNextRecordID;
+            $routeParams['cmsactions'][$recordClass]['PrevRecordLink'] = $prevLink;
+            $routeParams['cmsactions'][$recordClass]['NextRecordLink'] = $nextLink;
             $request->setRouteParams($routeParams);
         }
 

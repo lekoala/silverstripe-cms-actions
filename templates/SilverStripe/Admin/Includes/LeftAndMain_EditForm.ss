@@ -9,9 +9,9 @@
 			<% end_with %>
 		</div>
         <%-- cms-actions getCMSUtils entry point --%>
-        <% if $Record.getCMSUtils %>
+        <% if $Controller.recordCmsUtils %>
         <div class="cms-content-header-utils vertical-align-items">
-            <% loop $Record.getCMSUtils %>
+            <% loop $Controller.recordCmsUtils %>
                 $FieldHolder
             <% end_loop %>
         </div>
@@ -62,7 +62,7 @@
 				<%t SilverStripe\Admin\LeftAndMain.PreviewButton 'Preview' %> &raquo;
 			</a>
 			<% end_if %>
-            
+
 			<% if $hasExtraClass('cms-previewable') %>
 				<% if $Actions.last.id == 'Form_ItemEditForm_RightGroup' %>
 					<% include SilverStripe\\Admin\\LeftAndMain_ViewModeSelector SelectID="preview-mode-dropdown-in-content", ExtraClass="ml-0" %>

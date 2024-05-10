@@ -7,8 +7,9 @@ use SilverStripe\Forms\FieldList;
 
 /**
  * Add prev next in utils
- * Simply call this method in your getCMSUtils
- * This is not so useful since silverstripe provides this by default now
+ * Simply call `addPrevNextUtils` method in your getCMSUtils
+ * This is not so useful anymore since silverstripe provides this by default now
+ * but can help if you use custom prev/next logic
  */
 trait HasPrevNextUtils
 {
@@ -28,11 +29,21 @@ trait HasPrevNextUtils
         }
 
         $routeParams = $request->routeParams();
-        $getPreviousRecordID = $routeParams['PreviousRecordID'] ?? $request->param('PreviousRecordID');
-        $getNextRecordID = $routeParams['NextRecordID'] ?? $request->param('NextRecordID');
+        $recordClass = get_class($this);
+        $getPreviousRecordID = $routeParams['cmsactions'][$recordClass]['PreviousRecordID'] ?? $request->param('PreviousRecordID');
+        $getNextRecordID = $routeParams['cmsactions'][$recordClass]['NextRecordID'] ?? $request->param('NextRecordID');
 
         $search = sprintf('/%d/', $this->ID);
         $replaceStr = '/%d/';
+        $PrevRecordLink = $routeParams['cmsactions'][$recordClass]['PrevRecordLink'] ?? null;
+        $NextRecordLink = $routeParams['cmsactions'][$recordClass]['NextRecordLink'] ?? null;
+        if (!$PrevRecordLink) {
+            $PrevRecordLink = str_replace($search, sprintf($replaceStr, $getPreviousRecordID), $url);
+        }
+        if (!$NextRecordLink) {
+            $NextRecordLink = str_replace($search, sprintf($replaceStr, $getNextRecordID), $url);
+        }
+
         if ($this->ID && $getNextRecordID) {
             $utils->unshift(
                 $NextBtnLink = new CmsInlineFormAction(
@@ -41,7 +52,7 @@ trait HasPrevNextUtils
                     'btn-secondary'
                 )
             );
-            $NextBtnLink->setLink(str_replace($search, sprintf($replaceStr, $getNextRecordID), $url));
+            $NextBtnLink->setLink($NextRecordLink);
         }
         if ($this->ID && $getPreviousRecordID) {
             $utils->unshift(
@@ -51,7 +62,7 @@ trait HasPrevNextUtils
                     'btn-secondary'
                 )
             );
-            $PrevBtnLink->setLink(str_replace($search, sprintf($replaceStr, $getPreviousRecordID), $url));
+            $PrevBtnLink->setLink($PrevRecordLink);
         }
 
         return $utils;
