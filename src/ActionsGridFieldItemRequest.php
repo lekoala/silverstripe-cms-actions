@@ -25,8 +25,6 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
-use SilverStripe\Forms\GridField\GridFieldStateManagerInterface;
-use SilverStripe\Forms\GridField\GridFieldPaginator;
 use ReflectionObject;
 
 /**
@@ -443,16 +441,11 @@ class ActionsGridFieldItemRequest extends DataExtension
         if (Controller::has_curr()) {
             $prevLink = $nextLink = null;
             if (!$isCustom && $this->owner instanceof GridFieldDetailForm_ItemRequest) {
-                $this->owner->getStateManager();
-                $reflObject = new ReflectionObject($this->owner);
-                $reflMethod = $reflObject->getMethod('getEditLinkForAdjacentRecord');
-                $reflMethod->setAccessible(true);
-
                 if ($getPreviousRecordID) {
-                    $prevLink = $reflMethod->invoke($this->owner, -1);
+                    $prevLink = $this->getPublicEditLinkForAdjacentRecord(-1);
                 }
                 if ($getNextRecordID) {
-                    $nextLink = $reflMethod->invoke($this->owner, +1);
+                    $nextLink = $this->getPublicEditLinkForAdjacentRecord(+1);
                 }
             }
 
@@ -480,6 +473,20 @@ class ActionsGridFieldItemRequest extends DataExtension
             $doSaveAndNext->addExtraClass('font-icon-angle-double-right btn-mobile-collapse');
             $doSaveAndNext->setUseButtonTag(true);
             $MajorActions->push($doSaveAndNext);
+        }
+    }
+
+    public function getPublicEditLinkForAdjacentRecord(int $offset): ?string
+    {
+        $this->owner->getStateManager();
+        $reflObject = new ReflectionObject($this->owner);
+        $reflMethod = $reflObject->getMethod('getEditLinkForAdjacentRecord');
+        $reflMethod->setAccessible(true);
+
+        try {
+            return $reflMethod->invoke($this->owner, $offset);
+        } catch (Exception $e) {
+            return null;
         }
     }
 
@@ -773,12 +780,60 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller = $this->getToplevelController();
 
         $link = $this->getBackLink();
-        $link = $this->addGridState($link, $data);
+
+        // Doesn't seem to be needed anymore
+        // $link = $this->addGridState($link, $data);
 
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
-        // Prevent Already directed to errors
-        // $controller->getResponse()->addHeader("Location", $link);
+        return $controller->redirect($link);
+    }
+
+    /**
+     * @param string $dir prev|next
+     * @param array<string,mixed> $data The form data
+     * @param Form|null $form
+     * @return void
+     */
+    protected function doSaveAndAdjacent(string $dir, array $data, ?Form $form)
+    {
+        $record = $this->owner->record;
+        $this->owner->doSave($data, $form);
+        // Redirect after save
+        $controller = $this->getToplevelController();
+        $controller->getResponse()->addHeader("X-Pjax", "Content");
+
+        $class = get_class($record);
+        if (!$class) {
+            throw new Exception("Could not get class");
+        }
+
+        $method = match ($dir) {
+            'prev' => 'getCustomPreviousRecordID',
+            'next' => 'getCustomNextRecordID',
+        };
+
+        $offset = match ($dir) {
+            'prev' => -1,
+            'next' => +1,
+        };
+
+        $adjRecordID = $this->$method($record);
+
+        /** @var ?DataObject $adj */
+        $adj = $class::get()->byID($adjRecordID);
+
+        $useCustom = $this->useCustomPrevNext($record);
+        $link = $this->getPublicEditLinkForAdjacentRecord($offset);
+        if (!$link || $useCustom) {
+            $link = $this->owner->getEditLink($adjRecordID);
+            $link = $this->addGridState($link, $data);
+        }
+
+        // Link to a specific tab if set, see cms-actions.js
+        if ($adj && !empty($data['_activetab'])) {
+            $link .= sprintf('#%s', $data['_activetab']);
+        }
 
         return $controller->redirect($link);
     }
@@ -792,34 +847,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function doSaveAndNext($data, $form)
     {
-        $record = $this->owner->record;
-        $this->owner->doSave($data, $form);
-        // Redirect after save
-        $controller = $this->getToplevelController();
-        $controller->getResponse()->addHeader("X-Pjax", "Content");
-
-        $class = get_class($record);
-        if (!$class) {
-            throw new Exception("Could not get class");
-        }
-
-        $getNextRecordID = $this->getCustomNextRecordID($record);
-
-        /** @var ?DataObject $next */
-        $next = $class::get()->byID($getNextRecordID);
-
-        $link = $this->owner->getEditLink($getNextRecordID);
-        $link = $this->addGridState($link, $data);
-
-        // Link to a specific tab if set, see cms-actions.js
-        if ($next && !empty($data['_activetab'])) {
-            $link .= sprintf('#%s', $data['_activetab']);
-        }
-
-        // Prevent Already directed to errors
-        // $controller->getResponse()->addHeader("Location", $link);
-
-        return $controller->redirect($link);
+        return $this->doSaveAndAdjacent('next', $data, $form);
     }
 
     /**
@@ -831,40 +859,12 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function doSaveAndPrev($data, $form)
     {
-        $record = $this->owner->record;
-        $this->owner->doSave($data, $form);
-        // Redirect after save
-        $controller = $this->getToplevelController();
-        $controller->getResponse()->addHeader("X-Pjax", "Content");
-
-        $class = get_class($record);
-        if (!$class) {
-            throw new Exception("Could not get class");
-        }
-
-        $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
-        if (!$class) {
-            throw new Exception("Could not get class");
-        }
-
-        /** @var ?DataObject $prev */
-        $prev = $class::get()->byID($getPreviousRecordID);
-
-        $link = $this->owner->getEditLink($getPreviousRecordID);
-        $link = $this->addGridState($link, $data);
-
-        // Link to a specific tab if set, see cms-actions.js
-        if ($prev && !empty($data['_activetab'])) {
-            $link .= sprintf('#%s', $data['_activetab']);
-        }
-
-        // Prevent Already directed to errors
-        // $controller->getResponse()->addHeader("Location", $link);
-
-        return $controller->redirect($link);
+        return $this->doSaveAndAdjacent('prev', $data, $form);
     }
 
     /**
+     * Check if we can remove this safely
+     * @deprecated
      * @param string $url
      * @param array<mixed> $data
      * @return string
