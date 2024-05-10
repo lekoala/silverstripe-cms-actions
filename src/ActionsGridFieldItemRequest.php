@@ -25,6 +25,7 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\Forms\GridField\GridFieldStateManagerInterface;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -220,6 +221,14 @@ class ActionsGridFieldItemRequest extends DataExtension
             $this->moveCancelAndDelete($actions, $record);
         }
 
+        // Fix gridstate being lost when running custom actions
+        if (method_exists($this->owner, 'getStateManager')) {
+            $request = $this->owner->getRequest();
+            $stateManager = $this->owner->getStateManager();
+            $gridField = $this->owner->getGridField();
+            $actions->push(new HiddenField($stateManager->getStateKey($gridField), null, $stateManager->getStateFromRequest($gridField, $request)));
+        }
+
         // Add extension hook
         $this->extend('onAfterUpdateCMSActions', $actions, $record);
         $record->extend('onAfterUpdateCMSActions', $actions);
@@ -385,16 +394,9 @@ class ActionsGridFieldItemRequest extends DataExtension
 
         $MajorActions = $this->getMajorActions($actions);
 
-        // TODO: state is having a hard time on post
         // @link https://github.com/silverstripe/silverstripe-framework/issues/10742
         $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
         $getNextRecordID = $this->getCustomNextRecordID($record);
-
-        // Somehow grid state is sometimes lost, therefore we store prev/next ourselves
-        // TODO: this is a really ugly hack, but at least it works :-) find a better solution later
-        $class = get_class($record);
-        $actions->push(new HiddenField("_cmsactions[prev][$class]", null, $getPreviousRecordID));
-        $actions->push(new HiddenField("_cmsactions[next][$class]", null, $getNextRecordID));
 
         // Coupling for HasPrevNextUtils
         if (Controller::has_curr()) {
@@ -738,7 +740,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
         $class = get_class($record);
-        $getNextRecordID = $data['_cmsactions']['next'][$class] ?? $this->getCustomNextRecordID($record);
+        $getNextRecordID = $this->getCustomNextRecordID($record);
         $class = get_class($record);
         if (!$class) {
             throw new Exception("Could not get class");
@@ -776,7 +778,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
         $class = get_class($record);
-        $getPreviousRecordID = $data['_cmsactions']['prev'][$class] ?? $this->getCustomPreviousRecordID($record);
+        $getPreviousRecordID = $this->getCustomPreviousRecordID($record);
         $class = get_class($record);
         if (!$class) {
             throw new Exception("Could not get class");
