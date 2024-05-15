@@ -26,6 +26,7 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use ReflectionObject;
+use SilverStripe\Admin\ModelAdmin;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -94,7 +95,6 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $list[] = $action->getName();
             }
         }
-
         return $list;
     }
 
@@ -241,7 +241,8 @@ class ActionsGridFieldItemRequest extends DataExtension
             $request = $this->owner->getRequest();
             $stateManager = $this->owner->getStateManager();
             $gridField = $this->owner->getGridField();
-            $actions->push(new HiddenField($stateManager->getStateKey($gridField), null, $stateManager->getStateFromRequest($gridField, $request)));
+            $state = $stateManager->getStateFromRequest($gridField, $request);
+            $actions->push(new HiddenField($stateManager->getStateKey($gridField), null, $state));
         }
 
         // Add extension hook
@@ -592,8 +593,13 @@ class ActionsGridFieldItemRequest extends DataExtension
         } elseif (!empty($data['ClassName']) && !empty($data['ID'])) {
             $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
         } elseif ($controller->hasMethod("getRecord")) {
-            //@phpstan-ignore-next-line
-            $record = $controller->getRecord();
+            // LeftAndMain requires an id
+            if ($controller instanceof LeftAndMain && !empty($data['ID'])) {
+                $record = $controller->getRecord($data['ID']);
+            } elseif ($controller instanceof ModelAdmin) {
+                // Otherwise fallback to singleton
+                $record = DataObject::singleton($controller->getModelClass());
+            }
         }
 
         if (!$record) {

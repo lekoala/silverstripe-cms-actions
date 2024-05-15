@@ -9,6 +9,7 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
+use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Provide a simple way to declare buttons that affects a whole GridField
@@ -18,6 +19,7 @@ use SilverStripe\Forms\GridField\GridField_URLHandler;
 abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
 {
     use ProgressiveAction;
+    use Injectable;
 
     /**
      * Fragment to write the button to
@@ -70,6 +72,8 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
      */
     protected $attributes = [];
 
+    public bool $submitData = false;
+
     /**
      * @param string $targetFragment The HTML fragment to write the button into
      * @param string $buttonLabel
@@ -89,7 +93,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     {
         $class = (new ReflectionClass(get_called_class()))->getShortName();
 
-        // ! without lowercase, in does not work
+        // ! without lowercase, it does not work
         return strtolower(str_replace('Button', '', $class));
     }
 
@@ -116,6 +120,9 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             $action,
             []
         );
+        if ($this->submitData) {
+            $button->submitData = true;
+        }
         $button->addExtraClass('btn btn-secondary action_' . $action);
         if ($this->noAjax) {
             $button->addExtraClass('no-ajax');
@@ -167,11 +174,12 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     }
 
     /**
-     * @param $gridField
+     * @param GridField $gridField
      * @return array<string>
      */
     public function getActions($gridField)
     {
+        // $gridField is not used but required by parent class
         return [$this->getActionName()];
     }
 
@@ -194,7 +202,8 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                 }
             }
 
-            $result = $this->handle($gridField, $controller);
+            // Data should contain $_POST vars
+            $result = $this->handle($gridField, $controller, $arguments, $data);
             if ((!$result || is_string($result)) && $this->progressive) {
                 // simply increment counter and let's hope last action will return something
                 $step = (int)$controller->getRequest()->postVar("progress_step");
@@ -232,9 +241,11 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
             } else {
                 $response = $controller->getResponse();
                 $response->setBody($gridField->forTemplate());
-                $response
-                    ->addHeader('X-Status', 'Action completed');
 
+                // Add default message if none set
+                if (!$response->getHeader('X-Status')) {
+                    $response->addHeader('X-Status', 'Action completed');
+                }
                 return $response;
             }
         }
@@ -250,8 +261,11 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     }
 
     /**
+     * TODO: update the actual method with the new arguments
      * @param GridField $gridField
      * @param Controller $controller
+     * @param array<mixed> $arguments
+     * @param array<mixed> $data
      * @return mixed
      */
     abstract public function handle(GridField $gridField, Controller $controller);

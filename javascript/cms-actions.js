@@ -82,6 +82,13 @@
             },
         });
 
+        $("#Form_EditForm_action_gridfieldsaveall").entwine({
+            onclick: function (e) {
+                // .submit() does not work, but trigger("submit", [this]) works somehow...
+                this.parents("form").trigger("submit", [this]);
+            },
+        });
+
         // Allow posting from CmsInlineFormAction
         $("button.inline-action[data-action]").entwine({
             onclick: function (e) {
