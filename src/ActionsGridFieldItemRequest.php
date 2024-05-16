@@ -700,10 +700,7 @@ class ActionsGridFieldItemRequest extends DataExtension
 
             //@phpstan-ignore-next-line
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
-                $controller->getResponse()->addHeader('X-Reload', "true");
-                // Requires a ControllerURL as well, see https://github.com/silverstripe/silverstripe-admin/blob/a3aa41cea4c4df82050eef65ad5efcfae7bfde69/client/src/legacy/LeftAndMain.js#L773-L780
-                $url = $controller->getReferer();
-                $controller->getResponse()->addHeader('X-ControllerURL', $url);
+                self::addXReload($controller);
             }
             // 4xx status makes a red box
             if ($error) {
@@ -722,13 +719,31 @@ class ActionsGridFieldItemRequest extends DataExtension
         // Custom redirect
         //@phpstan-ignore-next-line
         if (method_exists($clickedAction, 'getRedirectURL') && $clickedAction->getRedirectURL()) {
-            $controller->getResponse()->addHeader('X-Reload', "true"); // we probably need a full ui refresh
+            // we probably need a full ui refresh
+            self::addXReload($clickedAction->getRedirectURL());
             //@phpstan-ignore-next-line
             return $controller->redirect($clickedAction->getRedirectURL());
         }
 
         // Redirect after action
         return $this->redirectAfterAction($isNewRecord, $record);
+    }
+
+    /**
+     * Requires a ControllerURL as well, see
+     * https://github.com/silverstripe/silverstripe-admin/blob/a3aa41cea4c4df82050eef65ad5efcfae7bfde69/client/src/legacy/LeftAndMain.js#L773-L780
+     *
+     * @param Controller $controller
+     * @param string|null $url
+     * @return void
+     */
+    public static function addXReload(Controller $controller, ?string $url = null): void
+    {
+        if (!$url) {
+            $url = $controller->getReferer();
+        }
+        $controller->getResponse()->addHeader('X-ControllerURL', $url);
+        $controller->getResponse()->addHeader('X-Reload', "true");
     }
 
     /**

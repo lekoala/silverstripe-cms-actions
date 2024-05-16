@@ -21,6 +21,9 @@ class GridFieldSaveAllButton extends GridFieldTableButton
      */
     protected $noAjax = false;
     protected ?string $completeMessage = null;
+    protected ?bool $useHandleSave = true;
+    protected $allowEmptyResponse = true;
+    protected bool $shouldReload = false;
 
     public function __construct($targetFragment = 'buttons-before-left', $buttonLabel = null)
     {
@@ -44,33 +47,44 @@ class GridFieldSaveAllButton extends GridFieldTableButton
             if (!$record) {
                 continue;
             }
-            $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldEditableColumns::class);
-            $component->handleSave($gridField, $record);
-            // foreach ($values as $k => $v) {
-            //     $record->$k = $v;
-            // }
-            // $record->write();
+            // You can use the grid field component or a simple loop with write
+            if ($this->useHandleSave) {
+                /** @var \Symbiote\GridFieldExtensions\GridFieldEditableColumns $component */
+                $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldEditableColumns::class);
+                $component->handleSave($gridField, $record);
+            } else {
+                foreach ($values as $k => $v) {
+                    $record->$k = $v;
+                }
+                $record->write();
+            }
         }
         $newData = $data[$fieldName]['GridFieldAddNewInlineButton'] ?? [];
         foreach ($newData as $idx => $values) {
-            $record = new $model;
-            foreach ($values as $k => $v) {
-                $record->$k = $v;
+            if ($this->useHandleSave) {
+                /** @var \Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton $component */
+                $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton::class);
+                $component->handleSave($gridField, $record);
+            } else {
+                $record = new $model;
+                foreach ($values as $k => $v) {
+                    $record->$k = $v;
+                }
+                $record->write();
             }
-            $record->write();
         }
 
         $response = $controller->getResponse();
 
         if (Director::is_ajax()) {
             if (!$this->completeMessage) {
-                $this->completeMessage = _t('GridFieldSaveAllButton.DONE', 'ALL SAVED!');
+                $this->completeMessage = _t('GridFieldSaveAllButton.DONE', 'All saved');
             }
-            // Reload for now since we mess up with the PJAX fragment
-            $url = $controller->getReferer();
-            $response->addHeader('X-ControllerURL', $url);
-            $response->addHeader('X-Reload', true);
+            if ($this->shouldReload) {
+                ActionsGridFieldItemRequest::addXReload($controller);
+            }
             $response->addHeader('X-Status', rawurlencode($this->completeMessage));
+            return null;
         } else {
             return $controller->redirectBack();
         }
@@ -92,6 +106,44 @@ class GridFieldSaveAllButton extends GridFieldTableButton
     public function setCompleteMessage($completeMessage): self
     {
         $this->completeMessage = $completeMessage;
+        return $this;
+    }
+
+    /**
+     * Get the value of useHandleSave
+     */
+    public function getUseHandleSave(): bool
+    {
+        return $this->useHandleSave;
+    }
+
+    /**
+     * Set the value of useHandleSave
+     *
+     * @param bool $useHandleSave
+     */
+    public function setUseHandleSave($useHandleSave): self
+    {
+        $this->useHandleSave = $useHandleSave;
+        return $this;
+    }
+
+    /**
+     * Get the value of shouldReload
+     */
+    public function getShouldReload(): bool
+    {
+        return $this->shouldReload;
+    }
+
+    /**
+     * Set the value of shouldReload
+     *
+     * @param bool $shouldReload
+     */
+    public function setShouldReload($shouldReload): self
+    {
+        $this->shouldReload = $shouldReload;
         return $this;
     }
 }

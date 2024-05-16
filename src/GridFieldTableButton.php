@@ -231,6 +231,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
                 return $result;
             }
 
+            // This can be helpful if you want to refresh the whole form for PJAX requests
             if ($this->allowEmptyResponse) {
                 return;
             }
