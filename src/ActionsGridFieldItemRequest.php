@@ -142,8 +142,8 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function recordCmsUtils()
     {
-        $record = $this->owner->getRecord();
-        if ($record->hasMethod('getCMSUtils')) {
+        $record = $this->owner->getRecord(0);
+        if ($record && $record->hasMethod('getCMSUtils')) {
             $utils = $record->getCMSUtils();
             $this->extend('onCMSUtils', $utils, $record);
             $record->extend('onCMSUtils', $utils);
