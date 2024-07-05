@@ -3,6 +3,7 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
+use ReflectionMethod;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\TabSet;
@@ -142,7 +143,14 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function recordCmsUtils()
     {
-        $record = $this->owner->getRecord(0);
+        /** @var \SilverStripe\Versioned\VersionedGridFieldItemRequest|\SilverStripe\Admin\LeftAndMain $owner */
+        $owner = $this->owner;
+
+        // At this stage, the get record could be from a gridfield item request, or from a more general left and main which requires an id
+        // maybe we could simply do:
+        // $record = DataObject::singleton($controller->getModelClass());
+        $reflectionMethod = new ReflectionMethod($owner, 'getRecord');
+        $record = count($reflectionMethod->getParameters()) > 0 ? $owner->getRecord(0) : $owner->getRecord();
         if ($record && $record->hasMethod('getCMSUtils')) {
             $utils = $record->getCMSUtils();
             $this->extend('onCMSUtils', $utils, $record);
