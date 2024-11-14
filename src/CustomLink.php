@@ -88,7 +88,9 @@ class CustomLink extends LiteralField
             /** @var string $att */
             $att = Convert::raw2htmlatt($this->confirmation);
             $attrs[] = sprintf('data-message="%s"', $att);
-            if ($this->progressive) {
+
+            // With no ajax or progressive, use entwine to show confirm message
+            if ($this->progressive || $this->getNoAjax()) {
                 $classes[] = "confirm";
             } else {
                 $attrs[] = 'onclick="return confirm(this.dataset.message);"';

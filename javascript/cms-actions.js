@@ -49,7 +49,7 @@
                 if (!input.length) {
                     // Add an input that track active tab
                     input = $(
-                        '<input type="hidden" name="_activetab" class="no-change-track" id="js-form-active-tab" />'
+                        '<input type="hidden" name="_activetab" class="no-change-track" id="js-form-active-tab" />',
                     );
                     $("#Form_ItemEditForm").append(input);
                 }
@@ -69,6 +69,13 @@
             onmatch: function () {},
             onunmatch: function () {},
             onclick: function (e) {
+                if (this.hasClass("confirm")) {
+                    var confirmed = confirm($(this).data("message"));
+                    if (!confirmed) {
+                        return;
+                    }
+                }
+
                 if (this.attr("target") == "_blank") {
                     // Maybe not necessary?
                     e.stopPropagation();
@@ -162,9 +169,7 @@
                     }
                     // Update UI
                     if (data.progress_step && data.progress_total) {
-                        var perc = Math.round(
-                            (data.progress_step / data.progress_total) * 100
-                        );
+                        var perc = Math.round((data.progress_step / data.progress_total) * 100);
                         inst.find("span").text(perc + "%");
                         inst.find(".btn__progress").css("width", perc);
                     }
@@ -210,10 +215,7 @@
                 formData["progress_step"] = 0;
 
                 // Total can be preset
-                if (
-                    typeof this.data("progress-total") !== "undefined" &&
-                    this.data("progress-total") !== null
-                ) {
+                if (typeof this.data("progress-total") !== "undefined" && this.data("progress-total") !== null) {
                     formData["progress_total"] = this.data("progress-total");
                 }
 
