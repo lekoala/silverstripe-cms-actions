@@ -72,6 +72,8 @@
                 if (this.hasClass("confirm")) {
                     var confirmed = confirm($(this).data("message"));
                     if (!confirmed) {
+                        // Prevent submission
+                        e.preventDefault();
                         return;
                     }
                 }
