@@ -5,7 +5,10 @@ namespace LeKoala\CmsActions;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use Exception;
+use SilverStripe\Control\HTTPResponse;
 
 /**
  * When using inline editing on a ModelAdmin, there is no save button
@@ -25,12 +28,23 @@ class GridFieldSaveAllButton extends GridFieldTableButton
     protected $allowEmptyResponse = true;
     protected bool $shouldReload = false;
 
+    /**
+     * @param string $targetFragment
+     * @param mixed $buttonLabel
+     */
     public function __construct($targetFragment = 'buttons-before-left', $buttonLabel = null)
     {
         parent::__construct($targetFragment, $buttonLabel);
         $this->buttonLabel = $buttonLabel ?? _t('GridFieldSaveAllButton.SaveAll', 'Save all');
     }
 
+    /**
+     * @param GridField $gridField
+     * @param Controller $controller
+     * @param array $arguments
+     * @param array $data
+     * @return ?HTTPResponse
+     */
     public function handle(GridField $gridField, Controller $controller, $arguments = [], $data = [])
     {
         $fieldName = $gridField->getName();
@@ -40,9 +54,12 @@ class GridFieldSaveAllButton extends GridFieldTableButton
         // Without this, handleSave does not work
         $gridField->setSubmittedValue($data[$fieldName]);
 
+        if (!($list instanceof DataList)) {
+            throw new Exception("Requires a DataList");
+        }
+
         $updatedData = $data[$fieldName]['GridFieldEditableColumns'] ?? [];
         foreach ($updatedData as $id => $values) {
-            /** @var DataObject $record */
             $record = $list->byID($id);
             if (!$record) {
                 continue;
@@ -61,17 +78,17 @@ class GridFieldSaveAllButton extends GridFieldTableButton
         }
         $newData = $data[$fieldName]['GridFieldAddNewInlineButton'] ?? [];
         foreach ($newData as $idx => $values) {
+            $record = new $model;
             if ($this->useHandleSave) {
                 /** @var \Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton $component */
                 $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton::class);
                 $component->handleSave($gridField, $record);
             } else {
-                $record = new $model;
                 foreach ($values as $k => $v) {
                     $record->$k = $v;
                 }
-                $record->write();
             }
+            $record->write();
         }
 
         $response = $controller->getResponse();

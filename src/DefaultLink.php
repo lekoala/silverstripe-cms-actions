@@ -93,6 +93,7 @@ trait DefaultLink
 
     /**
      * Get the value of link
+     * @return string
      */
     public function getLink()
     {
@@ -102,6 +103,7 @@ trait DefaultLink
     /**
      * Set the value of link
      *
+     * @param string $link
      * @return $this
      */
     public function setLink($link)
@@ -113,6 +115,7 @@ trait DefaultLink
 
     /**
      * Get the value of newWindow
+     * @return bool
      */
     public function getNewWindow()
     {
@@ -122,6 +125,7 @@ trait DefaultLink
     /**
      * Set the value of newWindow
      *
+     * @param bool $newWindow
      * @return $this
      */
     public function setNewWindow($newWindow)

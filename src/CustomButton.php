@@ -15,7 +15,8 @@ trait CustomButton
      * @var array
      */
     private static $default_classes = [
-        'btn', 'btn-info'
+        'btn',
+        'btn-info'
     ];
 
     /**
@@ -56,7 +57,7 @@ trait CustomButton
     /**
      * Set the value of title
      *
-     * @param string $is
+     * @param string $title
      * @return $this
      */
     public function setTitle($title)
@@ -206,6 +207,7 @@ trait CustomButton
 
     /**
      * Get the value of confirmation
+     * @return bool|string
      */
     public function getConfirmation()
     {
@@ -215,7 +217,7 @@ trait CustomButton
     /**
      * Set the value of confirmation
      *
-     * @param string|bool A confirm message or true for a generic message
+     * @param string|bool $confirmation A confirm message or true for a generic message
      * @return $this
      */
     public function setConfirmation($confirmation)

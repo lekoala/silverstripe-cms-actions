@@ -3,6 +3,7 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use ReflectionMethod;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\Form;
@@ -152,6 +153,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $reflectionMethod = new ReflectionMethod($owner, 'getRecord');
         $record = count($reflectionMethod->getParameters()) > 0 ? $owner->getRecord(0) : $owner->getRecord();
         if ($record && $record->hasMethod('getCMSUtils')) {
+            //@phpstan-ignore-next-line
             $utils = $record->getCMSUtils();
             $this->extend('onCMSUtils', $utils, $record);
             $record->extend('onCMSUtils', $utils);
@@ -161,8 +163,37 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
+     * @param Form $form
+     * @return void
+     */
+    public function updateItemEditForm($form)
+    {
+        $record = $this->owner->getRecord();
+        if (!$record) {
+            return;
+        }
+
+        // We get the actions as defined on our record
+        /** @var FieldList $CMSActions */
+        $CMSActions = $record->getCMSActions();
+
+        $FormActions = $form->Actions();
+
+        // Push our actions that are otherwise ignored by SilverStripe
+        foreach ($CMSActions as $CMSAction) {
+            $action = $FormActions->fieldByName($CMSAction->getName());
+
+            if ($action) {
+                // If it has been made readonly, revert
+                if ($CMSAction->isReadonly() != $action->isReadonly()) {
+                    $FormActions->replaceField($action->getName(), $action->setReadonly($CMSAction->isReadonly()));
+                }
+            }
+        }
+    }
+
+    /**
      * Called by GridField_ItemRequest
-     * GridField_ItemRequest defines its own set of actions so we need to add ours
      * We add our custom save&close, save&next and other tweaks
      * Actions can be made readonly after this extension point
      * @param FieldList $actions
@@ -546,7 +577,7 @@ class ActionsGridFieldItemRequest extends DataExtension
     /**
      * @param string $action
      * @param array<FormField>|FieldList $definedActions
-     * @return mixed|CompositeField|null
+     * @return FormField|null
      */
     protected static function findAction($action, $definedActions)
     {
@@ -632,12 +663,25 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $availableActions
             ));
         }
+
+        if ($clickedAction->isReadonly() || $clickedAction->isDisabled()) {
+            return $this->owner->httpError(403, sprintf(
+                'Action %s is disabled',
+                $clickedAction->getName(),
+            ));
+        }
+
         $message = null;
         $error = false;
 
         // Check record BEFORE the action
         // It can be deleted by the action, and it will return to the list
         $isNewRecord = $record->ID === 0;
+
+        $actionTitle = $clickedAction->getName();
+        if (method_exists($clickedAction, 'getTitle')) {
+            $actionTitle = $clickedAction->getTitle();
+        }
 
         try {
             $result = $record->$action($data, $form, $controller);
@@ -653,7 +697,10 @@ class ActionsGridFieldItemRequest extends DataExtension
                 $message = _t(
                     'ActionsGridFieldItemRequest.FAILED',
                     'Action {action} failed on {name}',
-                    ['action' => $clickedAction->getTitle(), 'name' => $record->i18n_singular_name()]
+                    [
+                        'action' => $actionTitle,
+                        'name' => $record->i18n_singular_name(),
+                    ]
                 );
             } elseif (is_string($result)) {
                 // Result is a message
@@ -670,7 +717,10 @@ class ActionsGridFieldItemRequest extends DataExtension
             $message = _t(
                 'ActionsGridFieldItemRequest.DONE',
                 'Action {action} was done on {name}',
-                ['action' => $clickedAction->getTitle(), 'name' => $record->i18n_singular_name()]
+                [
+                    'action' => $actionTitle,
+                    'name' => $record->i18n_singular_name(),
+                ]
             );
         }
         $status = 'good';
@@ -822,7 +872,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      * @param string $dir prev|next
      * @param array<string,mixed> $data The form data
      * @param Form|null $form
-     * @return void
+     * @return HTTPResponse
      */
     protected function doSaveAndAdjacent(string $dir, array $data, ?Form $form)
     {
@@ -835,6 +885,10 @@ class ActionsGridFieldItemRequest extends DataExtension
         $class = get_class($record);
         if (!$class) {
             throw new Exception("Could not get class");
+        }
+
+        if (!in_array($dir, ['prev', 'next'])) {
+            throw new Exception("Invalid dir $dir");
         }
 
         $method = match ($dir) {

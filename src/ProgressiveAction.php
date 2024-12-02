@@ -4,6 +4,9 @@ namespace LeKoala\CmsActions;
 
 trait ProgressiveAction
 {
+    /**
+     * @var bool
+     */
     protected $progressive = false;
 
     /**
