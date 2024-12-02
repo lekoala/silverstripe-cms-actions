@@ -3,7 +3,6 @@
 namespace LeKoala\CmsActions;
 
 use Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use ReflectionMethod;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\Form;
