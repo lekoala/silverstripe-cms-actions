@@ -28,7 +28,6 @@ use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use ReflectionObject;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Core\Extension;
-use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\View\ViewableData;
 
 /**
@@ -536,10 +535,10 @@ class ActionsGridFieldItemRequest extends Extension
 
     /**
      * @param FieldList $actions
-     * @param DataObjectInterface $record
+     * @param ViewableData $record
      * @return void
      */
-    public function addSaveAndClose(FieldList $actions, DataObjectInterface $record)
+    public function addSaveAndClose(FieldList $actions, ViewableData $record)
     {
         if (!$this->checkCan($record)) {
             return;
@@ -567,10 +566,10 @@ class ActionsGridFieldItemRequest extends Extension
     /**
      * New and existing records have different classes
      *
-     * @param DataObjectInterface $record
+     * @param ViewableData $record
      * @return string
      */
-    protected function getBtnClassForRecord(DataObjectInterface $record)
+    protected function getBtnClassForRecord(ViewableData $record)
     {
         if ($record->ID) {
             return 'btn-outline-primary';
