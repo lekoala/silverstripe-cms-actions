@@ -15,7 +15,6 @@ use SilverStripe\Control\Director;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Forms\HiddenField;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
@@ -28,6 +27,9 @@ use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use ReflectionObject;
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Core\Extension;
+use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\View\ViewableData;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -42,7 +44,7 @@ use SilverStripe\Admin\ModelAdmin;
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons/blob/master/src/Extensions/GridFieldBetterButtonsItemRequest.php
  * @property LeftAndMain&GridFieldDetailForm_ItemRequest&ActionsGridFieldItemRequest $owner
  */
-class ActionsGridFieldItemRequest extends DataExtension
+class ActionsGridFieldItemRequest extends Extension
 {
     use Configurable;
     use Extensible;
@@ -333,12 +335,15 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     /**
      * Check if a record can be edited/created/exists
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return bool
      */
     protected function checkCan($record)
     {
-        if (!$record->canEdit() || (!$record->ID && !$record->canCreate())) {
+        $canEdit = $record->hasMethod('canEdit') ? $record->canEdit() : false;
+        $canCreate = $record->hasMethod('canCreate') ? $record->canCreate() : false;
+
+        if (!$canEdit || (!$record->ID && !$canCreate)) {
             return false;
         }
 
@@ -347,10 +352,10 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     /**
      * @param FieldList $actions
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return void
      */
-    public function moveCancelAndDelete(FieldList $actions, DataObject $record)
+    public function moveCancelAndDelete(FieldList $actions, ViewableData $record)
     {
         // We have a 4.4 setup, before that there was no RightGroup
         $RightGroup = $actions->fieldByName('RightGroup');
@@ -391,10 +396,10 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return bool
      */
-    public function useCustomPrevNext(DataObject $record): bool
+    public function useCustomPrevNext(ViewableData $record): bool
     {
         if (self::config()->enable_custom_prevnext) {
             return $record->hasMethod('PrevRecord') && $record->hasMethod('NextRecord');
@@ -403,10 +408,10 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return int
      */
-    public function getCustomPreviousRecordID(DataObject $record)
+    public function getCustomPreviousRecordID(ViewableData $record)
     {
         // This will overwrite state provided record
         if ($this->useCustomPrevNext($record)) {
@@ -417,10 +422,10 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return int
      */
-    public function getCustomNextRecordID(DataObject $record)
+    public function getCustomNextRecordID(ViewableData $record)
     {
 
         // This will overwrite state provided record
@@ -460,10 +465,10 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     /**
      * @param FieldList $actions
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return void
      */
-    public function addSaveNextAndPrevious(FieldList $actions, DataObject $record)
+    public function addSaveNextAndPrevious(FieldList $actions, ViewableData $record)
     {
         if (!$record->canEdit() || !$record->ID) {
             return;
@@ -531,10 +536,10 @@ class ActionsGridFieldItemRequest extends DataExtension
 
     /**
      * @param FieldList $actions
-     * @param DataObject $record
+     * @param DataObjectInterface $record
      * @return void
      */
-    public function addSaveAndClose(FieldList $actions, DataObject $record)
+    public function addSaveAndClose(FieldList $actions, DataObjectInterface $record)
     {
         if (!$this->checkCan($record)) {
             return;
@@ -562,10 +567,10 @@ class ActionsGridFieldItemRequest extends DataExtension
     /**
      * New and existing records have different classes
      *
-     * @param DataObject $record
+     * @param DataObjectInterface $record
      * @return string
      */
-    protected function getBtnClassForRecord(DataObject $record)
+    protected function getBtnClassForRecord(DataObjectInterface $record)
     {
         if ($record->ID) {
             return 'btn-outline-primary';
@@ -606,7 +611,7 @@ class ActionsGridFieldItemRequest extends DataExtension
     }
 
     /**
-     * Forward a given action to a DataObject
+     * Forward a given action to a DataObject/ViewableData
      *
      * Action must be declared in getCMSActions to be called
      *
@@ -1025,7 +1030,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      * Response object for this request after a successful save
      *
      * @param bool $isNewRecord True if this record was just created
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return HTTPResponse|DBHTMLText|string
      * @todo  This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
      * because it is a protected method and not visible to a decorator!
