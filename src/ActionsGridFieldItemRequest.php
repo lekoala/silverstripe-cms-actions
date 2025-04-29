@@ -777,7 +777,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         //@phpstan-ignore-next-line
         if (method_exists($clickedAction, 'getRedirectURL') && $clickedAction->getRedirectURL()) {
             // we probably need a full ui refresh
-            self::addXReload($clickedAction->getRedirectURL());
+            self::addXReload($controller, $clickedAction->getRedirectURL());
             //@phpstan-ignore-next-line
             return $controller->redirect($clickedAction->getRedirectURL());
         }
