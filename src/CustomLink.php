@@ -41,7 +41,6 @@ class CustomLink extends LiteralField
         if ($link && is_string($link)) {
             $this->link = $link;
         } else {
-            //@phpstan-ignore-next-line
             $this->link = $this->getModelLink($name, $link);
         }
     }

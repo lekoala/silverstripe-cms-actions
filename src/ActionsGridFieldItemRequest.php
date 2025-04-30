@@ -15,7 +15,6 @@ use SilverStripe\Control\Director;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Forms\HiddenField;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
@@ -28,6 +27,7 @@ use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use ReflectionObject;
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Core\Extension;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -40,9 +40,10 @@ use SilverStripe\Admin\ModelAdmin;
  *
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons
  * @link https://github.com/unclecheese/silverstripe-gridfield-betterbuttons/blob/master/src/Extensions/GridFieldBetterButtonsItemRequest.php
- * @property LeftAndMain&GridFieldDetailForm_ItemRequest&ActionsGridFieldItemRequest $owner
+ * @property \SilverStripe\Admin\LeftAndMain|\SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest|ActionsGridFieldItemRequest $owner
+ * @extends \SilverStripe\Core\Extension<object>
  */
-class ActionsGridFieldItemRequest extends DataExtension
+class ActionsGridFieldItemRequest extends Extension
 {
     use Configurable;
     use Extensible;
@@ -167,6 +168,7 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function updateItemEditForm($form)
     {
+        /** @var ?DataObject $record */
         $record = $this->owner->getRecord();
         if (!$record) {
             return;
@@ -205,7 +207,11 @@ class ActionsGridFieldItemRequest extends DataExtension
             return;
         }
 
+        /** @var ?DataObject $record */
         $record = $this->owner->getRecord();
+        if (!$record) {
+            return;
+        }
 
         // We get the actions as defined on our record
         /** @var FieldList $CMSActions */
@@ -422,7 +428,6 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     public function getCustomNextRecordID(DataObject $record)
     {
-
         // This will overwrite state provided record
         if ($this->useCustomPrevNext($record)) {
             //@phpstan-ignore-next-line
@@ -624,6 +629,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         $record = null;
         if ($this->owner->hasMethod('ItemEditForm')) {
             // It's a request handler. Don't check for a specific class as it may be subclassed
+            //@phpstan-ignore-next-line
             $record = $this->owner->record;
         } elseif ($controller->hasMethod('save_siteconfig')) {
             // Check for any type of siteconfig controller
@@ -643,6 +649,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         if (!$record) {
             throw new Exception("No record to handle the action $action on " . get_class($controller));
         }
+        /** @var DataObject $record */
         $definedActions = $record->getCMSActions();
         // Check if the action is indeed available
         $clickedAction = null;
@@ -728,7 +735,6 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Progressive actions return array with json data
-        //@phpstan-ignore-next-line
         if (method_exists($clickedAction, 'getProgressive') && $clickedAction->getProgressive()) {
             $response = $controller->getResponse();
             $response->addHeader('Content-Type', 'application/json');
@@ -755,7 +761,6 @@ class ActionsGridFieldItemRequest extends DataExtension
         if (Director::is_ajax()) {
             $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
 
-            //@phpstan-ignore-next-line
             if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
                 self::addXReload($controller);
             }
@@ -774,11 +779,9 @@ class ActionsGridFieldItemRequest extends DataExtension
         }
 
         // Custom redirect
-        //@phpstan-ignore-next-line
         if (method_exists($clickedAction, 'getRedirectURL') && $clickedAction->getRedirectURL()) {
             // we probably need a full ui refresh
             self::addXReload($controller, $clickedAction->getRedirectURL());
-            //@phpstan-ignore-next-line
             return $controller->redirect($clickedAction->getRedirectURL());
         }
 
@@ -875,11 +878,16 @@ class ActionsGridFieldItemRequest extends DataExtension
      */
     protected function doSaveAndAdjacent(string $dir, array $data, ?Form $form)
     {
+        //@phpstan-ignore-next-line
         $record = $this->owner->record;
         $this->owner->doSave($data, $form);
         // Redirect after save
         $controller = $this->getToplevelController();
         $controller->getResponse()->addHeader("X-Pjax", "Content");
+
+        if (!($record instanceof DataObject)) {
+            throw new Exception("Works only with DataObject");
+        }
 
         $class = get_class($record);
         if (!$class) {
@@ -1011,6 +1019,7 @@ class ActionsGridFieldItemRequest extends DataExtension
             //@phpstan-ignore-next-line
             $backlink = $toplevelController->Backlink();
         } elseif ($this->owner->getController()->hasMethod('Breadcrumbs')) {
+            //@phpstan-ignore-next-line
             $parents = $this->owner->getController()->Breadcrumbs(false)->items;
             $backlink = array_pop($parents)->Link;
         }
@@ -1037,6 +1046,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($this->isLeftAndMain($controller)) {
             // CMSMain => redirect to show
             if ($this->owner->hasMethod("LinkPageEdit")) {
+                //@phpstan-ignore-next-line
                 return $controller->redirect($this->owner->LinkPageEdit($record->ID));
             }
         }
@@ -1044,6 +1054,7 @@ class ActionsGridFieldItemRequest extends DataExtension
         if ($isNewRecord) {
             return $controller->redirect($this->owner->Link());
         }
+        //@phpstan-ignore-next-line
         if ($this->owner->gridField && $this->owner->gridField->getList()->byID($this->owner->record->ID)) {
             // Return new view, as we can't do a "virtual redirect" via the CMS Ajax
             // to the same URL (it assumes that its content is already current, and doesn't reload)
