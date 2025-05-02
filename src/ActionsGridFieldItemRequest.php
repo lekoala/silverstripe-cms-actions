@@ -28,6 +28,7 @@ use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use ReflectionObject;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Core\Extension;
+use SilverStripe\View\ViewableData;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -175,19 +176,20 @@ class ActionsGridFieldItemRequest extends Extension
         }
 
         // We get the actions as defined on our record
-        /** @var FieldList $CMSActions */
-        $CMSActions = $record->getCMSActions();
+        $CMSActions = $this->getCmsActionsFromRecord($record);
 
         $FormActions = $form->Actions();
 
         // Push our actions that are otherwise ignored by SilverStripe
-        foreach ($CMSActions as $CMSAction) {
-            $action = $FormActions->fieldByName($CMSAction->getName());
+        if ($CMSActions) {
+            foreach ($CMSActions as $CMSAction) {
+                $action = $FormActions->fieldByName($CMSAction->getName());
 
-            if ($action) {
-                // If it has been made readonly, revert
-                if ($CMSAction->isReadonly() != $action->isReadonly()) {
-                    $FormActions->replaceField($action->getName(), $action->setReadonly($CMSAction->isReadonly()));
+                if ($action) {
+                    // If it has been made readonly, revert
+                    if ($CMSAction->isReadonly() != $action->isReadonly()) {
+                        $FormActions->replaceField($action->getName(), $action->setReadonly($CMSAction->isReadonly()));
+                    }
                 }
             }
         }
@@ -207,15 +209,14 @@ class ActionsGridFieldItemRequest extends Extension
             return;
         }
 
-        /** @var ?DataObject $record */
+        /** @var DataObject|ViewableData|null $record */
         $record = $this->owner->getRecord();
         if (!$record) {
             return;
         }
 
         // We get the actions as defined on our record
-        /** @var FieldList $CMSActions */
-        $CMSActions = $record->getCMSActions();
+        $CMSActions = $this->getCmsActionsFromRecord($record);
 
         // The default button group that contains the Save or Create action
         // @link https://docs.silverstripe.org/en/4/developer_guides/customising_the_admin_interface/how_tos/extend_cms_interface/#extending-the-cms-actions
@@ -227,12 +228,14 @@ class ActionsGridFieldItemRequest extends Extension
         }
 
         // Push our actions that are otherwise ignored by SilverStripe
-        foreach ($CMSActions as $action) {
-            // Avoid duplicated actions (eg: when added by SilverStripe\Versioned\VersionedGridFieldItemRequest)
-            if ($actions->fieldByName($action->getName())) {
-                continue;
+        if ($CMSActions) {
+            foreach ($CMSActions as $action) {
+                // Avoid duplicated actions (eg: when added by SilverStripe\Versioned\VersionedGridFieldItemRequest)
+                if ($actions->fieldByName($action->getName())) {
+                    continue;
+                }
+                $actions->push($action);
             }
-            $actions->push($action);
         }
 
         // We create a Drop-Up menu afterwards because it may already exist in the $CMSActions
@@ -339,12 +342,22 @@ class ActionsGridFieldItemRequest extends Extension
 
     /**
      * Check if a record can be edited/created/exists
-     * @param DataObject $record
+     * @param ViewableData $record
+     * @param bool $editOnly
      * @return bool
      */
-    protected function checkCan($record)
+    protected function checkCan($record, $editOnly = false)
     {
-        if (!$record->canEdit() || (!$record->ID && !$record->canCreate())) {
+        // For ViewableData, we assume all methods should be implemented
+        // @link https://docs.silverstripe.org/en/5/developer_guides/forms/using_gridfield_with_arbitrary_data/#custom-edit
+        if (!method_exists($record, 'canEdit') || !method_exists($record, 'canCreate')) {
+            return false;
+        }
+        //@phpstan-ignore-next-line
+        if (!$record->ID && ($editOnly || !$record->canCreate())) {
+            return false;
+        }
+        if (!$record->canEdit()) {
             return false;
         }
 
@@ -352,11 +365,26 @@ class ActionsGridFieldItemRequest extends Extension
     }
 
     /**
+     * @param ViewableData $record
+     * @return ?FieldList
+     */
+    protected function getCmsActionsFromRecord(ViewableData $record)
+    {
+        if ($record instanceof DataObject) {
+            return $record->getCMSActions();
+        }
+        if (method_exists($record, 'getCMSActions')) {
+            return $record->getCMSActions();
+        }
+        return null;
+    }
+
+    /**
      * @param FieldList $actions
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return void
      */
-    public function moveCancelAndDelete(FieldList $actions, DataObject $record)
+    public function moveCancelAndDelete(FieldList $actions, ViewableData $record)
     {
         // We have a 4.4 setup, before that there was no RightGroup
         $RightGroup = $actions->fieldByName('RightGroup');
@@ -397,10 +425,10 @@ class ActionsGridFieldItemRequest extends Extension
     }
 
     /**
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return bool
      */
-    public function useCustomPrevNext(DataObject $record): bool
+    public function useCustomPrevNext(ViewableData $record): bool
     {
         if (self::config()->enable_custom_prevnext) {
             return $record->hasMethod('PrevRecord') && $record->hasMethod('NextRecord');
@@ -409,10 +437,10 @@ class ActionsGridFieldItemRequest extends Extension
     }
 
     /**
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return int
      */
-    public function getCustomPreviousRecordID(DataObject $record)
+    public function getCustomPreviousRecordID(ViewableData $record)
     {
         // This will overwrite state provided record
         if ($this->useCustomPrevNext($record)) {
@@ -423,10 +451,10 @@ class ActionsGridFieldItemRequest extends Extension
     }
 
     /**
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return int
      */
-    public function getCustomNextRecordID(DataObject $record)
+    public function getCustomNextRecordID(ViewableData $record)
     {
         // This will overwrite state provided record
         if ($this->useCustomPrevNext($record)) {
@@ -465,12 +493,12 @@ class ActionsGridFieldItemRequest extends Extension
 
     /**
      * @param FieldList $actions
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return void
      */
-    public function addSaveNextAndPrevious(FieldList $actions, DataObject $record)
+    public function addSaveNextAndPrevious(FieldList $actions, ViewableData $record)
     {
-        if (!$record->canEdit() || !$record->ID) {
+        if ($this->checkCan($record, true)) {
             return;
         }
 
@@ -536,10 +564,10 @@ class ActionsGridFieldItemRequest extends Extension
 
     /**
      * @param FieldList $actions
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return void
      */
-    public function addSaveAndClose(FieldList $actions, DataObject $record)
+    public function addSaveAndClose(FieldList $actions, ViewableData $record)
     {
         if (!$this->checkCan($record)) {
             return;
@@ -547,6 +575,7 @@ class ActionsGridFieldItemRequest extends Extension
 
         $MajorActions = $this->getMajorActions($actions);
 
+        //@phpstan-ignore-next-line
         if ($record->ID) {
             $label = _t('ActionsGridFieldItemRequest.SAVEANDCLOSE', 'Save and Close');
         } else {
@@ -555,6 +584,7 @@ class ActionsGridFieldItemRequest extends Extension
         $saveAndClose = new FormAction('doSaveAndClose', $label);
         $saveAndClose->addExtraClass($this->getBtnClassForRecord($record));
         $saveAndClose->setAttribute('data-text-alternate', $label);
+
         if ($record->ID) {
             $saveAndClose->setAttribute('data-btn-alternate-add', 'btn-primary');
             $saveAndClose->setAttribute('data-btn-alternate-remove', 'btn-outline-primary');
@@ -567,11 +597,12 @@ class ActionsGridFieldItemRequest extends Extension
     /**
      * New and existing records have different classes
      *
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return string
      */
-    protected function getBtnClassForRecord(DataObject $record)
+    protected function getBtnClassForRecord(ViewableData $record)
     {
+        //@phpstan-ignore-next-line
         if ($record->ID) {
             return 'btn-outline-primary';
         }
@@ -649,16 +680,19 @@ class ActionsGridFieldItemRequest extends Extension
         if (!$record) {
             throw new Exception("No record to handle the action $action on " . get_class($controller));
         }
-        /** @var DataObject $record */
-        $definedActions = $record->getCMSActions();
+        $CMSActions = $this->getCmsActionsFromRecord($record);
+
         // Check if the action is indeed available
         $clickedAction = null;
-        if (!empty($definedActions)) {
-            $clickedAction = self::findAction($action, $definedActions);
+        if (!empty($CMSActions)) {
+            $clickedAction = self::findAction($action, $CMSActions);
         }
         if (!$clickedAction) {
             $class = get_class($record);
-            $availableActions = implode(',', $this->getAvailableActions($definedActions));
+            $availableActions = null;
+            if ($CMSActions) {
+                $availableActions = implode(',', $this->getAvailableActions($CMSActions));
+            }
             if (!$availableActions) {
                 $availableActions = "(no available actions, please check getCMSActions)";
             }
@@ -682,12 +716,14 @@ class ActionsGridFieldItemRequest extends Extension
 
         // Check record BEFORE the action
         // It can be deleted by the action, and it will return to the list
-        $isNewRecord = $record->ID === 0;
+        $isNewRecord = isset($record->ID) && $record->ID === 0;
 
         $actionTitle = $clickedAction->getName();
         if (method_exists($clickedAction, 'getTitle')) {
             $actionTitle = $clickedAction->getTitle();
         }
+
+        $recordName = $record instanceof DataObject ? $record->i18n_singular_name() : _t('ActionsGridFieldItemRequest.record', 'record');
 
         try {
             $result = $record->$action($data, $form, $controller);
@@ -705,7 +741,7 @@ class ActionsGridFieldItemRequest extends Extension
                     'Action {action} failed on {name}',
                     [
                         'action' => $actionTitle,
-                        'name' => $record->i18n_singular_name(),
+                        'name' => $recordName,
                     ]
                 );
             } elseif (is_string($result)) {
@@ -725,7 +761,7 @@ class ActionsGridFieldItemRequest extends Extension
                 'Action {action} was done on {name}',
                 [
                     'action' => $actionTitle,
-                    'name' => $record->i18n_singular_name(),
+                    'name' => $recordName,
                 ]
             );
         }
@@ -1038,7 +1074,7 @@ class ActionsGridFieldItemRequest extends Extension
      * Response object for this request after a successful save
      *
      * @param bool $isNewRecord True if this record was just created
-     * @param DataObject $record
+     * @param ViewableData $record
      * @return HTTPResponse|DBHTMLText|string
      * @todo  This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
      * because it is a protected method and not visible to a decorator!

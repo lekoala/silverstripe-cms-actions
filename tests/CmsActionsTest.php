@@ -15,6 +15,14 @@ use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridFieldFilterHeader;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\GridField\GridFieldViewButton;
 
 /**
  * Tests for Cms Actions module
@@ -127,6 +135,57 @@ class CmsActionsTest extends SapphireTest
         } else {
             $GridFieldDetailForm = new GridFieldDetailForm_ItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
         }
+        $form = $GridFieldDetailForm->ItemEditForm();
+        $form->loadDataFrom($record);
+
+        return $form;
+    }
+
+    /**
+     * @param Controller $controller
+     * @param DataObject $record
+     * @return Form
+     */
+    public function getViewableForm($controller = null, $record = null)
+    {
+        $r1 = ArrayData::create([
+            'ID' => 1,
+            'FieldName' => 'This is an item',
+        ]);
+        $r2 = ArrayData::create([
+            'ID' => 2,
+            'FieldName' => 'This is a different item',
+        ]);
+
+        if (!$controller) {
+            $controller = Controller::curr();
+        }
+        if (!$record) {
+            $record = $r1;
+        }
+
+        $list = ArrayList::create([
+            $r1,
+            $r2,
+        ]);
+
+        $gridField = GridField::create('MyData', 'My data', $list);
+        $gridField->setForm(new Form($controller, "TestForm"));
+        $gridField->getConfig()->removeComponentsByType(GridFieldFilterHeader::class);
+        $columns = $gridField->getConfig()->getComponentByType(GridFieldDataColumns::class);
+        $columns->setDisplayFields([
+            'FieldName' => 'Column Header Label',
+        ]);
+        $detailForm = GridFieldDetailForm::create();
+        $detailForm->setFields(FieldList::create([
+            HiddenField::create('ID'),
+            TextField::create('FieldName', 'View Field Label'),
+        ]));
+        $gridField->getConfig()->addComponents([
+            GridFieldViewButton::create(),
+            $detailForm,
+        ]);
+        $GridFieldDetailForm = new GridFieldDetailForm_ItemRequest($gridField, $detailForm, $record, $controller, 'testPopup');
         $form = $GridFieldDetailForm->ItemEditForm();
         $form->loadDataFrom($record);
 
@@ -275,5 +334,13 @@ class CmsActionsTest extends SapphireTest
         $this->assertEquals('admin/model_admin/MyModel/EditForm/field/MyModel/item/0/ItemEditForm/field/OtherModel/item/0/doCustomLink?CustomLink=testAction', $link);
 
         $controller->getRequest()->setUrl('');
+    }
+
+    public function testViewable()
+    {
+        $form = $this->getViewableForm();
+
+        $doSaveAndClose = $form->Actions()->fieldByName("action_doSaveAndClose");
+        $this->assertNull($doSaveAndClose); // not available for ViewableData
     }
 }
