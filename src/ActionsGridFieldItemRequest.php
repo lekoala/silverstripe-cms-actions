@@ -779,6 +779,7 @@ class ActionsGridFieldItemRequest extends Extension
         }
 
         // Custom redirect
+        /** @var CustomAction $clickedAction */
         if (method_exists($clickedAction, 'getRedirectURL') && $clickedAction->getRedirectURL()) {
             // we probably need a full ui refresh
             self::addXReload($controller, $clickedAction->getRedirectURL());
@@ -802,7 +803,10 @@ class ActionsGridFieldItemRequest extends Extension
         if (!$url) {
             $url = $controller->getReferer();
         }
-        $controller->getResponse()->addHeader('X-ControllerURL', $url);
+        // Triggers a full reload. Without this header, it will use the pjax response
+        if ($url) {
+            $controller->getResponse()->addHeader('X-ControllerURL', $url);
+        }
         $controller->getResponse()->addHeader('X-Reload', "true");
     }
 
