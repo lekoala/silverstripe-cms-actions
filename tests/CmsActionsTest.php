@@ -23,6 +23,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\GridField\GridFieldViewButton;
+use SilverStripe\Dev\Deprecation;
 
 /**
  * Tests for Cms Actions module
@@ -338,6 +339,11 @@ class CmsActionsTest extends SapphireTest
 
     public function testViewable()
     {
+        $version = LeftAndMain::create()->CMSVersionNumber();
+        if (version_compare($version, '5.4') === -1) {
+            $this->markTestSkipped("Only works on 5.4");
+            return;
+        }
         $form = $this->getViewableForm();
 
         $doSaveAndClose = $form->Actions()->fieldByName("action_doSaveAndClose");
