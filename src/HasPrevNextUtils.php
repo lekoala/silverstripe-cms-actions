@@ -46,21 +46,13 @@ trait HasPrevNextUtils
 
         if ($this->ID && $getNextRecordID) {
             $utils->unshift(
-                $NextBtnLink = new CmsInlineFormAction(
-                    'NextBtnLink',
-                    _t('HasPrevNextUtils.Next', 'Next') . ' >',
-                    'btn-secondary'
-                )
+                $NextBtnLink = CmsInlineFormAction::create('NextBtnLink', _t('HasPrevNextUtils.Next', 'Next') . ' >', 'btn-secondary')
             );
             $NextBtnLink->setLink($NextRecordLink);
         }
         if ($this->ID && $getPreviousRecordID) {
             $utils->unshift(
-                $PrevBtnLink = new CmsInlineFormAction(
-                    'PrevBtnLink',
-                    '< ' . _t('HasPrevNextUtils.Previous', 'Previous'),
-                    'btn-secondary'
-                )
+                $PrevBtnLink = CmsInlineFormAction::create('PrevBtnLink', '< ' . _t('HasPrevNextUtils.Previous', 'Previous'), 'btn-secondary')
             );
             $PrevBtnLink->setLink($PrevRecordLink);
         }

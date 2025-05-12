@@ -111,10 +111,7 @@ class GridFieldTableLink implements GridField_HTMLProvider
     {
         $action = $this->getActionName();
 
-        $button = new CustomLink(
-            $action,
-            $this->getButtonLabel()
-        );
+        $button = CustomLink::create($action, $this->getButtonLabel());
         $button->addExtraClass('btn btn-secondary action_' . $action);
         if ($this->fontIcon) {
             $button->addExtraClass('font-icon-' . $this->fontIcon);
