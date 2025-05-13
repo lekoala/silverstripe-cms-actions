@@ -506,7 +506,7 @@ class ActionsGridFieldItemRequest extends Extension
         $isCustom = $this->useCustomPrevNext($record);
 
         // Coupling for HasPrevNextUtils
-        if (Controller::has_curr()) {
+        if (Controller::curr() instanceof Controller) {
             $prevLink = $nextLink = null;
             if (!$isCustom && $this->getOwner() instanceof GridFieldDetailForm_ItemRequest) {
                 if ($getPreviousRecordID) {
