@@ -103,15 +103,25 @@
             onclick: function (e) {
                 e.preventDefault();
                 var form = this.parents("form");
+
+                // store current form action
                 var action = form.attr("action");
                 var submitSelector = this.data("submit-selector");
+
+                // submit using our custom action
                 form.attr("action", this.data("action"));
 
-                // somehow this does nothing?
-                // form.submit();
+                if (submitSelector) {
+                    $(submitSelector).click();
+                } else {
+                    // somehow this does nothing?
+                    form.submit();
+                }
 
-                $(submitSelector).click();
-                form.attr("action", action);
+                // restore handler, give it some time to process
+                setTimeout(function () {
+                    form.attr("action", action);
+                }, 100);
             },
         });
 
