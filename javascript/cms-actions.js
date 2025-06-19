@@ -104,6 +104,16 @@
                 e.preventDefault();
                 var form = this.parents("form");
 
+                // elemental compat
+                var elementalArea = $(".elementalarea");
+                var elementPresent = false;
+                if (elementalArea.length) {
+                    if (!elementalArea.hasClass("elemental-area--read-only")) {
+                        elementalArea.addClass("elemental-area--read-only");
+                        elementPresent = true;
+                    }
+                }
+
                 // store current form action
                 var action = form.attr("action");
                 var submitSelector = this.data("submit-selector");
@@ -121,6 +131,10 @@
                 // restore handler, give it some time to process
                 setTimeout(function () {
                     form.attr("action", action);
+
+                    if (elementPresent) {
+                        elementalArea.removeClass("elemental-area--read-only");
+                    }
                 }, 100);
             },
         });
