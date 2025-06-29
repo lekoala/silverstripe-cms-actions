@@ -2,6 +2,7 @@
 
 namespace LeKoala\CmsActions;
 
+use SilverStripe\Control\HTTPResponse;
 use ReflectionClass;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -113,13 +114,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     {
         $action = $this->getActionName();
 
-        $button = new CustomGridField_FormAction(
-            $gridField,
-            $action,
-            $this->getButtonLabel(),
-            $action,
-            []
-        );
+        $button = CustomGridField_FormAction::create($gridField, $action, $this->getButtonLabel(), $action, []);
         if ($this->submitData) {
             $button->submitData = true;
         }
@@ -188,7 +183,7 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
      * @param string $actionName
      * @param array<mixed> $arguments
      * @param array<mixed> $data
-     * @return array<mixed>|\SilverStripe\Control\HTTPResponse|void
+     * @return array<mixed>|HTTPResponse|void
      */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {

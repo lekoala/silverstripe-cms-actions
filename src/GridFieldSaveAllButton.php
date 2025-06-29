@@ -2,11 +2,12 @@
 
 namespace LeKoala\CmsActions;
 
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+use Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use Exception;
 use SilverStripe\Control\HTTPResponse;
 
@@ -66,8 +67,8 @@ class GridFieldSaveAllButton extends GridFieldTableButton
             }
             // You can use the grid field component or a simple loop with write
             if ($this->useHandleSave) {
-                /** @var \Symbiote\GridFieldExtensions\GridFieldEditableColumns $component */
-                $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldEditableColumns::class);
+                /** @var GridFieldEditableColumns $component */
+                $component = $gridField->getConfig()->getComponentByType(GridFieldEditableColumns::class);
                 $component->handleSave($gridField, $record);
             } else {
                 foreach ($values as $k => $v) {
@@ -80,8 +81,8 @@ class GridFieldSaveAllButton extends GridFieldTableButton
         foreach ($newData as $idx => $values) {
             $record = new $model;
             if ($this->useHandleSave) {
-                /** @var \Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton $component */
-                $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton::class);
+                /** @var GridFieldAddNewInlineButton $component */
+                $component = $gridField->getConfig()->getComponentByType(GridFieldAddNewInlineButton::class);
                 $component->handleSave($gridField, $record);
             } else {
                 foreach ($values as $k => $v) {
