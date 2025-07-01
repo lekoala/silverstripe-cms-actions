@@ -31,6 +31,7 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripe\Control\RequestHandler;
+use SilverStripe\View\Requirements;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -176,14 +177,11 @@ class ActionsGridFieldItemRequest extends Extension
 
         // Display pending message after a X-Reload
         $curr = Controller::curr();
-        if ($curr && $curr->getRequest()->isGET() && $pendingMessage = $curr->getRequest()->getSession()->get('CmsActionsPendingMessage')) {
-            if (!empty($pendingMessage['display'])) {
-                $curr->getRequest()->getSession()->clear('CmsActionsPendingMessage');
-                $form->sessionMessage($pendingMessage['message'], $pendingMessage['status'], ValidationResult::CAST_HTML);
-            } else {
-                $pendingMessage['display'] = true;
-                $curr->getRequest()->getSession()->set('CmsActionsPendingMessage', $pendingMessage);
-            }
+        if ($curr && !Director::is_ajax() && $pendingMessage = $curr->getRequest()->getSession()->get('CmsActionsPendingMessage')) {
+            $curr->getRequest()->getSession()->clear('CmsActionsPendingMessage');
+            $text = addslashes($pendingMessage['message'] ?? '');
+            $type = addslashes($pendingMessage['status'] ?? 'good');
+            Requirements::customScript("jQuery.noticeAdd({text: '$text', type: '$type', stayTime: 5000, inEffect: {left: '0', opacity: 'show'}});");
         }
 
         // We get the actions as defined on our record
@@ -817,23 +815,23 @@ class ActionsGridFieldItemRequest extends Extension
         $shouldRefresh = method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh();
 
         // When loading using pjax, we can show toasts through X-Status
-        if (Director::is_ajax() && !$shouldRefresh) {
+        if (Director::is_ajax()) {
             $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
             // 4xx status makes a red box
             if ($error) {
                 $controller->getResponse()->setStatusCode(400);
             }
-        } else {
+
             if ($shouldRefresh) {
                 self::addXReload($controller);
 
                 // Store a pending session message to display after reload
                 $controller->getRequest()->getSession()->set('CmsActionsPendingMessage', [
                     'message' => $message,
-                    'status' => $status
+                    'status' => $status,
                 ]);
             }
-
+        } else {
             // If the controller support sessionMessage, use it instead of form
             if ($controller->hasMethod('sessionMessage')) {
                 //@phpstan-ignore-next-line
@@ -856,23 +854,28 @@ class ActionsGridFieldItemRequest extends Extension
     }
 
     /**
-     * Requires a ControllerURL as well, see
-     * https://github.com/silverstripe/silverstripe-admin/blob/a3aa41cea4c4df82050eef65ad5efcfae7bfde69/client/src/legacy/LeftAndMain.js#L773-L780
+     * Adds X-Reload headers
      *
      * @param Controller $controller
      * @param string|null $url
-     * @return void
+     * @return bool Returns true if will reload
      */
-    public static function addXReload(Controller $controller, ?string $url = null): void
+    public static function addXReload(Controller $controller, ?string $url = null): bool
     {
         if (!$url) {
             $url = $controller->getReferer();
         }
-        // Triggers a full reload. Without this header, it will use the pjax response
-        if ($url) {
-            $controller->getResponse()->addHeader('X-ControllerURL', $url);
+        if (!$url) {
+            $url = $controller->getBackURL();
         }
+        if (!$url) {
+            return false;
+        }
+        // Triggers a full reload. Needs both headers to work
+        // @link https://github.com/silverstripe/silverstripe-admin/blob/3/client/src/legacy/LeftAndMain.js#L819
+        $controller->getResponse()->addHeader('X-ControllerURL', $url);
         $controller->getResponse()->addHeader('X-Reload', "true");
+        return true;
     }
 
     /**
