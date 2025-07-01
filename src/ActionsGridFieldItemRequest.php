@@ -325,8 +325,10 @@ class ActionsGridFieldItemRequest extends Extension
     protected function createDropUpContainer($actions)
     {
         $rootTabSet = TabSet::create('ActionMenus');
-        $dropUpContainer = Tab::create('MoreOptions',
-            _t(__CLASS__ . '.MoreOptions', 'More options', 'Expands a view for more buttons'));
+        $dropUpContainer = Tab::create(
+            'MoreOptions',
+            _t(__CLASS__ . '.MoreOptions', 'More options', 'Expands a view for more buttons')
+        );
         $dropUpContainer->addExtraClass('popover-actions-simulate');
         $rootTabSet->push($dropUpContainer);
         $rootTabSet->addExtraClass('ss-ui-action-tabset action-menus noborder');
@@ -529,16 +531,20 @@ class ActionsGridFieldItemRequest extends Extension
         }
 
         if ($getPreviousRecordID) {
-            $doSaveAndPrev = FormAction::create('doSaveAndPrev',
-                _t('ActionsGridFieldItemRequest.SAVEANDPREVIOUS', 'Save and Previous'));
+            $doSaveAndPrev = FormAction::create(
+                'doSaveAndPrev',
+                _t('ActionsGridFieldItemRequest.SAVEANDPREVIOUS', 'Save and Previous')
+            );
             $doSaveAndPrev->addExtraClass($this->getBtnClassForRecord($record));
             $doSaveAndPrev->addExtraClass('font-icon-angle-double-left btn-mobile-collapse');
             $doSaveAndPrev->setUseButtonTag(true);
             $MajorActions->push($doSaveAndPrev);
         }
         if ($getNextRecordID) {
-            $doSaveAndNext = FormAction::create('doSaveAndNext',
-                _t('ActionsGridFieldItemRequest.SAVEANDNEXT', 'Save and Next'));
+            $doSaveAndNext = FormAction::create(
+                'doSaveAndNext',
+                _t('ActionsGridFieldItemRequest.SAVEANDNEXT', 'Save and Next')
+            );
             $doSaveAndNext->addExtraClass($this->getBtnClassForRecord($record));
             $doSaveAndNext->addExtraClass('font-icon-angle-double-right btn-mobile-collapse');
             $doSaveAndNext->setUseButtonTag(true);
@@ -721,8 +727,10 @@ class ActionsGridFieldItemRequest extends Extension
             $actionTitle = $clickedAction->getTitle();
         }
 
-        $recordName = $record instanceof DataObject ? $record->i18n_singular_name() : _t('ActionsGridFieldItemRequest.record',
-            'record');
+        $recordName = $record instanceof DataObject ? $record->i18n_singular_name() : _t(
+            'ActionsGridFieldItemRequest.record',
+            'record'
+        );
 
         try {
             $result = $record->$action($data, $form, $controller);
