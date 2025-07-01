@@ -120,12 +120,6 @@ td>.action.btn {
     color: #fff;
 }
 
-.ui-widget-content a,
-.ui-widget a,
-.ui-widget.ui-widget-content a {
-    color: var(--bs-btn-color, #0071c4);
-}
-
 .ui-widget a.btn.btn-secondary.custom-link {
     color: #566b8d;
 }

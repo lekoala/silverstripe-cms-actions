@@ -30,6 +30,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\VersionedGridFieldItemRequest;
+use SilverStripe\Control\RequestHandler;
 
 /**
  * Decorates GridDetailForm_ItemRequest to use new form actions and buttons.
@@ -1044,9 +1045,7 @@ class ActionsGridFieldItemRequest extends Extension
     /**
      * Gets the top level controller.
      *
-     * @return Controller
-     * @todo  This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
-     * because it is a protected method and not visible to a decorator!
+     * @return Controller|RequestHandler
      */
     protected function getToplevelController()
     {
@@ -1104,8 +1103,6 @@ class ActionsGridFieldItemRequest extends Extension
      * @param bool $isNewRecord True if this record was just created
      * @param ModelData $record
      * @return HTTPResponse|DBHTMLText|string
-     * @todo  This had to be directly copied from {@link GridFieldDetailForm_ItemRequest}
-     * because it is a protected method and not visible to a decorator!
      */
     protected function redirectAfterAction($isNewRecord, $record = null)
     {
