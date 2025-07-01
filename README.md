@@ -1,6 +1,6 @@
 # SilverStripe Cms Actions module
 
-![Build Status](https://github.com/lekoala/silverstripe-cms-actions/actions/workflows/ci.yml/badge.svg)
+[![Build Status](https://github.com/lekoala/silverstripe-cms-actions/actions/workflows/ci.yml/badge.svg)](https://github.com/lekoala/silverstripe-cms-actions/actions)
 [![Build Status](https://app.travis-ci.com/lekoala/silverstripe-cms-actions.svg?branch=master)](https://app.travis-ci.com/lekoala/silverstripe-cms-actions)
 [![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-cms-actions/)
 [![Code coverage](https://codecov.io/gh/lekoala/silverstripe-cms-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-cms-actions)
@@ -521,7 +521,9 @@ This module is kindly sponsored by [RESTRUCT](restruct.nl)
 
 ## Compatibility
 
-Tested with 5.1 but should work on any ^5.1 projects
+Branch 1 - Tested with 5.1 but should work on any ^5.1 projects
+
+Branch 2/master - SilverStripe 6+
 
 ## Maintainer
 
