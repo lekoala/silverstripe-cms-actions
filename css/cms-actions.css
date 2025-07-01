@@ -4,12 +4,6 @@ html,
     scroll-padding-top: 53px;
 }
 
-/* Only necessary pre 4.4 */
-#Form_ItemEditForm_action_doDelete.align-right {
-    position: absolute;
-    right: 1.5385rem;
-}
-
 /* Add some spacing on the right */
 .cms-content-header-utils {
     padding-right: 1.5385rem;
@@ -114,12 +108,22 @@ td>.action.btn {
     margin-right: 0;
 }
 
+.toolbar--south .btn-toolbar>.btn-group:not(:first-child)+label {
+    margin-left: 5px;
+}
+
 /* a.btn */
 .ui-widget.ui-widget-content a.btn.custom-action,
 .ui-widget a.btn.custom-action,
 .ui-widget.ui-widget-content .cms-content-actions a.btn.custom-link,
 .ui-widget .cms-content-actions a.btn.custom-link {
     color: #fff;
+}
+
+.ui-widget-content a,
+.ui-widget a,
+.ui-widget.ui-widget-content a {
+    color: var(--bs-btn-color, #0071c4);
 }
 
 .ui-widget a.btn.btn-secondary.custom-link {

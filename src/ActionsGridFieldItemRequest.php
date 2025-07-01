@@ -173,6 +173,18 @@ class ActionsGridFieldItemRequest extends Extension
             return;
         }
 
+        // Display pending message after a X-Reload
+        $curr = Controller::curr();
+        if ($curr && $curr->getRequest()->isGET() && $pendingMessage = $curr->getRequest()->getSession()->get('CmsActionsPendingMessage')) {
+            if (!empty($pendingMessage['display'])) {
+                $curr->getRequest()->getSession()->clear('CmsActionsPendingMessage');
+                $form->sessionMessage($pendingMessage['message'], $pendingMessage['status'], ValidationResult::CAST_HTML);
+            } else {
+                $pendingMessage['display'] = true;
+                $curr->getRequest()->getSession()->set('CmsActionsPendingMessage', $pendingMessage);
+            }
+        }
+
         // We get the actions as defined on our record
         $CMSActions = $this->getCmsActionsFromRecord($record);
 
@@ -801,17 +813,26 @@ class ActionsGridFieldItemRequest extends Extension
             return $message;
         }
 
-        if (Director::is_ajax()) {
-            $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
+        $shouldRefresh = method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh();
 
-            if (method_exists($clickedAction, 'getShouldRefresh') && $clickedAction->getShouldRefresh()) {
-                self::addXReload($controller);
-            }
+        // When loading using pjax, we can show toasts through X-Status
+        if (Director::is_ajax() && !$shouldRefresh) {
+            $controller->getResponse()->addHeader('X-Status', rawurlencode($message));
             // 4xx status makes a red box
             if ($error) {
                 $controller->getResponse()->setStatusCode(400);
             }
         } else {
+            if ($shouldRefresh) {
+                self::addXReload($controller);
+
+                // Store a pending session message to display after reload
+                $controller->getRequest()->getSession()->set('CmsActionsPendingMessage', [
+                    'message' => $message,
+                    'status' => $status
+                ]);
+            }
+
             // If the controller support sessionMessage, use it instead of form
             if ($controller->hasMethod('sessionMessage')) {
                 //@phpstan-ignore-next-line
