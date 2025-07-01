@@ -15,15 +15,14 @@ use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\View\ArrayData;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\GridField\GridFieldViewButton;
-use SilverStripe\Dev\Deprecation;
+use SilverStripe\Model\ArrayData;
+use SilverStripe\Model\List\ArrayList;
 
 /**
  * Tests for Cms Actions module
@@ -37,9 +36,9 @@ class CmsActionsTest extends SapphireTest
     protected static $fixture_file = 'CmsActionsTest.yml';
     protected static $fixture_file_simple = 'CmsActionsSimpleTest.yml';
 
-    protected static $extra_dataobjects = array(
+    protected static $extra_dataobjects = [
         Test_CmsActionsModel::class,
-    );
+    ];
 
     public static function get_fixture_file()
     {
@@ -340,10 +339,6 @@ class CmsActionsTest extends SapphireTest
     public function testViewable()
     {
         $version = LeftAndMain::create()->CMSVersionNumber();
-        if (version_compare($version, '5.4') === -1) {
-            $this->markTestSkipped("Only works on 5.4");
-            return;
-        }
         $form = $this->getViewableForm();
 
         $doSaveAndClose = $form->Actions()->fieldByName("action_doSaveAndClose");
