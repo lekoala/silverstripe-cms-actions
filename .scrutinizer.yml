@@ -1,12 +1,13 @@
+inherit: true
+
 build:
+  image: default-bionic
   environment:
-    php:
-      version: 8.3.6
+    php: 8.3.22
   nodes:
     analysis:
       tests:
-        override:
-          - php-scrutinizer-run
+        override: [php-scrutinizer-run]
 
 checks:
   php:
