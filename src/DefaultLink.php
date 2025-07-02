@@ -31,7 +31,7 @@ trait DefaultLink
      * @param array<mixed>|null $params
      * @return string
      */
-    public function getModelLink($action, array $params = null)
+    public function getModelLink($action, ?array $params = null)
     {
         if ($params === null) {
             $params = [];
@@ -71,7 +71,7 @@ trait DefaultLink
      * @param array|null $params
      * @return string
      */
-    public function getControllerLink($action, array $params = null)
+    public function getControllerLink($action, ?array $params = null)
     {
         if ($params === null) {
             $params = [];
