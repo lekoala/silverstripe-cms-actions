@@ -498,7 +498,7 @@ class ActionsGridFieldItemRequest extends Extension
      */
     public function addSaveNextAndPrevious(FieldList $actions, ViewableData $record)
     {
-        if ($this->checkCan($record, true)) {
+        if (!$this->checkCan($record, true)) {
             return;
         }
 
