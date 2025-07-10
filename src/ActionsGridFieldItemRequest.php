@@ -415,6 +415,14 @@ class ActionsGridFieldItemRequest extends Extension
                 //@phpstan-ignore-next-line
                 $deleteAction->setTitle($record->getDeleteButtonTitle());
             }
+        } else {
+            // Add disabled delete action to avoid clicking by mistake on delete
+            // if it was not there when navigating
+            $actions->push($fakeDelete = new FormAction('doDelete', _t('SilverStripe\\Forms\\GridField\\GridFieldDetailForm.Delete', 'Delete')));
+            $fakeDelete
+                ->setUseButtonTag(true)
+                ->addExtraClass('btn-group-spacer btn-hide-outline font-icon-trash-bin')
+                ->setDisabled(true);
         }
         // Move cancel at the end
         $cancelButton = $actions->fieldByName('cancelbutton');

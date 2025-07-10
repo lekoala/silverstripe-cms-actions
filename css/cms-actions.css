@@ -31,6 +31,11 @@ You can also use it on your own classes with .btn-icon-end */
     margin-left: 5px;
 }
 
+/* Make it more specific */
+.btn.btn-hide-outline {
+    border-color: rgba(0, 0, 0, 0);
+}
+
 /* Misc stuff - check if still necessary */
 label.btn {
     margin-bottom: 0;
