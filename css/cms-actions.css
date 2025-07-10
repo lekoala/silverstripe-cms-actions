@@ -26,6 +26,11 @@ You can also use it on your own classes with .btn-icon-end */
     padding-right: 1.5385rem;
 }
 
+/* Add spacing even if the group before has no margin right */
+.btn-toolbar>.btn-group+.btn.btn-group-spacer {
+    margin-left: 5px;
+}
+
 /* Misc stuff - check if still necessary */
 label.btn {
     margin-bottom: 0;

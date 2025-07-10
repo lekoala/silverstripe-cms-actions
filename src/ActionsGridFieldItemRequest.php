@@ -405,6 +405,7 @@ class ActionsGridFieldItemRequest extends Extension
             $actions->remove($deleteAction);
             $actions->push($deleteAction);
 
+            $deleteAction->addExtraClass('btn-group-spacer');
             if (!$RightGroup) {
                 // Only necessary pre 4.4
                 $deleteAction->addExtraClass('align-right');
@@ -421,6 +422,8 @@ class ActionsGridFieldItemRequest extends Extension
             // Move at the end of the stack
             $actions->remove($cancelButton);
             $actions->push($cancelButton);
+
+            $cancelButton->addExtraClass('btn-group-spacer');
             if (!$RightGroup) {
                 // Only necessary pre 4.4
                 $cancelButton->addExtraClass('align-right');
