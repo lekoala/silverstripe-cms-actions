@@ -1049,7 +1049,7 @@ class ActionsGridFieldItemRequest extends Extension
 
     /**
      * Sets the backlink for save and close buttons.
-     * 
+     *
      * @param string $backlink
      * @return $this
      */
