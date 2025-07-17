@@ -84,6 +84,8 @@ class ActionsGridFieldItemRequest extends Extension
         'doCustomLink', // For CustomLink
     ];
 
+    protected string $backlink = '';
+
     /**
      * @param FieldList $actions
      * @return array<string>
@@ -1046,12 +1048,28 @@ class ActionsGridFieldItemRequest extends Extension
     }
 
     /**
+     * Sets the backlink for save and close buttons.
+     * 
+     * @param string $backlink
+     * @return $this
+     */
+    public function setBacklink(string $backlink): self
+    {
+        $this->backlink = $backlink;
+        return $this;
+    }
+
+    /**
      * Gets the back link
      *
      * @return string
      */
     public function getBackLink()
     {
+        if ($this->backlink) {
+            return $this->backlink;
+        }
+
         $backlink = '';
         $toplevelController = $this->getToplevelController();
         // Check for LeftAndMain and alike controllers with a Backlink or Breadcrumbs methods
