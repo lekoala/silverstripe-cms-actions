@@ -9,6 +9,8 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use Exception;
 use SilverStripe\Control\HTTPResponse;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+use Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton;
 
 /**
  * When using inline editing on a ModelAdmin, there is no save button
@@ -58,37 +60,38 @@ class GridFieldSaveAllButton extends GridFieldTableButton
             throw new Exception("Requires a DataList");
         }
 
-        $updatedData = $data[$fieldName]['GridFieldEditableColumns'] ?? [];
-        foreach ($updatedData as $id => $values) {
-            $record = $list->byID($id);
-            if (!$record) {
-                continue;
-            }
-            // You can use the grid field component or a simple loop with write
-            if ($this->useHandleSave) {
-                /** @var \Symbiote\GridFieldExtensions\GridFieldEditableColumns $component */
-                $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldEditableColumns::class);
-                $component->handleSave($gridField, $record);
-            } else {
-                foreach ($values as $k => $v) {
-                    $record->$k = $v;
+        if ($this->useHandleSave) {
+            /** @var GridFieldEditableColumns $component */
+            $component = $gridField->getConfig()->getComponentByType(GridFieldEditableColumns::class);
+            $component->handleSave($gridField, singleton($model));
+
+            /** @var GridFieldAddNewInlineButton $component */
+            $component = $gridField->getConfig()->getComponentByType(GridFieldAddNewInlineButton::class);
+            $component->handleSave($gridField, singleton($model));
+        } else {
+            foreach ($data[$fieldName]['GridFieldEditableColumns'] ?? [] as $id => $values) {
+                $record = $list->byID($id);
+
+                if (!$record) {
+                    continue;
                 }
+
+                foreach ($values as $key => $value) {
+                    $record->$key = $value;
+                }
+
                 $record->write();
             }
-        }
-        $newData = $data[$fieldName]['GridFieldAddNewInlineButton'] ?? [];
-        foreach ($newData as $idx => $values) {
-            $record = new $model;
-            if ($this->useHandleSave) {
-                /** @var \Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton $component */
-                $component = $gridField->getConfig()->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton::class);
-                $component->handleSave($gridField, $record);
-            } else {
-                foreach ($values as $k => $v) {
-                    $record->$k = $v;
+
+            foreach ($data[$fieldName]['GridFieldAddNewInlineButton'] ?? [] as $values) {
+                $record = new $model;
+
+                foreach ($values as $key => $value) {
+                    $record->$key = $value;
                 }
+
+                $record->write();
             }
-            $record->write();
         }
 
         $response = $controller->getResponse();
