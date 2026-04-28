@@ -581,7 +581,6 @@ class ActionsGridFieldItemRequest extends Extension
         $this->getOwner()->getStateManager();
         $reflObject = new ReflectionObject($this->getOwner());
         $reflMethod = $reflObject->getMethod('getEditLinkForAdjacentRecord');
-        $reflMethod->setAccessible(true);
 
         try {
             return $reflMethod->invoke($this->getOwner(), $offset);
