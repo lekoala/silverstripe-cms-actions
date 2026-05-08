@@ -693,7 +693,7 @@ class ActionsGridFieldItemRequest extends Extension
             // Check for any type of siteconfig controller
             $record = SiteConfig::current_site_config();
         } elseif (!empty($data['ClassName']) && !empty($data['ID'])) {
-            $record = DataObject::get_by_id($data['ClassName'], $data['ID']);
+            $record = DataObject::get($data['ClassName'])->byID($data['ID']);
         } elseif ($controller->hasMethod("getRecord")) {
             // LeftAndMain requires an id
             if ($controller instanceof LeftAndMain && !empty($data['ID'])) {
@@ -886,7 +886,7 @@ class ActionsGridFieldItemRequest extends Extension
         // Triggers a full reload. Needs both headers to work
         // @link https://github.com/silverstripe/silverstripe-admin/blob/3/client/src/legacy/LeftAndMain.js#L819
         $controller->getResponse()->addHeader('X-ControllerURL', $url);
-        $controller->getResponse()->addHeader('X-Reload', "true");
+        $controller->getResponse()->addHeader('X-Reload', true);
         return true;
     }
 
@@ -1141,9 +1141,9 @@ class ActionsGridFieldItemRequest extends Extension
 
         if ($this->isLeftAndMain($controller)) {
             // CMSMain => redirect to show
-            if ($this->getOwner()->hasMethod("LinkPageEdit")) {
+            if ($this->getOwner()->hasMethod("LinkRecordEdit")) {
                 //@phpstan-ignore-next-line
-                return $controller->redirect($this->getOwner()->LinkPageEdit($record->ID));
+                return $controller->redirect($this->getOwner()->LinkRecordEdit($record->ID));
             }
         }
 
