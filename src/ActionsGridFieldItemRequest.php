@@ -903,9 +903,7 @@ class ActionsGridFieldItemRequest extends Extension
         $controller = $this->getToplevelController();
 
         $link = $this->getBackLink();
-
-        // Doesn't seem to be needed anymore
-        // $link = $this->addGridState($link, $data);
+        $link = $this->addGridState($link, $data);
 
         $controller->getResponse()->addHeader("X-Pjax", "Content");
 
