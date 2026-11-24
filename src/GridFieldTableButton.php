@@ -8,15 +8,12 @@ use SilverStripe\Control\Director;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
-use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Provide a simple way to declare buttons that affects a whole GridField
- *
- * This implements a URL Handler that can be called by the button
  */
-abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
+abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField_ActionProvider
 {
     use ProgressiveAction;
     use Injectable;
@@ -253,20 +250,14 @@ abstract class GridFieldTableButton implements GridField_HTMLProvider, GridField
     }
 
     /**
-     * it is also a URL
-     * @return array<string,string>
-     */
-    public function getURLHandlers($gridField)
-    {
-        return [$this->getActionName() => 'handle'];
-    }
-
-    /**
-     * TODO: update the actual method with the new arguments
+     * Run the table button action.
+     *
+     * handleAction() also passes the action arguments and submitted form data.
+     * Subclasses can receive them by declaring $arguments and $data as optional
+     * third and fourth parameters, respectively.
+     *
      * @param GridField $gridField
      * @param Controller $controller
-     * @param array<mixed> $arguments
-     * @param array<mixed> $data
      * @return mixed
      */
     abstract public function handle(GridField $gridField, Controller $controller);
